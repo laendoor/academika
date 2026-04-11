@@ -1,0 +1,212 @@
+Legajo;DNI;Carrera;Regular;Calidad;Cod.Materia;Nombre_materia;Fecha;Result;Nota;Forma Aprobación;Créditos;Acta Promo;Acta Ex;Plan
+12001;35120001;P;;;80005;Elementos de Programación y Lógica;01/12/2019;P;4;Examen;10;0;1231;2015
+12001;35120001;P;;;80000;Lectura y Escritura Académica;20/07/2018;P;7;Examen;10;0;8959;2015
+12001;35120001;P;;;80003;Matemática;15/07/2018;P;8;Examen;10;0;4555;2015
+12001;35120001;P;;;487;Introducción a la Programación;08/12/2018;P;6;Examen;18;0;3342;2015
+12001;35120001;P;;;1033;Matemática I;02/02/2019;P;7;Examen;16;0;3490;2015
+12001;35120001;P;;;1032;Organización de Computadoras;08/12/2018;P;6;Examen;12;0;5419;2015
+12001;35120001;P;;;1036;Estructuras de Datos;24/07/2019;P;9;Examen;16;0;1423;2015
+12001;35120001;P;;;1034;Programación con Objetos I;03/12/2019;P;6;Examen;16;0;7909;2015
+12001;35120001;P;;;1035;Bases de Datos;17/12/2019;P;10;Examen;12;0;8440;2015
+12001;35120001;P;;;1041;Matemática II;11/02/2020;P;6;Examen;8;0;9228;2015
+12001;35120001;P;;;1037;Programación con Objetos II;26/12/2019;P;9;Examen;12;0;2979;2015
+12001;35120001;P;;;1038;Redes de Computadoras;22/02/2020;P;7;Examen;12;0;2289;2015
+12001;35120001;P;;;1039;Sistemas Operativos;04/12/2019;P;10;Examen;12;0;4203;2015
+12001;35120001;P;;;1045;Programación Funcional;22/02/2020;P;9;Examen;8;0;6694;2015
+12001;35120001;P;;;1043;Construcción de Interfaces de Usuario;13/07/2020;P;6;Examen;12;0;2859;2015
+12001;35120001;P;;;1042;Elementos de Ingeniería de Software;05/12/2020;R;2;Examen;12;0;0;2015
+12001;35120001;P;;;1044;Estrategias de Persistencia;23/07/2020;P;9;Examen;12;0;7686;2015
+12001;35120001;P;;;1047;Laboratorio de Sistemas Operativos y Redes;06/07/2021;P;5;Examen;8;0;6389;2015
+12001;35120001;P;;;1046;Desarrollo de Aplicaciones;04/02/2021;P;10;Examen;12;0;3180;2015
+12001;35120001;P;;;1040;Programación Concurrente;24/02/2021;P;9;Examen;8;0;5196;2015
+12001;35120001;P;;;1305;Práctica del Desarrollo de Software;06/12/2020;P;7;Examen;16;0;6418;2015
+12002;37450023;P;;;80005;Elementos de Programación y Lógica;11/07/2019;P;10;Examen;10;0;3549;2015
+12002;37450023;P;;;80000;Lectura y Escritura Académica;23/07/2019;P;10;Examen;10;0;7714;2015
+12002;37450023;P;;;80003;Matemática;12/12/2019;A;A;Equivalencia;10;0;0;2015
+12002;37450023;P;;;487;Introducción a la Programación;03/02/2020;P;7;Examen;18;0;3812;2015
+12002;37450023;P;;;1033;Matemática I;27/02/2020;P;8;Examen;16;0;8058;2015
+12002;37450023;P;;;1032;Organización de Computadoras;03/02/2020;P;8;Examen;12;0;6378;2015
+12002;37450023;P;;;1036;Estructuras de Datos;05/07/2020;R;1;Examen;16;0;0;2015
+12002;37450023;P;;;1034;Programación con Objetos I;28/12/2020;R;1;Examen;16;0;0;2015
+12002;37450023;P;;;1035;Bases de Datos;25/07/2020;P;7;Examen;12;0;9883;2015
+12002;37450023;P;;;1041;Matemática II;25/02/2021;P;8;Examen;8;0;1909;2015
+12002;37450023;P;;;1037;Programación con Objetos II;19/12/2020;R;1;Examen;12;0;0;2015
+12002;37450023;P;;;1038;Redes de Computadoras;12/12/2020;P;10;Examen;12;0;8218;2015
+12002;37450023;P;;;1039;Sistemas Operativos;08/12/2020;R;1;Examen;12;0;0;2015
+12002;37450023;P;;;1045;Programación Funcional;28/12/2020;P;6;Examen;8;0;3953;2015
+12002;37450023;P;;;1043;Construcción de Interfaces de Usuario;11/12/2022;P;5;Examen;12;0;6116;2015
+12002;37450023;P;;;1042;Elementos de Ingeniería de Software;03/07/2021;P;6;Examen;12;0;1829;2015
+12002;37450023;P;;;1044;Estrategias de Persistencia;16/07/2021;P;6;Examen;12;0;5450;2015
+12002;37450023;P;;;1047;Laboratorio de Sistemas Operativos y Redes;16/07/2021;P;9;Examen;8;0;1486;2015
+12002;37450023;P;;;1046;Desarrollo de Aplicaciones;20/12/2021;P;10;Examen;12;0;4936;2015
+12002;37450023;P;;;1040;Programación Concurrente;20/02/2022;P;8;Examen;8;0;9862;2015
+12002;37450023;P;;;1305;Práctica del Desarrollo de Software;14/02/2023;P;4;Examen;16;0;2161;2015
+12003;38901234;P;;;80005;Elementos de Programación y Lógica;19/07/2020;P;10;Examen;10;0;9855;2015
+12003;38901234;P;;;80000;Lectura y Escritura Académica;23/12/2020;P;9;Examen;10;0;7455;2015
+12003;38901234;P;;;80003;Matemática;19/12/2020;P;7;Examen;10;0;6240;2015
+12003;38901234;P;;;487;Introducción a la Programación;04/02/2021;P;8;Examen;18;0;7047;2015
+12003;38901234;P;;;1033;Matemática I;24/02/2021;A;A;Equivalencia;16;0;0;2015
+12003;38901234;P;;;1032;Organización de Computadoras;17/12/2021;P;4;Examen;12;0;2991;2015
+12003;38901234;P;;;1036;Estructuras de Datos;23/12/2021;P;7;Examen;16;0;4506;2015
+12003;38901234;P;;;1034;Programación con Objetos I;18/12/2021;P;10;Examen;16;0;4384;2015
+12003;38901234;P;;;1035;Bases de Datos;15/12/2021;P;10;Examen;12;0;2616;2015
+12003;38901234;P;;;1041;Matemática II;25/12/2021;P;9;Examen;8;0;3310;2015
+12003;38901234;P;;;1037;Programación con Objetos II;25/12/2021;P;10;Examen;12;0;8119;2015
+12003;38901234;P;;;1038;Redes de Computadoras;24/12/2021;P;9;Examen;12;0;8306;2015
+12003;38901234;P;;;1039;Sistemas Operativos;21/02/2022;P;8;Examen;12;0;2731;2015
+12003;38901234;P;;;1045;Programación Funcional;26/02/2022;P;10;Examen;8;0;9445;2015
+12003;38901234;P;;;1043;Construcción de Interfaces de Usuario;26/07/2022;P;7;Examen;12;0;5473;2015
+12003;38901234;P;;;1042;Elementos de Ingeniería de Software;20/12/2022;R;2;Examen;12;0;0;2015
+12003;38901234;P;;;1044;Estrategias de Persistencia;22/12/2022;R;1;Examen;12;0;0;2015
+12003;38901234;P;;;1047;Laboratorio de Sistemas Operativos y Redes;19/07/2022;P;6;Examen;8;0;3868;2015
+12003;38901234;P;;;1046;Desarrollo de Aplicaciones;25/02/2023;P;6;Examen;12;0;4875;2015
+12003;38901234;P;;;1040;Programación Concurrente;08/12/2022;P;9;Examen;8;0;7330;2015
+12003;38901234;P;;;1305;Práctica del Desarrollo de Software;01/02/2023;P;7;Examen;16;0;8443;2015
+12004;36234567;P;;;80005;Elementos de Programación y Lógica;19/12/2019;P;8;Examen;10;0;2548;2015
+12004;36234567;P;;;80000;Lectura y Escritura Académica;21/07/2019;P;9;Examen;10;0;9509;2015
+12004;36234567;P;;;80003;Matemática;04/07/2019;P;8;Examen;10;0;4631;2015
+12004;36234567;P;;;487;Introducción a la Programación;27/12/2019;P;7;Examen;18;0;6893;2015
+12004;36234567;P;;;1033;Matemática I;13/02/2020;P;7;Examen;16;0;8699;2015
+12004;36234567;P;;;1032;Organización de Computadoras;02/02/2020;P;8;Examen;12;0;4069;2015
+12004;36234567;P;;;1036;Estructuras de Datos;02/12/2020;P;9;Examen;16;0;8254;2015
+12004;36234567;P;;;1034;Programación con Objetos I;17/07/2020;P;8;Examen;16;0;1971;2015
+12004;36234567;P;;;1035;Bases de Datos;08/12/2021;P;5;Examen;12;0;3951;2015
+12004;36234567;P;;;1041;Matemática II;04/02/2022;P;4;Examen;8;0;8345;2015
+12004;36234567;P;;;1037;Programación con Objetos II;13/02/2021;A;A;Equivalencia;12;0;0;2015
+12004;36234567;P;;;1038;Redes de Computadoras;18/12/2020;P;8;Examen;12;0;8265;2015
+12004;36234567;P;;;1039;Sistemas Operativos;07/02/2021;P;10;Examen;12;0;3518;2015
+12004;36234567;P;;;1045;Programación Funcional;02/12/2020;P;6;Examen;8;0;2798;2015
+12004;36234567;P;;;1043;Construcción de Interfaces de Usuario;08/12/2021;A;A;Equivalencia;12;0;0;2015
+12004;36234567;P;;;1042;Elementos de Ingeniería de Software;10/07/2021;P;9;Examen;12;0;5885;2015
+12004;36234567;P;;;1044;Estrategias de Persistencia;01/07/2021;P;9;Examen;12;0;5643;2015
+12004;36234567;P;;;1047;Laboratorio de Sistemas Operativos y Redes;16/07/2021;P;9;Examen;8;0;3323;2015
+12004;36234567;P;;;1046;Desarrollo de Aplicaciones;18/12/2021;P;8;Examen;12;0;7831;2015
+12004;36234567;P;;;1040;Programación Concurrente;01/12/2021;P;10;Examen;8;0;4412;2015
+12004;36234567;P;;;1305;Práctica del Desarrollo de Software;02/02/2022;P;10;Examen;16;0;8417;2015
+12005;39012345;P;;;80005;Elementos de Programación y Lógica;15/07/2021;P;7;Examen;10;0;7298;2015
+12005;39012345;P;;;80000;Lectura y Escritura Académica;06/07/2021;P;8;Examen;10;0;2031;2015
+12005;39012345;P;;;80003;Matemática;07/07/2021;R;1;Examen;10;0;0;2015
+12005;39012345;P;;;487;Introducción a la Programación;17/02/2022;P;9;Examen;18;0;6235;2015
+12005;39012345;P;;;1033;Matemática I;23/12/2021;R;1;Examen;16;0;0;2015
+12005;39012345;P;;;1032;Organización de Computadoras;26/02/2022;P;10;Examen;12;0;5765;2015
+12005;39012345;P;;;1036;Estructuras de Datos;27/12/2022;P;6;Examen;16;0;2332;2015
+12005;39012345;P;;;1034;Programación con Objetos I;17/07/2022;P;7;Examen;16;0;4611;2015
+12005;39012345;P;;;1035;Bases de Datos;26/07/2022;P;10;Examen;12;0;6312;2015
+12005;39012345;P;;;1041;Matemática II;11/02/2023;P;8;Examen;8;0;7386;2015
+12005;39012345;P;;;1037;Programación con Objetos II;05/02/2023;P;9;Examen;12;0;9264;2015
+12005;39012345;P;;;1038;Redes de Computadoras;10/02/2023;P;6;Examen;12;0;3983;2015
+12005;39012345;P;;;1039;Sistemas Operativos;12/12/2023;P;4;Examen;12;0;1336;2015
+12005;39012345;P;;;1045;Programación Funcional;08/02/2023;P;7;Examen;8;0;1436;2015
+12005;39012345;P;;;1043;Construcción de Interfaces de Usuario;27/12/2024;P;5;Examen;12;0;9569;2015
+12005;39012345;P;;;1042;Elementos de Ingeniería de Software;12/12/2023;P;6;Examen;12;0;8354;2015
+12005;39012345;P;;;1044;Estrategias de Persistencia;09/07/2023;R;2;Examen;12;0;0;2015
+12005;39012345;P;;;1047;Laboratorio de Sistemas Operativos y Redes;19/07/2023;P;10;Examen;8;0;4163;2015
+12005;39012345;P;;;1046;Desarrollo de Aplicaciones;02/12/2023;P;9;Examen;12;0;4880;2015
+12005;39012345;P;;;1040;Programación Concurrente;12/12/2023;P;8;Examen;8;0;7797;2015
+12005;39012345;P;;;1305;Práctica del Desarrollo de Software;05/02/2024;R;2;Examen;16;0;0;2015
+12006;34789012;W;;;80000;Lectura y escritura académica;27/12/2020;P;6;Examen;10;0;3213;2019
+12006;34789012;W;;;80003;Matemática;12/07/2020;R;3;Examen;10;0;0;2019
+12006;34789012;W;;;80005;Elementos de programación y lógica;02/07/2020;P;6;Examen;10;0;8665;2019
+12006;34789012;W;;;487;Introducción a la Programación;10/12/2020;P;6;Examen;16;0;4632;2019
+12006;34789012;W;;;1033;Matemática I;12/02/2021;P;9;Examen;16;0;6433;2019
+12006;34789012;W;;;1032;Organización de Computadoras;07/02/2021;P;7;Examen;12;0;3931;2019
+12006;34789012;W;;;1036;Estructuras de Datos;28/12/2021;P;9;Examen;16;0;1237;2019
+12006;34789012;W;;;1034;Programación con Objetos I;20/07/2021;P;10;Examen;16;0;7926;2019
+12006;34789012;W;;;1035;Bases de Datos;02/07/2021;P;6;Examen;12;0;9937;2019
+12006;34789012;W;;;1041;Matemática II;15/12/2021;P;6;Examen;8;0;7334;2019
+12006;34789012;W;;;1037;Programación con Objetos II;10/02/2022;P;9;Examen;12;0;8562;2019
+12006;34789012;W;;;1038;Redes de Computadoras;15/12/2021;P;8;Examen;12;0;9645;2019
+12006;34789012;W;;;1039;Sistemas Operativos;05/12/2021;P;6;Examen;12;0;6102;2019
+12006;34789012;W;;;1045;Programación Funcional;03/02/2023;P;4;Examen;8;0;2330;2019
+12006;34789012;W;;;1043;Construcción de Interfaces de Usuario;25/12/2022;P;7;Examen;12;0;2890;2019
+12006;34789012;W;;;1307;Algoritmos;20/07/2022;P;7;Examen;12;0;3208;2019
+12006;34789012;W;;;1044;Estrategias de Persistencia;12/12/2023;P;4;Examen;12;0;4556;2019
+12006;34789012;W;;;1047;Laboratorio de Sistemas Operativos y Redes;22/12/2022;P;7;Examen;8;0;4912;2019
+12006;34789012;W;;;54;Análisis Matemático;23/02/2023;P;10;Examen;12;0;9150;2019
+12006;34789012;W;;;1302;Lógica y Programación;11/02/2023;P;7;Examen;12;0;3337;2019
+12006;34789012;W;;;1042;Elementos de Ingeniería de Software;03/12/2022;A;A;Equivalencia;12;0;0;2019
+12006;34789012;W;;;842;Matemática III;15/12/2023;P;6;Examen;8;0;6977;2019
+12006;34789012;W;;;1040;Programación Concurrente;04/12/2023;P;8;Examen;8;0;1935;2019
+12006;34789012;W;;;1308;Ingeniería de Requerimientos;28/07/2023;P;10;Examen;8;0;5441;2019
+12006;34789012;W;;;1305;Práctica del Desarrollo de Software;12/12/2023;P;6;Examen;16;0;9903;2019
+12007;40123456;W;;;80000;Lectura y escritura académica;10/12/2021;P;8;Examen;10;0;9156;2019
+12007;40123456;W;;;80003;Matemática;20/12/2022;P;4;Examen;10;0;6427;2019
+12007;40123456;W;;;80005;Elementos de programación y lógica;22/07/2021;P;7;Examen;10;0;4600;2019
+12007;40123456;W;;;487;Introducción a la Programación;21/12/2021;P;10;Examen;16;0;5342;2019
+12007;40123456;W;;;1033;Matemática I;03/12/2021;P;9;Examen;16;0;3855;2019
+12007;40123456;W;;;1032;Organización de Computadoras;09/02/2022;P;9;Examen;12;0;5820;2019
+12007;40123456;W;;;1036;Estructuras de Datos;09/12/2023;P;4;Examen;16;0;4277;2019
+12007;40123456;W;;;1034;Programación con Objetos I;01/12/2022;P;9;Examen;16;0;1090;2019
+12007;40123456;W;;;1035;Bases de Datos;15/12/2022;P;8;Examen;12;0;4694;2019
+12007;40123456;W;;;1041;Matemática II;21/02/2023;P;7;Examen;8;0;8829;2019
+12007;40123456;W;;;1037;Programación con Objetos II;19/02/2023;P;8;Examen;12;0;3490;2019
+12007;40123456;W;;;1038;Redes de Computadoras;26/12/2022;P;8;Examen;12;0;1187;2019
+12007;40123456;W;;;1039;Sistemas Operativos;17/12/2022;P;8;Examen;12;0;5859;2019
+12007;40123456;W;;;1045;Programación Funcional;14/12/2022;P;7;Examen;8;0;9222;2019
+12007;40123456;W;;;1043;Construcción de Interfaces de Usuario;16/12/2023;P;9;Examen;12;0;8156;2019
+12007;40123456;W;;;1307;Algoritmos;08/12/2024;P;5;Examen;12;0;9001;2019
+12007;40123456;W;;;1044;Estrategias de Persistencia;11/12/2024;P;5;Examen;12;0;7566;2019
+12007;40123456;W;;;1047;Laboratorio de Sistemas Operativos y Redes;13/12/2023;P;6;Examen;8;0;8751;2019
+12007;40123456;W;;;54;Análisis Matemático;12/02/2025;P;5;Examen;12;0;5929;2019
+12007;40123456;W;;;1302;Lógica y Programación;28/12/2023;P;10;Examen;12;0;7800;2019
+12007;40123456;W;;;1042;Elementos de Ingeniería de Software;24/12/2023;P;8;Examen;12;0;4189;2019
+12008;37654321;W;;;80000;Lectura y escritura académica;13/12/2020;P;8;Examen;10;0;1293;2019
+12008;37654321;W;;;80003;Matemática;20/12/2020;P;6;Examen;10;0;9696;2019
+12008;37654321;W;;;80005;Elementos de programación y lógica;12/12/2020;R;2;Examen;10;0;0;2019
+12008;37654321;W;;;487;Introducción a la Programación;08/02/2021;A;A;Equivalencia;16;0;0;2019
+12008;37654321;W;;;1033;Matemática I;02/12/2020;P;7;Examen;16;0;7232;2019
+12008;37654321;W;;;1032;Organización de Computadoras;26/02/2021;P;6;Examen;12;0;4565;2019
+12008;37654321;W;;;1036;Estructuras de Datos;13/12/2022;P;4;Examen;16;0;9156;2019
+12008;37654321;W;;;1034;Programación con Objetos I;23/12/2022;P;4;Examen;16;0;1852;2019
+12008;37654321;W;;;1035;Bases de Datos;26/12/2021;P;9;Examen;12;0;9522;2019
+12008;37654321;W;;;1041;Matemática II;15/12/2021;P;6;Examen;8;0;1807;2019
+12008;37654321;W;;;1037;Programación con Objetos II;08/12/2021;R;3;Examen;12;0;0;2019
+12008;37654321;W;;;1038;Redes de Computadoras;03/02/2022;A;A;Equivalencia;12;0;0;2019
+12008;37654321;W;;;1039;Sistemas Operativos;25/02/2022;P;8;Examen;12;0;1096;2019
+12008;37654321;W;;;1045;Programación Funcional;05/02/2022;P;7;Examen;8;0;3822;2019
+12008;37654321;W;;;1043;Construcción de Interfaces de Usuario;07/07/2022;P;10;Examen;12;0;3175;2019
+12008;37654321;W;;;1307;Algoritmos;06/12/2022;P;8;Examen;12;0;7352;2019
+12008;37654321;W;;;1044;Estrategias de Persistencia;24/12/2022;P;6;Examen;12;0;6180;2019
+12008;37654321;W;;;1047;Laboratorio de Sistemas Operativos y Redes;06/12/2022;P;7;Examen;8;0;2602;2019
+12008;37654321;W;;;54;Análisis Matemático;06/02/2023;P;7;Examen;12;0;3749;2019
+12008;37654321;W;;;1302;Lógica y Programación;01/02/2023;P;7;Examen;12;0;2063;2019
+12008;37654321;W;;;1042;Elementos de Ingeniería de Software;04/02/2024;P;4;Examen;12;0;2631;2019
+12008;37654321;W;;;842;Matemática III;10/07/2023;A;A;Equivalencia;8;0;0;2019
+12008;37654321;W;;;1040;Programación Concurrente;28/12/2023;R;3;Examen;8;0;0;2019
+12008;37654321;W;;;1308;Ingeniería de Requerimientos;20/12/2024;P;4;Examen;8;0;2208;2019
+12008;37654321;W;;;1305;Práctica del Desarrollo de Software;19/12/2023;P;10;Examen;16;0;4155;2019
+12009;38765432;W;;;80000;Lectura y escritura académica;28/07/2023;P;5;Examen;10;0;9646;2019
+12009;38765432;W;;;80003;Matemática;13/07/2022;P;10;Examen;10;0;6575;2019
+12009;38765432;W;;;80005;Elementos de programación y lógica;12/12/2022;P;8;Examen;10;0;1104;2019
+12009;38765432;W;;;487;Introducción a la Programación;25/02/2023;P;6;Examen;16;0;2704;2019
+12009;38765432;W;;;1033;Matemática I;15/02/2023;P;9;Examen;16;0;4264;2019
+12009;38765432;W;;;1032;Organización de Computadoras;20/02/2023;P;7;Examen;12;0;9908;2019
+12009;38765432;W;;;1036;Estructuras de Datos;25/12/2023;P;10;Examen;16;0;6010;2019
+12009;38765432;W;;;1034;Programación con Objetos I;15/07/2023;P;6;Examen;16;0;7736;2019
+12009;38765432;W;;;1035;Bases de Datos;27/12/2023;P;10;Examen;12;0;1300;2019
+12009;38765432;W;;;1041;Matemática II;04/12/2023;A;A;Equivalencia;8;0;0;2019
+12009;38765432;W;;;1037;Programación con Objetos II;19/02/2025;P;5;Examen;12;0;4341;2019
+12009;38765432;W;;;1038;Redes de Computadoras;27/02/2024;A;A;Equivalencia;12;0;0;2019
+12009;38765432;W;;;1039;Sistemas Operativos;02/12/2023;P;7;Examen;12;0;5435;2019
+12009;38765432;W;;;1045;Programación Funcional;27/02/2024;P;7;Examen;8;0;4622;2019
+12010;36543210;W;;;80000;Lectura y escritura académica;07/07/2021;P;8;Examen;10;0;6659;2019
+12010;36543210;W;;;80003;Matemática;10/12/2021;P;8;Examen;10;0;4788;2019
+12010;36543210;W;;;80005;Elementos de programación y lógica;14/12/2021;P;10;Examen;10;0;2948;2019
+12010;36543210;W;;;487;Introducción a la Programación;02/02/2022;P;7;Examen;16;0;3148;2019
+12010;36543210;W;;;1033;Matemática I;04/02/2022;P;6;Examen;16;0;2407;2019
+12010;36543210;W;;;1032;Organización de Computadoras;25/12/2021;P;6;Examen;12;0;2720;2019
+12010;36543210;W;;;1036;Estructuras de Datos;04/12/2022;P;6;Examen;16;0;9823;2019
+12010;36543210;W;;;1034;Programación con Objetos I;13/12/2022;P;8;Examen;16;0;3689;2019
+12010;36543210;W;;;1035;Bases de Datos;18/07/2022;R;3;Examen;12;0;0;2019
+12010;36543210;W;;;1041;Matemática II;13/02/2023;P;8;Examen;8;0;2378;2019
+12010;36543210;W;;;1037;Programación con Objetos II;17/02/2023;P;10;Examen;12;0;9648;2019
+12010;36543210;W;;;1038;Redes de Computadoras;13/02/2023;P;10;Examen;12;0;7627;2019
+12010;36543210;W;;;1039;Sistemas Operativos;07/12/2022;P;6;Examen;12;0;8918;2019
+12010;36543210;W;;;1045;Programación Funcional;18/12/2022;P;6;Examen;8;0;7584;2019
+12010;36543210;W;;;1043;Construcción de Interfaces de Usuario;17/07/2023;P;10;Examen;12;0;2006;2019
+12010;36543210;W;;;1307;Algoritmos;23/07/2023;A;A;Equivalencia;12;0;0;2019
+12010;36543210;W;;;1044;Estrategias de Persistencia;27/07/2023;P;10;Examen;12;0;8952;2019
+12010;36543210;W;;;1047;Laboratorio de Sistemas Operativos y Redes;27/07/2023;P;6;Examen;8;0;2017;2019
+12010;36543210;W;;;54;Análisis Matemático;22/02/2024;A;A;Equivalencia;12;0;0;2019
+12010;36543210;W;;;1302;Lógica y Programación;13/02/2024;P;6;Examen;12;0;1288;2019
+12010;36543210;W;;;1042;Elementos de Ingeniería de Software;01/12/2023;P;6;Examen;12;0;2270;2019

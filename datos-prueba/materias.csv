@@ -1,0 +1,108 @@
+P;2010;1035;Bases de Datos;bd
+P;2010;1048;Bases de Datos II;bd2
+P;2010;1043;Construcción de Interfases de Usuario;uis
+P;2010;1057;Derecho de Autor  y Derecho de Copia en la Era Digital;deraut
+P;2010;1046;Desarrollo de Aplicaciones;dapp
+P;2010;1042;Elementos de Ingeniería de Software;iisoft
+P;2010;1044;Estrategias de Persistencia;epers
+P;2010;1036;Estructuras de Datos;ed
+P;2010;1055;Herramientas declarativas en Programación;hdec
+P;2010;90000;Inglés I;ing1
+P;2010;90028;Inglés II (Para Técnicatura);ing2
+P;2010;1052;Introducción a la Bioinformática;bio
+P;2010;487;Introducción a la Programación;inpr
+P;2010;1050;Introducción a las Arquitecturas de Software;iarq
+P;2010;1056;Introducción al Desarrollo de Videojuegos;games
+P;2010;1047;Laboratorio de Sistemas Operativos y Redes;labo
+P;2010;1033;Matemática I;mat1
+P;2010;1041;Matemática II;mat2
+P;2010;1032;Organización de Computadoras;orga
+P;2010;1049;Participación y Gestión en Proyectos de Software Libre;proysl
+P;2010;1053;Politicas Públicas en la Sociedad de la Información y la Era Digital;ppub
+P;2010;1034;Programación con Objetos I;obj1
+P;2010;1037;Programación con Objetos II;obj2
+P;2010;1051;Programación con Objetos III;obj3
+P;2010;1040;Programacion Concurrente;pconc
+P;2010;1045;Programación Funcional;pf
+P;2010;1038;Redes de Computadoras;red
+P;2010;646;Seguridad Informática;seg
+P;2010;1328;Seminario : Televisión Digital;sem_tvd
+P;2010;1059;Seminarios sobre  Herramientas ó Tecnicas Puntuales: Tecnología y Sociedad;sem_ts
+P;2010;1058;Seminarios: Introducción a la Electrónica y Programación de Controladores con Arduino;sem_micro
+P;2010;1054;Sistemas de Información Geográfica;geo
+P;2010;1039;Sistemas Operativos;so
+P;2010;751;Taller de Trabajo Intelectual;tti
+P;2010;752;Taller de Trabajo Universitario;ttu
+P;2010;1060;Trabajo de Inserción Profesional;tip
+W;2012;1307;Algoritmos;algo
+W;2012;1318;Análisis Estático de Programas y Herramientas Asociadas;aest
+W;2012;54;Análisis Matemático I;am1
+W;2012;1314;Arquitectura de computadoras;arqco
+W;2012;1310;Arquitectura de Software I;arq1
+W;2012;1313;Arquitectura de Software II;arq2
+W;2012;1316;Aspectos Legales y Sociales;legal
+W;2012;1035;Bases de Datos;bd
+W;2012;1048;Bases de Datos II;bd2
+W;2012;1312;Caracteristicas de Lenguajes de Programación;clp
+W;2012;1043;Construcción de Interfases de Usuario;uis
+W;2012;1057;Derecho de Autor  y Derecho de Copia en la Era Digital;deraut
+W;2012;1042;Elementos de Ingeniería de Software;iisoft
+W;2012;1044;Estrategias de Persistencia;epers
+W;2012;1036;Estructuras de Datos;ed
+W;2012;1304;Gestión de Proyectos de desarrollo de Software;gproy
+W;2012;1055;Herramientas declarativas en Programación;hdec
+W;2012;1308;Ingeniería de Requerimientos;ingreq
+W;2012;90000;Inglés I;ing1
+W;2012;90028;Inglés II;ing2
+W;2012;1052;Introducción a la Bioinformática;bio
+W;2012;487;Introducción a la Programación;inpr
+W;2012;1056;Introducción al Desarrollo de Videojuegos;games
+W;2012;1047;Laboratorio de Sistemas Operativos y Redes;labo
+W;2012;1306;Lenguajes Formales y Autómatas;lfa
+W;2012;1302;Lógica y Programación;lyp
+W;2012;1033;Matemática I;mat1
+W;2012;1041;Matemática II;mat2
+W;2012;842;Matemática III;mat3
+W;2012;1032;Organización de Computadoras;orga
+W;2012;1315;Parseo y Generación de Código;parse
+W;2012;1049;Participación y Gestión en Proyectos de Software Libre;proysl
+W;2012;1053;Politicas Públicas en la Sociedad de la Información y la Era Digital;ppub
+W;2012;1305;Práctica del Desarrollo de Software;pdes
+W;2012;604;Probabilidad Y Estadística;proba
+W;2012;1034;Programación con Objetos I;obj1
+W;2012;1037;Programación con Objetos II;obj2
+W;2012;1051;Programación con Objetos III;obj3
+W;2012;1040;Programacion Concurrente;pconc
+W;2012;1045;Programación Funcional;pf
+W;2012;1038;Redes de Computadoras;red
+W;2012;646;Seguridad de la Información;seg
+W;2012;1319;Semántica de Lenguajes de Programación;selp
+W;2012;1317;Seminario final;semf
+W;2012;1059;Seminarios sobre  Herramientas ó Tecnicas Puntuales: Tecnología y Sociedad;sem_ts
+W;2012;1058;Seminarios: Introducción a la Electrónica y Programación de Controladores con Arduino;sem_micro
+W;2012;1054;Sistemas de Información Geográfica;geo
+W;2012;1311;Sistemas Distribuidos;syd
+W;2012;1039;Sistemas Operativos;so
+W;2012;751;Taller de Trabajo Intelectual;tti
+W;2012;752;Taller de Trabajo Universitario;ttu
+W;2012;1309;Teoría de la Computación;tco
+P;2010;1632;Seminario : Tecnología de Streaming sobre Internet;sem_str
+W;2012;1632;Seminario : Tecnología de Streaming sobre Internet;sem_str
+P;2010;8000;Lectura y Escritura Académica;len
+P;2010;8003;Matemática;mat
+P;2010;8005;Elementos de Programación y Lógica;epl
+W;2012;8000;Lectura y Escritura Académica;len
+W;2012;8003;Matemática;mat
+W;2012;8005;Elementos de Programación y Lógica;epl
+W;2012;8888;Seminario Servicios Web;sem_web
+P;2010;8888;Seminario Servicios Web;sem_web
+W;2012;6666;Sem AlgA;sem_alga
+P;2010;6666;Sem AlgA;sem_alga
+W;2012;7777;Sem TallerAlg;sem_talleralg
+P;2010;7777;Sem TallerAlg;sem_talleralg
+W;2012;1052;Introducción a la Bioinformática;bioinf
+P;2010;1052;Introducción a la Bioinformática;bioinf
+W;2012;1053;Políticas Públicas en la Sociedad de la Información y la Era Digital;politicas
+P;2010;1053;Políticas Públicas en la Sociedad de la Información y la Era Digital;politicas
+W;2012;940;Redes Neuronales;rn
+P;2010;940;Redes Neuronales;rn
