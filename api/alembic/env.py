@@ -2,11 +2,11 @@ import asyncio
 import os
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.db.base import Base
 import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
+from alembic import context
+from app.db.base import Base
 
 config = context.config
 if config.config_file_name is not None:

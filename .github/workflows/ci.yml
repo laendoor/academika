@@ -22,6 +22,47 @@ jobs:
       - name: Test (pytest)
         run: cd api && uv run pytest
 
+  alembic-check:
+    name: Alembic — migrations check
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: academika
+          POSTGRES_USER: academika
+          POSTGRES_PASSWORD: academika
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: cd api && uv sync --frozen
+      - name: upgrade head
+        run: cd api && uv run alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
+      - name: check (no pending migrations)
+        run: cd api && uv run alembic check
+        env:
+          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
+      - name: downgrade base
+        run: cd api && uv run alembic downgrade base
+        env:
+          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
+      - name: upgrade head (desde cero — valida flujo completo)
+        run: cd api && uv run alembic upgrade head
+        env:
+          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
+
   frontend:
     name: Frontend — biome + build
     runs-on: ubuntu-latest

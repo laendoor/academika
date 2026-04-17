@@ -4,12 +4,11 @@ import uuid
 from datetime import date
 from typing import TYPE_CHECKING
 
-import uuid_utils
 from sqlalchemy import Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
-from app.db.base import AuditMixin, Base
+from app.db.base import AuditMixin, Base, generate_uuid
 
 if TYPE_CHECKING:
     from app.models.alumno import Alumno
@@ -19,7 +18,7 @@ if TYPE_CHECKING:
 class Cursada(AuditMixin, Base):
     __tablename__ = "cursada"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=uuid_utils.uuid7)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     alumno_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("alumno.id"))
     materia_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("materia.id"))
     periodo: Mapped[str] = mapped_column(String(4))  # e.g. "1C", "2C", "V"

@@ -3,12 +3,11 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-import uuid_utils
 from sqlalchemy import Boolean, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
-from app.db.base import AuditMixin, Base
+from app.db.base import AuditMixin, Base, generate_uuid
 
 if TYPE_CHECKING:
     from app.models.carrera import Carrera
@@ -20,7 +19,7 @@ if TYPE_CHECKING:
 class Alumno(AuditMixin, Base):
     __tablename__ = "alumno"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=uuid_utils.uuid7)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     legajo: Mapped[str] = mapped_column(String(32), unique=True)
     nombre: Mapped[str] = mapped_column(String(255))
     apellido: Mapped[str] = mapped_column(String(255))

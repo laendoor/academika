@@ -3,12 +3,11 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-import uuid_utils
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
-from app.db.base import AuditMixin, Base
+from app.db.base import AuditMixin, Base, generate_uuid
 
 if TYPE_CHECKING:
     from app.models.carrera import Carrera
@@ -25,7 +24,7 @@ plan_materia = Table(
 class PlanDeEstudio(AuditMixin, Base):
     __tablename__ = "plan_de_estudio"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=uuid_utils.uuid7)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     carrera_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("carrera.id"))
     nombre: Mapped[str] = mapped_column(String(255))
     anio: Mapped[int] = mapped_column(Integer)
