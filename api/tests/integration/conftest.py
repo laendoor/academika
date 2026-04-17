@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import NullPool
@@ -66,3 +66,16 @@ async def db_session(db_url) -> AsyncSession:
         yield session
         await session.rollback()
     await engine.dispose()
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def clean_db(db_session: AsyncSession) -> None:
+    """Trunca tablas de negocio después de cada test. Las lkp son session-scoped y no se tocan."""
+    yield
+    await db_session.execute(
+        text(
+            "TRUNCATE course_enrollment, study_plan_course, student, study_plan, course, degree"
+            " RESTART IDENTITY CASCADE"
+        )
+    )
+    await db_session.commit()

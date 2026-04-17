@@ -11,6 +11,7 @@ from app.db.base import AuditMixin, Base, generate_uuid
 from app.models.study_plan import study_plan_course
 
 if TYPE_CHECKING:
+    from app.models.course_enrollment import CourseEnrollment
     from app.models.study_plan import StudyPlan
 
 
@@ -25,3 +26,4 @@ class Course(AuditMixin, Base):
     study_plans: Mapped[list[StudyPlan]] = relationship(
         "StudyPlan", secondary=study_plan_course, back_populates="courses"
     )
+    course_enrollments: Mapped[list[CourseEnrollment]] = relationship("CourseEnrollment", back_populates="course")

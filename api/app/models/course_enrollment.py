@@ -34,7 +34,7 @@ class CourseEnrollment(AuditMixin, Base):
     enrollment_status: Mapped[str] = mapped_column(String(50), ForeignKey("lkp_enrollment_status.key"))
     grade: Mapped[str | None] = mapped_column(String(5), nullable=True)
     enrolled_at: Mapped[date | None] = mapped_column(Date, nullable=True)
-    status_changed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    status_changed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     student: Mapped[Student] = relationship("Student", back_populates="course_enrollments")
-    course: Mapped[Course] = relationship("Course")
+    course: Mapped[Course] = relationship("Course", back_populates="course_enrollments")

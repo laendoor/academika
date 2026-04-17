@@ -58,6 +58,32 @@ result = await session.execute(
 await session.execute(insert(plan_materia).values(plan_id=..., materia_id=...))
 ```
 
+### Relationships — back_populates obligatorio
+
+Toda `relationship()` en un modelo debe tener `back_populates` con el lado opuesto declarado.
+Sin `back_populates`, SQLAlchemy puede invalidar la caché de identidad de formas inesperadas y
+las relaciones inversas no son navegables.
+
+Excepción aceptada: relationships hacia lookup tables (`lkp_*`) no tienen `back_populates`
+porque las lkp no exponen colecciones de vuelta (son tablas de referencia, no entidades).
+
+### Association tables — Table() + Column() es intencional
+
+Las tablas de asociación M2M sin columnas extra se definen con `Table()` standalone (SA legacy API):
+
+```python
+study_plan_course = Table(
+    "study_plan_course",
+    Base.metadata,
+    Column("plan_id", Uuid, ForeignKey("study_plan.id"), primary_key=True),
+    Column("course_id", Uuid, ForeignKey("course.id"), primary_key=True),
+)
+```
+
+`Table()` standalone no acepta `mapped_column()` ni `Mapped[]` — `Column()` es correcto aquí.
+Si la tabla de asociación necesita columnas extra (ej. `order`, `created_at`), convertirla
+a un modelo completo con `mapped_column()`.
+
 ---
 
 ## IDs
