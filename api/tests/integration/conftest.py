@@ -2,11 +2,42 @@ import pytest
 import pytest_asyncio
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Session
 from sqlalchemy.pool import NullPool
 from testcontainers.postgres import PostgresContainer
 
 import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
 from app.db.base import Base
+from app.models.lkp_academic_status import LkpAcademicStatus
+from app.models.lkp_enrollment_status import LkpEnrollmentStatus
+from app.models.lkp_enrollment_type import LkpEnrollmentType
+
+
+def _seed_lkp(engine) -> None:
+    """Inserta datos estáticos de lookup una vez para toda la sesión de tests."""
+    with Session(engine) as session:
+        session.add_all(
+            [
+                LkpAcademicStatus(key="alumno_regular", label="Alumno Regular"),
+                LkpAcademicStatus(key="no_regular", label="No Regular"),
+            ]
+        )
+        session.add_all(
+            [
+                LkpEnrollmentStatus(key="inscripto", code="I", label="Inscripto"),
+                LkpEnrollmentStatus(key="regular", code="R", label="Regular"),
+                LkpEnrollmentStatus(key="promocionado", code="P", label="Promocionado"),
+                LkpEnrollmentStatus(key="aprobado", code="A", label="Aprobado"),
+                LkpEnrollmentStatus(key="pendiente_aprobacion", code="PA", label="Pendiente de Aprobación"),
+            ]
+        )
+        session.add_all(
+            [
+                LkpEnrollmentType(key="regular", label="Cursada Regular"),
+                LkpEnrollmentType(key="libre", label="Libre"),
+            ]
+        )
+        session.commit()
 
 
 @pytest.fixture(scope="session")
@@ -17,10 +48,11 @@ def postgres_container():
 
 @pytest.fixture(scope="session")
 def db_url(postgres_container):
-    """Crea el schema una vez usando psycopg2 (sync) y devuelve la URL asyncpg."""
+    """Crea el schema y seedea lookups una vez; devuelve la URL asyncpg."""
     sync_url = postgres_container.get_connection_url()
     engine = create_engine(sync_url)
     Base.metadata.create_all(engine)
+    _seed_lkp(engine)
     engine.dispose()
     return sync_url.replace("postgresql+psycopg2://", "postgresql+asyncpg://")
 

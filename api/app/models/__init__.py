@@ -1,8 +1,20 @@
-from app.models.alumno import Alumno
-from app.models.carrera import Carrera
-from app.models.cursada import Cursada
-from app.models.inscripcion import Inscripcion
-from app.models.materia import Materia
-from app.models.plan_de_estudio import PlanDeEstudio
+from app.models.course import Course
+from app.models.course_enrollment import CourseEnrollment
+from app.models.degree import Degree
+from app.models.lkp_academic_status import LkpAcademicStatus
+from app.models.lkp_enrollment_status import LkpEnrollmentStatus
+from app.models.lkp_enrollment_type import LkpEnrollmentType
+from app.models.student import Student
+from app.models.study_plan import StudyPlan, study_plan_course
 
-__all__ = ["Alumno", "Carrera", "Cursada", "Inscripcion", "Materia", "PlanDeEstudio"]
+__all__ = [
+    "Course",
+    "CourseEnrollment",
+    "Degree",
+    "LkpAcademicStatus",
+    "LkpEnrollmentStatus",
+    "LkpEnrollmentType",
+    "Student",
+    "StudyPlan",
+    "study_plan_course",
+]
