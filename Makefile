@@ -43,17 +43,14 @@ format:
 	cd ui && npm run format
 
 test:
-	cd api && uv run pytest
+	cd api && uv run pytest tests/unit/
 	@# cd ui && npm test  (UI tests pendientes)
 
-# Pendiente hasta ticket #2 — requiere docker-compose.test.yml + Alembic
-# Cuando esté listo, el comando será:
-#   docker compose -f docker-compose.test.yml -p academika_test up -d --wait
-#   cd api && DATABASE_URL=postgresql+psycopg://academika:academika@localhost:5433/academika_test uv run alembic upgrade head
-#   cd api && uv run pytest tests/integration; \
-#     EXIT=$$?; cd ..; docker compose -f docker-compose.test.yml -p academika_test down -v; exit $$EXIT
+# Los tests de integración usan testcontainers — levantan postgres automáticamente.
+# tests/unit/    → sin infraestructura, corren offline
+# tests/integration/ → requieren DB (testcontainers postgres)
 test-integration:
-	@echo "Pendiente hasta ticket #2 (modelos + Alembic + docker-compose.test.yml)"
+	cd api && uv run pytest tests/integration/ -v
 
 clean:
 	cd api && find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
