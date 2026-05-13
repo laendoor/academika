@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.exception_handlers import add_error_handlers
 from app.routers import (
     course_enrollments,
     courses,
@@ -11,6 +12,8 @@ from app.routers import (
 )
 
 app = FastAPI(title="Académika API")
+
+add_error_handlers(app)
 
 app.include_router(health.router, prefix="/health", tags=["health"])
 
