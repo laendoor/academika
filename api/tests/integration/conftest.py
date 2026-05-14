@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session
@@ -8,6 +9,8 @@ from testcontainers.postgres import PostgresContainer
 
 import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
 from app.db.base import Base
+from app.db.session import get_session
+from app.main import app
 from app.models.lkp_academic_status import LkpAcademicStatus
 from app.models.lkp_enrollment_status import LkpEnrollmentStatus
 from app.models.lkp_enrollment_type import LkpEnrollmentType
@@ -79,3 +82,20 @@ async def clean_db(db_session: AsyncSession) -> None:
         )
     )
     await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def client(db_url: str) -> AsyncClient:
+    """Cliente HTTP con su propia sesión por request — no comparte la sesión del test."""
+    engine = create_async_engine(db_url, poolclass=NullPool)
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+
+    async def override_get_session():
+        async with session_factory() as session:
+            yield session
+
+    app.dependency_overrides[get_session] = override_get_session
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
+    app.dependency_overrides.clear()
+    await engine.dispose()
