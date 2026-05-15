@@ -1,0 +1,44 @@
+{
+	"[markdown]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.wordWrap": "on",
+		"editor.rulers": []
+	},
+	"markdownlint.config": {
+		"MD013": false,
+		"MD033": false,
+		"MD041": false
+	},
+	"cSpell.language": "en,es",
+	"cSpell.words": [
+		"academika",
+		"Academika",
+		"Académika",
+		"Arévalo",
+		"Cálcena",
+		"cuatrimestre",
+		"deserción",
+		"Etchepare",
+		"Finisterre",
+		"Guaraní",
+		"inscripciones",
+		"legajo",
+		"materias",
+		"nachoyegro",
+		"Pari",
+		"psicohistoria"
+	],
+	"python.defaultInterpreterPath": "${workspaceFolder}/academika/api/.venv/bin/python",
+	"python.terminal.activateEnvironment": false,
+	"editor.tabSize": 2,
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	"python-envs.pythonProjects": [
+		{
+			"path": ".",
+			"envManager": "ms-python.python:venv",
+			"packageManager": "ms-python.python:pip"
+		}
+	]
+}

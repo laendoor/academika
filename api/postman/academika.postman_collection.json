@@ -1,0 +1,370 @@
+{
+  "info": {
+    "name": "Académika API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Endpoints base de Académika — Fase 2 (ticket #3)"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+    { "key": "degree_id", "value": "", "type": "string" },
+    { "key": "course_id", "value": "", "type": "string" },
+    { "key": "plan_id", "value": "", "type": "string" },
+    { "key": "student_id", "value": "", "type": "string" },
+    { "key": "enrollment_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Carreras",
+      "item": [
+        {
+          "name": "GET /api/v1/carreras",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/carreras?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "carreras"],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/carreras",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/carreras",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tecnicatura en Programación Informática\",\n  \"code\": \"TPI\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/carreras/:id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/carreras/{{degree_id}}"
+          }
+        },
+        {
+          "name": "PUT /api/v1/carreras/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/v1/carreras/{{degree_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tecnicatura en Programación Informática (actualizada)\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/carreras/:id",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/v1/carreras/{{degree_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Materias",
+      "item": [
+        {
+          "name": "GET /api/v1/materias",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/materias?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "materias"],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/materias",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/materias",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Introducción a la Programación\",\n  \"code\": \"IP\",\n  \"abbreviation\": \"IntProg\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/materias/:id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/materias/{{course_id}}"
+          }
+        },
+        {
+          "name": "PUT /api/v1/materias/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/v1/materias/{{course_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Introducción a la Programación (actualizada)\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/materias/:id",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/v1/materias/{{course_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Planes",
+      "item": [
+        {
+          "name": "GET /api/v1/planes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/planes?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "planes"],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/planes",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/planes",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"degree_id\": \"{{degree_id}}\",\n  \"name\": \"Plan 2018\",\n  \"year\": 2018,\n  \"is_active\": true,\n  \"course_ids\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/planes/:id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/planes/{{plan_id}}"
+          }
+        },
+        {
+          "name": "PUT /api/v1/planes/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/v1/planes/{{plan_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": false,\n  \"course_ids\": [\"{{course_id}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/planes/:id",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/v1/planes/{{plan_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alumnos",
+      "item": [
+        {
+          "name": "GET /api/v1/alumnos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/alumnos?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "alumnos"],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/alumnos",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/alumnos",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ana\",\n  \"last_name\": \"García\",\n  \"doc_id\": \"12345678\",\n  \"email\": \"ana.garcia@unq.edu.ar\",\n  \"degree_id\": \"{{degree_id}}\",\n  \"plan_id\": null,\n  \"academic_status\": \"alumno_regular\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/alumnos/:id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/alumnos/{{student_id}}"
+          }
+        },
+        {
+          "name": "PUT /api/v1/alumnos/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/v1/alumnos/{{student_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"academic_status\": \"no_regular\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/alumnos/:id",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/v1/alumnos/{{student_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inscripciones",
+      "item": [
+        {
+          "name": "GET /api/v1/inscripciones",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/v1/inscripciones?skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "inscripciones"],
+              "query": [
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "20" },
+                { "key": "student_id", "value": "", "disabled": true },
+                { "key": "course_id", "value": "", "disabled": true },
+                { "key": "year", "value": "", "disabled": true },
+                { "key": "term", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/v1/inscripciones",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/inscripciones",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"{{student_id}}\",\n  \"course_id\": \"{{course_id}}\",\n  \"year\": 2024,\n  \"term\": \"1C\",\n  \"section\": null,\n  \"enrollment_type\": \"regular\",\n  \"enrollment_status\": \"inscripto\",\n  \"grade\": null,\n  \"enrolled_at\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/inscripciones/:id",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/inscripciones/{{enrollment_id}}"
+          }
+        },
+        {
+          "name": "PUT /api/v1/inscripciones/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/v1/inscripciones/{{enrollment_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enrollment_status\": \"regular\",\n  \"grade\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/v1/inscripciones/:id",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/v1/inscripciones/{{enrollment_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lookups",
+      "item": [
+        {
+          "name": "GET /api/v1/lookups/academic-status",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/lookups/academic-status"
+          }
+        },
+        {
+          "name": "GET /api/v1/lookups/academic-status/:key",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/lookups/academic-status/alumno_regular"
+          }
+        },
+        {
+          "name": "GET /api/v1/lookups/enrollment-status",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/lookups/enrollment-status"
+          }
+        },
+        {
+          "name": "GET /api/v1/lookups/enrollment-status/:key",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/lookups/enrollment-status/inscripto"
+          }
+        },
+        {
+          "name": "GET /api/v1/lookups/enrollment-type",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/lookups/enrollment-type"
+          }
+        },
+        {
+          "name": "GET /api/v1/lookups/enrollment-type/:key",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/v1/lookups/enrollment-type/regular"
+          }
+        }
+      ]
+    }
+  ]
+}
