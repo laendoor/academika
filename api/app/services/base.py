@@ -67,4 +67,4 @@ class BaseService[ModelT, CreateSchemaT, UpdateSchemaT]:
         return data.model_dump()  # type: ignore[union-attr]
 
     def _update_dict(self, data: UpdateSchemaT) -> dict:
-        return data.model_dump(exclude_none=True)  # type: ignore[union-attr]
+        return data.model_dump(exclude_unset=True)  # type: ignore[union-attr]
