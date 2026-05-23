@@ -17,6 +17,7 @@ from app.models.lkp_enrollment_type import LkpEnrollmentType
 
 
 def _seed_lkp(engine) -> None:
+    """Inserta datos estáticos de lookup una vez para toda la sesión de tests."""
     with Session(engine) as session:
         session.add_all(
             [
@@ -67,8 +68,8 @@ async def test_engine(db_url) -> AsyncEngine:
     await engine.dispose()
 
 
-@pytest.fixture
-def session_factory(test_engine) -> async_sessionmaker:
+@pytest_asyncio.fixture
+async def session_factory(test_engine) -> async_sessionmaker:
     return async_sessionmaker(test_engine, expire_on_commit=False)
 
 
