@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import create_engine, text
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import NullPool
 from testcontainers.postgres import PostgresContainer
@@ -61,35 +61,43 @@ def db_url(postgres_container):
 
 
 @pytest_asyncio.fixture
-async def db_session(db_url) -> AsyncSession:
-    """Cada test recibe su propio engine NullPool + sesión con rollback al finalizar."""
+async def test_engine(db_url) -> AsyncEngine:
+    """Engine NullPool compartido por db_session, client y clean_db dentro de un mismo test."""
     engine = create_async_engine(db_url, poolclass=NullPool)
-    session_factory = async_sessionmaker(engine, expire_on_commit=False)
-    async with session_factory() as session:
-        yield session
-        await session.rollback()
+    yield engine
     await engine.dispose()
 
 
-@pytest_asyncio.fixture(autouse=True)
-async def clean_db(db_session: AsyncSession) -> None:
-    """Trunca tablas de negocio después de cada test. Las lkp son session-scoped y no se tocan."""
-    yield
-    await db_session.execute(
-        text(
-            "TRUNCATE course_enrollment, study_plan_course, student, study_plan, course, degree"
-            " RESTART IDENTITY CASCADE"
-        )
-    )
-    await db_session.commit()
+@pytest_asyncio.fixture
+async def session_factory(test_engine) -> async_sessionmaker:
+    return async_sessionmaker(test_engine, expire_on_commit=False)
 
 
 @pytest_asyncio.fixture
-async def client(db_url: str) -> AsyncClient:
-    """Cliente HTTP con su propia sesión por request — no comparte la sesión del test."""
-    engine = create_async_engine(db_url, poolclass=NullPool)
-    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+async def db_session(session_factory) -> AsyncSession:
+    """Cada test recibe su propia sesión con rollback al finalizar."""
+    async with session_factory() as session:
+        yield session
+        await session.rollback()
 
+
+@pytest_asyncio.fixture(autouse=True)
+async def clean_db(test_engine: AsyncEngine) -> None:
+    """Trunca tablas de negocio después de cada test. Las lkp son session-scoped y no se tocan."""
+    yield
+    async with AsyncSession(test_engine) as session:
+        await session.execute(
+            text(
+                "TRUNCATE course_enrollment, study_plan_course, student, study_plan, course, degree"
+                " RESTART IDENTITY CASCADE"
+            )
+        )
+        await session.commit()
+
+
+@pytest_asyncio.fixture
+async def client(session_factory) -> AsyncClient:
+    """Cliente HTTP con sesión del mismo engine que el resto del test."""
     async def override_get_session():
         async with session_factory() as session:
             yield session
@@ -98,4 +106,3 @@ async def client(db_url: str) -> AsyncClient:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
     app.dependency_overrides.clear()
-    await engine.dispose()
