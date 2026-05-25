@@ -106,6 +106,7 @@ async def test_create_course_enrollment(db_session: AsyncSession) -> None:
     enrollment = CourseEnrollment(
         student_id=student.id,
         course_id=course.id,
+        degree_id=degree.id,
         year=2024,
         term="1C",
         enrollment_type="regular",
