@@ -17,13 +17,13 @@ if TYPE_CHECKING:
 
 class Student(AuditMixin, Base):
     __tablename__ = "student"
-    __table_args__ = (UniqueConstraint("legajo", name="uq_student_legajo"),)
+    __table_args__ = (UniqueConstraint("unq_id", name="uq_student_unq_id"),)
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     first_name: Mapped[str] = mapped_column(String(100))
     last_name: Mapped[str] = mapped_column(String(100))
     doc_id: Mapped[str] = mapped_column(String(20), unique=True)
-    legajo: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    unq_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     degree_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("degree.id"))
     plan_id: Mapped[uuid.UUID | None] = mapped_column(

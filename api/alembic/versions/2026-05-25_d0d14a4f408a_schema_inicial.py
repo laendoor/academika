@@ -84,7 +84,7 @@ def upgrade() -> None:
         sa.Column("first_name", sa.String(length=100), nullable=False),
         sa.Column("last_name", sa.String(length=100), nullable=False),
         sa.Column("doc_id", sa.String(length=20), nullable=False),
-        sa.Column("legajo", sa.String(length=20), nullable=True),
+        sa.Column("unq_id", sa.String(length=20), nullable=True),
         sa.Column("email", sa.String(length=255), nullable=True),
         sa.Column("degree_id", sa.Uuid(), nullable=False),
         sa.Column("plan_id", sa.Uuid(), nullable=True),
@@ -105,7 +105,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("doc_id"),
-        sa.UniqueConstraint("legajo", name="uq_student_legajo"),
+        sa.UniqueConstraint("unq_id", name="uq_student_unq_id"),
     )
     op.create_table(
         "study_plan_course",

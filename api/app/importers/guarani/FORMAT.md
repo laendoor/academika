@@ -15,11 +15,11 @@ Datos maestros del alumno. Una fila por alumno.
 > **Nota de dominio:** la UNQ decidió a partir de un cierto año usar el DNI como número de legajo,
 > por lo que para alumnos recientes `Legajo == DNI`. Para alumnos anteriores son distintos.
 > Usamos el DNI como `doc_id` (source of truth de identidad); el `Legajo` se persiste en
-> `Student.legajo` para preservar el identificador interno de Guaraní.
+> `Student.unq_id` para preservar el identificador interno de Guaraní.
 
 | Columna           | Tipo   | Mapea a                             | Notas                                  |
 | ----------------- | ------ | ----------------------------------- | -------------------------------------- |
-| Legajo            | string | `Student.legajo`                    | ID interno de Guaraní; nullable, único |
+| Legajo            | string | `Student.unq_id`                    | ID interno de Guaraní; nullable, único |
 | DNI               | string | `Student.doc_id`                    | Identidad nacional, source of truth    |
 | Apellido          | string | `Student.last_name`                 |                                        |
 | Nombre            | string | `Student.first_name`                |                                        |
@@ -41,7 +41,7 @@ Produce:
 ```python
 Student(
     doc_id="35120001",
-    legajo="12001",
+    unq_id="12001",
     last_name="García",
     first_name="Martina",
     email="martina.garcia1@hotmail.com",
