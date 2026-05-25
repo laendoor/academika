@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy import Date, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
@@ -29,6 +30,7 @@ class Student(AuditMixin, Base):
     plan_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid(native_uuid=True), ForeignKey("study_plan.id"), nullable=True
     )
+    enrolled_at: Mapped[date | None] = mapped_column(Date, nullable=True)
     academic_status: Mapped[str] = mapped_column(String(50), ForeignKey("lkp_academic_status.key"))
 
     degree: Mapped[Degree] = relationship("Degree", back_populates="students")

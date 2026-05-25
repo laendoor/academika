@@ -1,8 +1,8 @@
-"""Schema inicial
+"""schema_inicial
 
-Revision ID: d0d14a4f408a
+Revision ID: fc6f97d5203a
 Revises:
-Create Date: 2026-05-25 18:20:53.280480
+Create Date: 2026-05-25 20:17:49.529916
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "d0d14a4f408a"
+revision: str = "fc6f97d5203a"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -88,6 +88,7 @@ def upgrade() -> None:
         sa.Column("email", sa.String(length=255), nullable=True),
         sa.Column("degree_id", sa.Uuid(), nullable=False),
         sa.Column("plan_id", sa.Uuid(), nullable=True),
+        sa.Column("enrolled_at", sa.Date(), nullable=True),
         sa.Column("academic_status", sa.String(length=50), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -163,12 +164,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint(
-            "student_id",
-            "course_id",
-            "degree_id",
-            "year",
-            "term",
-            name="uq_enrollment_student_course_degree_term",
+            "student_id", "course_id", "degree_id", "year", "term", name="uq_enrollment_student_course_degree_term"
         ),
     )
     # Seed lookup tables — datos estáticos requeridos por FK constraints
