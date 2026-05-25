@@ -6,9 +6,7 @@ from app.schemas.course_enrollments import CourseEnrollmentCreate, CourseEnrollm
 from app.services.base import BaseService
 
 
-class CourseEnrollmentService(
-    BaseService[CourseEnrollment, CourseEnrollmentCreate, CourseEnrollmentUpdate]
-):
+class CourseEnrollmentService(BaseService[CourseEnrollment, CourseEnrollmentCreate, CourseEnrollmentUpdate]):
     model = CourseEnrollment
 
     async def list_filtered(

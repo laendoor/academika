@@ -48,9 +48,7 @@ async def create_course_enrollment(body: CourseEnrollmentCreate, service: Servic
 
 
 @router.put("/{enrollment_id}", response_model=CourseEnrollmentResponse)
-async def update_course_enrollment(
-    enrollment_id: uuid.UUID, body: CourseEnrollmentUpdate, service: ServiceDep
-):
+async def update_course_enrollment(enrollment_id: uuid.UUID, body: CourseEnrollmentUpdate, service: ServiceDep):
     return await service.update(enrollment_id, body)
 
 

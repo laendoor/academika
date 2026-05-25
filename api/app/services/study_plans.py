@@ -44,12 +44,8 @@ class StudyPlanService(BaseService[StudyPlan, StudyPlanCreate, StudyPlanUpdate])
         return instance
 
     async def _set_courses(self, plan_id: uuid.UUID, course_ids: list[uuid.UUID]) -> None:
-        await self.session.execute(
-            delete(study_plan_course).where(study_plan_course.c.plan_id == plan_id)
-        )
+        await self.session.execute(delete(study_plan_course).where(study_plan_course.c.plan_id == plan_id))
         if course_ids:
             await self.session.execute(
-                insert(study_plan_course).values(
-                    [{"plan_id": plan_id, "course_id": cid} for cid in course_ids]
-                )
+                insert(study_plan_course).values([{"plan_id": plan_id, "course_id": cid} for cid in course_ids])
             )

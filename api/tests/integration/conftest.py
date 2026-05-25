@@ -98,6 +98,7 @@ async def clean_db(test_engine: AsyncEngine) -> None:
 @pytest_asyncio.fixture
 async def client(session_factory) -> AsyncClient:
     """Cliente HTTP con sesión del mismo engine que el resto del test."""
+
     async def override_get_session():
         async with session_factory() as session:
             yield session

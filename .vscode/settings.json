@@ -26,7 +26,9 @@
 		"legajo",
 		"materias",
 		"nachoyegro",
+		"nullable",
 		"Pari",
+		"postgresql",
 		"psicohistoria"
 	],
 	"python.defaultInterpreterPath": "${workspaceFolder}/academika/api/.venv/bin/python",
