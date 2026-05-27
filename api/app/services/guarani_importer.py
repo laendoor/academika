@@ -3,7 +3,7 @@ import uuid
 from pathlib import Path
 from typing import Self
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,15 +21,18 @@ from app.models.study_plan import StudyPlan
 logger = logging.getLogger(__name__)
 
 _RESULT_TO_STATUS: dict[str, str] = {
+    "I": "inscripto",
     "P": "promocionado",
     "A": "aprobado",
+    "D": "desaprobado",
     "R": "regular",
     "PA": "pendiente_aprobacion",
 }
 
 
 def _result_to_status(result: str) -> str:
-    return _RESULT_TO_STATUS.get(result.strip().upper(), "inscripto")
+    code = result.strip().upper()
+    return _RESULT_TO_STATUS.get(code, "__unknown__")
 
 
 class GuaraniImporterService:
@@ -88,7 +91,7 @@ class GuaraniImporterService:
                 )
                 .on_conflict_do_update(
                     index_elements=["doc_id"],
-                    set_={
+                    set_={  # academic_status intentionally absent: preserve manual overrides
                         "unq_id": row.unq_id,
                         "first_name": row.first_name,
                         "last_name": row.last_name,
@@ -96,6 +99,7 @@ class GuaraniImporterService:
                         "enrolled_at": row.enrolled_at,
                         "degree_id": degree.id,
                         "plan_id": plan.id if plan else None,
+                        "updated_at": func.now(),
                     },
                 )
             )
@@ -159,6 +163,7 @@ class GuaraniImporterService:
                         "approval_type": row.approval_type,
                         "credits": row.credits,
                         "plan_year": row.plan_year,
+                        "updated_at": func.now(),
                     },
                 )
             )
@@ -212,6 +217,7 @@ class GuaraniImporterService:
                     set_={
                         "section": row.section,
                         "enrolled_at": row.enrollment_date,
+                        "updated_at": func.now(),
                     },
                 )
             )

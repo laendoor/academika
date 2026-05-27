@@ -31,7 +31,8 @@
 		"Pari",
 		"parseo",
 		"postgresql",
-		"psicohistoria"
+		"psicohistoria",
+		"upserted"
 	],
 	"[python]": {
 		"editor.defaultFormatter": "charliermarsh.ruff",

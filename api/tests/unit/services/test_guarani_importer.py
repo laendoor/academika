@@ -159,7 +159,7 @@ class TestUpsertEnrollmentHistory:
         call_args = session.execute.call_args[0][0]
         assert call_args.compile().params.get("enrollment_status") == "aprobado"
 
-    async def test_unknown_result_defaults_to_inscripto(self):
+    async def test_unknown_result_returns_unknown(self):
         session = AsyncMock()
         service = GuaraniImporterService(session)
         student = make_student("12345678")
@@ -171,7 +171,7 @@ class TestUpsertEnrollmentHistory:
             await service._upsert_enrollment_history([make_enrollment_history_row(result="X")])
 
         call_args = session.execute.call_args[0][0]
-        assert call_args.compile().params.get("enrollment_status") == "inscripto"
+        assert call_args.compile().params.get("enrollment_status") == "__unknown__"
 
 
 @pytest.mark.asyncio
@@ -192,6 +192,30 @@ class TestUpsertEnrollments:
         degree = make_degree("P")
 
         p1, p2, p3 = self._patch_all(service, student=None, course=course, degree=degree)
+        with p1, p2, p3:
+            upserted, skipped = await service._upsert_enrollments([make_enrollment_row()])
+
+        assert upserted == 0
+        assert skipped == 1
+
+    async def test_skips_when_course_not_found(self):
+        service = GuaraniImporterService(AsyncMock())
+        student = make_student("12345678")
+        degree = make_degree("P")
+
+        p1, p2, p3 = self._patch_all(service, student=student, course=None, degree=degree)
+        with p1, p2, p3:
+            upserted, skipped = await service._upsert_enrollments([make_enrollment_row()])
+
+        assert upserted == 0
+        assert skipped == 1
+
+    async def test_skips_when_degree_not_found(self):
+        service = GuaraniImporterService(AsyncMock())
+        student = make_student("12345678")
+        course = make_course("ALGO1")
+
+        p1, p2, p3 = self._patch_all(service, student=student, course=course, degree=None)
         with p1, p2, p3:
             upserted, skipped = await service._upsert_enrollments([make_enrollment_row()])
 

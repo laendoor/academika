@@ -107,6 +107,37 @@ async def test_idempotency_enrollment_history(db_session: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
+async def test_idempotency_enrollments(db_session: AsyncSession) -> None:
+    await _seed(db_session)
+    service = GuaraniImporterService(db_session)
+    await service.import_students(SAMPLE_DATA / "datos_personales.csv")
+    path = SAMPLE_DATA / "inscripciones.csv"
+
+    upserted_1, _ = await service.import_enrollments(path)
+    upserted_2, _ = await service.import_enrollments(path)
+
+    enrollments = (await db_session.execute(select(CourseEnrollment))).scalars().all()
+    assert upserted_1 == upserted_2
+    assert len(enrollments) == upserted_1
+
+
+@pytest.mark.asyncio
+async def test_reimport_preserves_manual_academic_status(db_session: AsyncSession) -> None:
+    await _seed(db_session)
+    service = GuaraniImporterService(db_session)
+    await service.import_students(SAMPLE_DATA / "datos_personales.csv")
+
+    student = (await db_session.execute(select(Student))).scalars().first()
+    student.academic_status = "no_regular"
+    await db_session.commit()
+
+    await service.import_students(SAMPLE_DATA / "datos_personales.csv")
+
+    await db_session.refresh(student)
+    assert student.academic_status == "no_regular"
+
+
+@pytest.mark.asyncio
 async def test_skips_missing_degree(db_session: AsyncSession) -> None:
     service = GuaraniImporterService(db_session)
 

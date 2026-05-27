@@ -7,9 +7,9 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def parse_csv[T](path: Path, parse_row: Callable[[list[str]], T]) -> list[T]:
+def parse_csv[T](path: Path, parse_row: Callable[[list[str]], T], encoding: str = "utf-8") -> list[T]:
     rows: list[T] = []
-    with open(path, encoding="utf-8", newline="") as f:
+    with open(path, encoding=encoding, newline="") as f:
         reader = csv.reader(f, delimiter=";")
         next(reader)
         for i, row in enumerate(reader, start=2):
@@ -30,8 +30,5 @@ def or_none(value: str) -> str | None:
 
 
 def date_to_year_term(d: date) -> tuple[int, str]:
-    if d.month >= 8:
-        return d.year, "2C"
-    if d.month >= 3:
-        return d.year, "1C"
-    return d.year - 1, "2C"
+    term = "2C" if d.month >= 7 else "1C"
+    return d.year, term
