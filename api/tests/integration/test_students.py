@@ -32,8 +32,11 @@ async def test_list_students(client: AsyncClient) -> None:
         await client.post(
             "/api/v1/alumnos",
             json={
-                "first_name": "x", "last_name": "x", "doc_id": doc_id,
-                "degree_id": degree["id"], "academic_status": "alumno_regular",
+                "first_name": "x",
+                "last_name": "x",
+                "doc_id": doc_id,
+                "degree_id": degree["id"],
+                "academic_status": "alumno_regular",
             },
         )
     response = await client.get("/api/v1/alumnos")
@@ -65,8 +68,11 @@ async def test_create_student_invalid_degree(client: AsyncClient) -> None:
 async def test_create_student_duplicate_doc_id(client: AsyncClient) -> None:
     degree = await _create_degree(client)
     payload = {
-        "first_name": "x", "last_name": "x", "doc_id": "99999999",
-        "degree_id": degree["id"], "academic_status": "alumno_regular",
+        "first_name": "x",
+        "last_name": "x",
+        "doc_id": "99999999",
+        "degree_id": degree["id"],
+        "academic_status": "alumno_regular",
     }
     await client.post("/api/v1/alumnos", json=payload)
     response = await client.post("/api/v1/alumnos", json=payload)

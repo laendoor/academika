@@ -1,8 +1,8 @@
-"""schema inicial
+"""schema_inicial
 
-Revision ID: d2619e5d3ecf
+Revision ID: fc6f97d5203a
 Revises:
-Create Date: 2026-04-17 16:25:23.170209
+Create Date: 2026-05-25 20:17:49.529916
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "d2619e5d3ecf"
+revision: str = "fc6f97d5203a"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -84,9 +84,11 @@ def upgrade() -> None:
         sa.Column("first_name", sa.String(length=100), nullable=False),
         sa.Column("last_name", sa.String(length=100), nullable=False),
         sa.Column("doc_id", sa.String(length=20), nullable=False),
+        sa.Column("unq_id", sa.String(length=20), nullable=True),
         sa.Column("email", sa.String(length=255), nullable=True),
         sa.Column("degree_id", sa.Uuid(), nullable=False),
         sa.Column("plan_id", sa.Uuid(), nullable=True),
+        sa.Column("enrolled_at", sa.Date(), nullable=True),
         sa.Column("academic_status", sa.String(length=50), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -104,6 +106,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("doc_id"),
+        sa.UniqueConstraint("unq_id", name="uq_student_unq_id"),
     )
     op.create_table(
         "study_plan_course",
@@ -124,6 +127,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("student_id", sa.Uuid(), nullable=False),
         sa.Column("course_id", sa.Uuid(), nullable=False),
+        sa.Column("degree_id", sa.Uuid(), nullable=False),
         sa.Column("year", sa.Integer(), nullable=False),
         sa.Column("term", sa.String(length=5), nullable=False),
         sa.Column("section", sa.String(length=20), nullable=True),
@@ -132,11 +136,19 @@ def upgrade() -> None:
         sa.Column("grade", sa.String(length=5), nullable=True),
         sa.Column("enrolled_at", sa.Date(), nullable=True),
         sa.Column("status_changed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("is_regular", sa.String(length=5), nullable=True),
+        sa.Column("approval_type", sa.String(length=50), nullable=True),
+        sa.Column("credits", sa.Integer(), nullable=True),
+        sa.Column("plan_year", sa.Integer(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.ForeignKeyConstraint(
             ["course_id"],
             ["course.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["degree_id"],
+            ["degree.id"],
         ),
         sa.ForeignKeyConstraint(
             ["enrollment_status"],
@@ -151,6 +163,9 @@ def upgrade() -> None:
             ["student.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint(
+            "student_id", "course_id", "degree_id", "year", "term", name="uq_enrollment_student_course_degree_term"
+        ),
     )
     # Seed lookup tables — datos estáticos requeridos por FK constraints
     op.bulk_insert(

@@ -23,12 +23,26 @@
 		"Finisterre",
 		"Guaraní",
 		"inscripciones",
+		"inscripto",
 		"legajo",
 		"materias",
 		"nachoyegro",
+		"nullable",
 		"Pari",
-		"psicohistoria"
+		"parseo",
+		"postgresql",
+		"psicohistoria",
+		"upserted"
 	],
+	"[python]": {
+		"editor.defaultFormatter": "charliermarsh.ruff",
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.ruff": "explicit",
+			"source.organizeImports.ruff": "explicit"
+		}
+	},
+	"ruff.path": ["/Users/laendor/unq/seminario/academika/api/.venv/bin/ruff"],
 	"python.defaultInterpreterPath": "${workspaceFolder}/academika/api/.venv/bin/python",
 	"python.terminal.activateEnvironment": false,
 	"editor.tabSize": 2,

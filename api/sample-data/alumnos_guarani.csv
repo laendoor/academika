@@ -1,0 +1,19 @@
+Legajo;DNI;Carrera;Regular;Calidad;Cod.Materia;Nombre_materia;Fecha;Result;Nota;Forma Aprobación;Créditos;Acta Promo;Acta Ex;Plan
+12001;35120001;TPI;;;80005;Elementos de Programación;01/07/2018;P;9;Promoción;10;;1001;2015
+12001;35120001;TPI;;;80010;Algoritmos y Estructuras;10/12/2018;A;7;Examen;8;;1124;2015
+12001;35120001;TPI;;;80015;Bases de Datos;15/07/2019;P;8;Promoción;10;;1345;2015
+12001;35120001;TPI;;;80020;Álgebra;02/12/2019;A;6;Examen;6;;1432;2015
+12008;36789008;TPI;;;80005;Elementos de Programación;01/07/2018;P;10;Promoción;10;;1002;2015
+12008;36789008;TPI;;;80010;Algoritmos y Estructuras;12/12/2019;A;5;Examen;8;;1200;2015
+12008;36789008;TPI;;;80015;Bases de Datos;20/08/2020;R;;;Promoción;10;;;2015
+12002;38450002;LI;;;80020;Álgebra;10/07/2020;A;6;Examen;6;;2001;2018
+12002;38450002;LI;;;80025;Sistemas Operativos;15/12/2020;P;9;Promoción;8;;2100;2018
+12002;38450002;LI;;;80030;Redes de Computadoras;20/07/2021;A;7;Examen;8;;2250;2018
+12003;40123003;TPI;;;80005;Elementos de Programación;12/07/2021;A;6;Examen;10;;3001;2018
+12003;40123003;TPI;;;80010;Algoritmos y Estructuras;18/12/2022;P;8;Promoción;8;;3120;2018
+12004;41567004;LI;;;80020;Álgebra;15/07/2021;A;7;Examen;6;;4001;2020
+12004;41567004;LI;;;80025;Sistemas Operativos;10/12/2022;P;9;Promoción;8;;4110;2020
+12005;42890005;TPI;;;80005;Elementos de Programación;14/07/2022;P;10;Promoción;10;;5001;2020
+12005;42890005;TPI;;;80010;Algoritmos y Estructuras;20/11/2023;R;;;Promoción;8;;;2020
+12006;43234006;LI;;;80020;Álgebra;18/07/2022;A;5;Examen;6;;6001;2021
+12007;44567007;TPI;;L;80005;Elementos de Programación;14/12/2023;A;6;Examen;10;;7001;2021

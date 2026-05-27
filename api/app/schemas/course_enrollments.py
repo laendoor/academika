@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class CourseEnrollmentCreate(BaseModel):
     student_id: uuid.UUID
     course_id: uuid.UUID
+    degree_id: uuid.UUID
     year: int
     term: str
     section: str | None = None
@@ -15,6 +16,10 @@ class CourseEnrollmentCreate(BaseModel):
     grade: str | None = None
     enrolled_at: date | None = None
     status_changed_at: datetime | None = None
+    is_regular: str | None = None
+    approval_type: str | None = None
+    credits: int | None = None
+    plan_year: int | None = None
 
 
 class CourseEnrollmentUpdate(BaseModel):
@@ -28,6 +33,7 @@ class CourseEnrollmentResponse(BaseModel):
     id: uuid.UUID
     student_id: uuid.UUID
     course_id: uuid.UUID
+    degree_id: uuid.UUID
     year: int
     term: str
     section: str | None
@@ -36,6 +42,10 @@ class CourseEnrollmentResponse(BaseModel):
     grade: str | None
     enrolled_at: date | None
     status_changed_at: datetime | None
+    is_regular: str | None
+    approval_type: str | None
+    credits: int | None
+    plan_year: int | None
     created_at: datetime
     updated_at: datetime
 
