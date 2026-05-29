@@ -1,8 +1,77 @@
+import csv
+import logging
 from pathlib import Path
 
 from app.importers.utils import or_none, parse_csv, parse_date
 
-from .types import EnrollmentHistoryRow, EnrollmentRow, StudentRow
+from .types import (
+    CourseRow,
+    DegreeRow,
+    EnrollmentHistoryRow,
+    EnrollmentRow,
+    PrerequisiteRow,
+    StudentRow,
+    StudyPlanCourseRow,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def parse_degrees(path: Path) -> list[DegreeRow]:
+    def _row(row: list[str]) -> DegreeRow:
+        code, name, _fecha = row
+        return DegreeRow(code=code.strip(), name=name.strip())
+
+    return parse_csv(path, _row)
+
+
+def parse_courses(path: Path) -> list[CourseRow]:
+    def _row(row: list[str]) -> CourseRow:
+        _degree_code, _plan_year, code, name, abbreviation = row
+        return CourseRow(
+            code=code.strip(),
+            name=name.strip(),
+            abbreviation=or_none(abbreviation),
+        )
+
+    return parse_csv(path, _row, has_header=False)
+
+
+def parse_study_plan_courses(path: Path) -> list[StudyPlanCourseRow]:
+    def _row(row: list[str]) -> StudyPlanCourseRow:
+        degree_code, plan_year_str, _cuatrimestre, _nucleo, _area, course_code, _creditos, _nombre = row[:8]
+        return StudyPlanCourseRow(
+            degree_code=degree_code.strip(),
+            plan_year=int(plan_year_str.strip()),
+            course_code=course_code.strip(),
+        )
+
+    return parse_csv(path, _row)
+
+
+def parse_prerequisites(path: Path) -> list[PrerequisiteRow]:
+    def _split_codes(value: str) -> list[str]:
+        return [c.strip() for c in value.strip().split(",") if c.strip()]
+
+    rows: list[PrerequisiteRow] = []
+    with open(path, encoding="utf-8", newline="") as f:
+        reader = csv.reader(f, delimiter=";")
+        next(reader)
+        for i, row in enumerate(reader, start=2):
+            try:
+                degree_code, plan_year_str, course_code, obligatorias_str, recomendadas_str = row[:5]
+                rows.append(
+                    PrerequisiteRow(
+                        degree_code=degree_code.strip(),
+                        plan_year=int(plan_year_str.strip()),
+                        course_code=course_code.strip(),
+                        required_codes=_split_codes(obligatorias_str),
+                        recommended_codes=_split_codes(recomendadas_str),
+                    )
+                )
+            except Exception as e:
+                logger.warning("%s fila %d inválida: %s", path.name, i, e)
+    return rows
 
 
 def parse_students(path: Path) -> list[StudentRow]:
