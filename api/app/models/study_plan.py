@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
@@ -30,6 +30,8 @@ class StudyPlan(AuditMixin, Base):
     name: Mapped[str] = mapped_column(String(255))
     year: Mapped[int] = mapped_column(Integer)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+
+    __table_args__ = (UniqueConstraint("degree_id", "year", name="uq_study_plan_degree_year"),)
 
     degree: Mapped[Degree] = relationship("Degree", back_populates="study_plans")
     courses: Mapped[list[Course]] = relationship("Course", secondary=study_plan_course, back_populates="study_plans")
