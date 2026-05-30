@@ -2,7 +2,47 @@ import uuid
 from datetime import date
 from unittest.mock import MagicMock
 
-from app.importers.guarani.types import EnrollmentHistoryRow, EnrollmentRow, StudentRow
+from app.importers.guarani.types import (
+    CourseRow,
+    DegreeRow,
+    EnrollmentHistoryRow,
+    EnrollmentRow,
+    PrerequisiteRow,
+    StudentRow,
+    StudyPlanCourseRow,
+)
+
+
+def make_degree_row(code: str = "TPI", name: str = "Tecnicatura en Programación") -> DegreeRow:
+    return DegreeRow(code=code, name=name)
+
+
+def make_course_row(code: str = "101", name: str = "Algoritmos", abbreviation: str | None = "algo") -> CourseRow:
+    return CourseRow(code=code, name=name, abbreviation=abbreviation)
+
+
+def make_study_plan_course_row(
+    degree_code: str = "TPI",
+    plan_year: int = 2015,
+    course_code: str = "101",
+) -> StudyPlanCourseRow:
+    return StudyPlanCourseRow(degree_code=degree_code, plan_year=plan_year, course_code=course_code)
+
+
+def make_prerequisite_row(
+    degree_code: str = "TPI",
+    plan_year: int = 2015,
+    course_code: str = "102",
+    required_codes: list[str] | None = None,
+    recommended_codes: list[str] | None = None,
+) -> PrerequisiteRow:
+    return PrerequisiteRow(
+        degree_code=degree_code,
+        plan_year=plan_year,
+        course_code=course_code,
+        required_codes=required_codes if required_codes is not None else ["101"],
+        recommended_codes=recommended_codes if recommended_codes is not None else [],
+    )
 
 
 def make_student_row(

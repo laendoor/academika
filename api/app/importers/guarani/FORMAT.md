@@ -144,6 +144,130 @@ CourseEnrollment(
 )
 ```
 
+## carreras.csv
+
+Catálogo de carreras. Una fila por carrera.
+
+| Columna | Tipo     | Mapea a       | Notas                                |
+| ------- | -------- | ------------- | ------------------------------------ |
+| Codigo  | `string` | `Degree.code` | Clave natural; ej: `TPI`, `P`, `W`   |
+| Nombre  | `string` | `Degree.name` |                                      |
+| fecha   | `date`   | —             | Ignorado (fecha de creación Guaraní) |
+
+### Ejemplo de parseo
+
+**Fila:**
+
+```txt
+TPI;Tecnicatura Universitaria en Programación Informática;01/01/2000
+```
+
+**Produce:**
+
+```python
+DegreeRow(code="TPI", name="Tecnicatura Universitaria en Programación Informática")
+```
+
+## materias.csv
+
+Catálogo de materias. **Sin cabecera.** Una fila por materia.
+
+> **Nota:** este archivo no tiene fila de cabecera — `parse_csv(has_header=False)`.
+
+| Posición | Tipo     | Mapea a                 | Notas                                  |
+| -------- | -------- | ----------------------- | -------------------------------------- |
+| 0        | `string` | `CourseRow.degree_code` | Código de carrera; usado para contexto |
+| 1        | `int`    | `CourseRow.plan_year`   | Año del plan; usado para contexto      |
+| 2        | `string` | `Course.code`           | Clave natural de la materia            |
+| 3        | `string` | `Course.name`           |                                        |
+| 4        | `string` | `Course.abbreviation`   | Puede estar vacío (`""`)               |
+
+### Ejemplo de parseo
+
+**Fila:**
+
+```txt
+TPI;2015;101;Algoritmos;algo
+```
+
+**Produce:**
+
+```python
+CourseRow(degree_code="TPI", plan_year=2015, code="101", name="Algoritmos", abbreviation="algo")
+```
+
+## planes\_\*.csv
+
+Materias de un plan de estudios. Una fila por materia-plan. Archivos separados por carrera (`planes_tpi.csv`, `planes_lds.csv`).
+
+> **Nota:** las exportaciones de Guaraní suelen incluir columnas trailing vacías (ej: `;;;;` al final de cada fila). El parser trabaja por índice y las ignora.
+
+| Columna        | Tipo     | Mapea a                       | Notas                                |
+| -------------- | -------- | ----------------------------- | ------------------------------------ |
+| Codigo Carrera | `string` | `StudyPlan.degree_code`       | Debe existir en `degree.code`        |
+| Plan           | `int`    | `StudyPlan.year`              | Año del plan; ej: 2015, 2018         |
+| Cuatrimestre   | `string` | —                             | Ignorado                             |
+| Nucleo         | `string` | —                             | Ignorado                             |
+| Area           | `string` | —                             | Ignorado                             |
+| Codigo         | `string` | `study_plan_course.course_id` | Debe existir en `course.code`        |
+| Creditos       | `int`    | —                             | Ignorado (no modelado aún)           |
+| Nombre         | `string` | —                             | Ignorado (nombre canónico en Course) |
+
+El upsert crea/actualiza el `StudyPlan` con `name = "Plan {year}"` y luego vincula las materias en `study_plan_course` (ON CONFLICT DO NOTHING).
+
+### Ejemplo de parseo
+
+**Fila:**
+
+```txt
+TPI;2015;1;Básico;Programación;101;8;Algoritmos
+```
+
+**Produce:**
+
+```python
+StudyPlanCourseRow(degree_code="TPI", plan_year=2015, course_code="101")
+```
+
+## requisitos\_\*.csv
+
+Correlatividades de un plan de estudios. Una fila por materia. Archivos separados por carrera (`requisitos_tpi.csv`, `requisitos_lds.csv`).
+
+> **Nota:** `Obligatorias` y `Recomendadas` son listas de códigos separadas por coma. Si la lista tiene más de un elemento, el CSV la entrega entre comillas (`"101, 102"`). Si está vacía, el campo es `""`.
+> El parser devuelve una `PrerequisiteRow` por fila CSV; el service expande la lista en filas individuales de `CoursePrerequisite`.
+
+| Columna      | Tipo     | Mapea a                                | Notas                                 |
+| ------------ | -------- | -------------------------------------- | ------------------------------------- |
+| Carrera      | `string` | `PrerequisiteRow.degree_code`          | Debe existir en `degree.code`         |
+| Plan         | `int`    | `PrerequisiteRow.plan_year`            | Año del plan                          |
+| Materia      | `string` | `CoursePrerequisite.course_id`         | Materia que tiene correlativas        |
+| Obligatorias | `string` | `CoursePrerequisite.is_required=True`  | Lista de códigos; vacío → lista vacía |
+| Recomendadas | `string` | `CoursePrerequisite.is_required=False` | Lista de códigos; vacío → lista vacía |
+
+### Ejemplo de parseo
+
+**Fila:**
+
+```txt
+TPI;2015;103;"101, 102";101
+```
+
+**Produce:**
+
+```python
+PrerequisiteRow(
+    degree_code="TPI",
+    plan_year=2015,
+    course_code="103",
+    required_codes=["101", "102"],
+    recommended_codes=["101"],
+)
+# El service expande esto en 3 filas CoursePrerequisite:
+#   (plan, 103, 101, is_required=True)
+#   (plan, 103, 102, is_required=True)
+#   (plan, 103, 101, is_required=False)
+```
+
 ## Decisiones y defaults
 
 ### Derivación para cuatrimestre

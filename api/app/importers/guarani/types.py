@@ -1,5 +1,34 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
+
+
+@dataclass
+class DegreeRow:
+    code: str
+    name: str
+
+
+@dataclass
+class CourseRow:
+    code: str
+    name: str
+    abbreviation: str | None
+
+
+@dataclass
+class StudyPlanCourseRow:
+    degree_code: str
+    plan_year: int
+    course_code: str
+
+
+@dataclass
+class PrerequisiteRow:
+    degree_code: str
+    plan_year: int
+    course_code: str
+    required_codes: list[str] = field(default_factory=list)
+    recommended_codes: list[str] = field(default_factory=list)
 
 
 @dataclass
