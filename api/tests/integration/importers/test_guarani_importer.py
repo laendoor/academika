@@ -7,9 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.base import generate_uuid
 from app.models.course import Course
 from app.models.course_enrollment import CourseEnrollment
+from app.models.course_prerequisite import CoursePrerequisite
 from app.models.degree import Degree
 from app.models.student import Student
-from app.models.study_plan import StudyPlan
+from app.models.study_plan import StudyPlan, study_plan_course
 from app.services.guarani_importer import GuaraniImporterService
 
 SAMPLE_DATA = Path(__file__).parents[3] / "sample-data"
@@ -147,3 +148,147 @@ async def test_skips_missing_degree(db_session: AsyncSession) -> None:
     assert upserted == 0
     assert skipped > 0
     assert len(students) == 0
+
+
+# ---------------------------------------------------------------------------
+# Degrees
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_import_degrees_from_csv(db_session: AsyncSession) -> None:
+    service = GuaraniImporterService(db_session)
+
+    upserted, skipped = await service.import_degrees(SAMPLE_DATA / "carreras.csv")
+
+    degrees = (await db_session.execute(select(Degree))).scalars().all()
+    assert upserted > 0
+    assert skipped == 0
+    assert len(degrees) == upserted
+
+
+@pytest.mark.asyncio
+async def test_idempotency_degrees(db_session: AsyncSession) -> None:
+    service = GuaraniImporterService(db_session)
+    path = SAMPLE_DATA / "carreras.csv"
+
+    upserted_1, _ = await service.import_degrees(path)
+    upserted_2, _ = await service.import_degrees(path)
+
+    degrees = (await db_session.execute(select(Degree))).scalars().all()
+    assert upserted_1 == upserted_2
+    assert len(degrees) == upserted_1
+
+
+# ---------------------------------------------------------------------------
+# Courses
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_import_courses_from_csv(db_session: AsyncSession) -> None:
+    service = GuaraniImporterService(db_session)
+
+    upserted, skipped = await service.import_courses(SAMPLE_DATA / "materias.csv")
+
+    courses = (await db_session.execute(select(Course))).scalars().all()
+    assert upserted > 0
+    assert skipped == 0
+    # The same course code can appear in multiple plan rows; upsert deduplicates by code
+    assert len(courses) <= upserted
+    assert len(courses) > 0
+
+
+@pytest.mark.asyncio
+async def test_idempotency_courses(db_session: AsyncSession) -> None:
+    service = GuaraniImporterService(db_session)
+    path = SAMPLE_DATA / "materias.csv"
+
+    upserted_1, _ = await service.import_courses(path)
+    upserted_2, _ = await service.import_courses(path)
+
+    courses = (await db_session.execute(select(Course))).scalars().all()
+    assert upserted_1 == upserted_2
+    assert len(courses) > 0
+
+
+# ---------------------------------------------------------------------------
+# Study plans
+# ---------------------------------------------------------------------------
+
+
+async def _seed_degrees_and_courses(session: AsyncSession) -> None:
+    service = GuaraniImporterService(session)
+    await service.import_degrees(SAMPLE_DATA / "carreras.csv")
+    await service.import_courses(SAMPLE_DATA / "materias.csv")
+
+
+@pytest.mark.asyncio
+async def test_import_study_plans_from_csv(db_session: AsyncSession) -> None:
+    await _seed_degrees_and_courses(db_session)
+    service = GuaraniImporterService(db_session)
+    paths = [SAMPLE_DATA / "planes_tpi.csv", SAMPLE_DATA / "planes_lds.csv"]
+
+    upserted, skipped = await service.import_study_plans(paths)
+
+    plans = (await db_session.execute(select(StudyPlan))).scalars().all()
+    links = (await db_session.execute(select(study_plan_course))).all()
+    assert upserted > 0
+    # Real data may reference courses not present in materias.csv — skips are expected
+    assert skipped >= 0
+    assert len(plans) > 0
+    assert len(links) == upserted
+
+
+@pytest.mark.asyncio
+async def test_idempotency_study_plans(db_session: AsyncSession) -> None:
+    await _seed_degrees_and_courses(db_session)
+    service = GuaraniImporterService(db_session)
+    paths = [SAMPLE_DATA / "planes_tpi.csv", SAMPLE_DATA / "planes_lds.csv"]
+
+    upserted_1, _ = await service.import_study_plans(paths)
+    upserted_2, _ = await service.import_study_plans(paths)
+
+    links = (await db_session.execute(select(study_plan_course))).all()
+    assert upserted_1 == upserted_2
+    assert len(links) == upserted_1
+
+
+# ---------------------------------------------------------------------------
+# Prerequisites
+# ---------------------------------------------------------------------------
+
+
+async def _seed_full(session: AsyncSession) -> None:
+    await _seed_degrees_and_courses(session)
+    service = GuaraniImporterService(session)
+    await service.import_study_plans([SAMPLE_DATA / "planes_tpi.csv", SAMPLE_DATA / "planes_lds.csv"])
+
+
+@pytest.mark.asyncio
+async def test_import_prerequisites_from_csv(db_session: AsyncSession) -> None:
+    await _seed_full(db_session)
+    service = GuaraniImporterService(db_session)
+    paths = [SAMPLE_DATA / "requisitos_tpi.csv", SAMPLE_DATA / "requisitos_lds.csv"]
+
+    upserted, skipped = await service.import_prerequisites(paths)
+
+    prereqs = (await db_session.execute(select(CoursePrerequisite))).scalars().all()
+    assert upserted > 0
+    # Real data may reference courses/plans not fully covered by the seeded data
+    assert skipped >= 0
+    assert len(prereqs) == upserted
+
+
+@pytest.mark.asyncio
+async def test_idempotency_prerequisites(db_session: AsyncSession) -> None:
+    await _seed_full(db_session)
+    service = GuaraniImporterService(db_session)
+    paths = [SAMPLE_DATA / "requisitos_tpi.csv", SAMPLE_DATA / "requisitos_lds.csv"]
+
+    upserted_1, _ = await service.import_prerequisites(paths)
+    upserted_2, _ = await service.import_prerequisites(paths)
+
+    prereqs = (await db_session.execute(select(CoursePrerequisite))).scalars().all()
+    assert upserted_1 == upserted_2
+    assert len(prereqs) == upserted_1
