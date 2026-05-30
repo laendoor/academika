@@ -391,6 +391,7 @@ class TestUpsertPrerequisites:
         courses = {code: make_course(code) for code in ["102", "100", "101"]}
         plan = make_study_plan(degree.id, 2015)
 
+        # "101" appears in both lists — required should win; dedup yields 2 unique entries
         row = make_prerequisite_row(required_codes=["100", "101"], recommended_codes=["101"])
 
         with patch.object(service, "_fetch_degrees", return_value={"TPI": degree}):
@@ -398,7 +399,7 @@ class TestUpsertPrerequisites:
                 with patch.object(service, "_fetch_study_plans", return_value={(degree.id, 2015): plan}):
                     upserted, skipped = await service._upsert_prerequisites([row])
 
-        assert upserted == 3
+        assert upserted == 2
         assert skipped == 0
 
     async def test_commits_at_end(self):

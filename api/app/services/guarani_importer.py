@@ -376,10 +376,10 @@ class GuaraniImporterService:
                 skipped += 1
                 continue
 
-            prerequisites = [(code, True) for code in row.required_codes] + [
-                (code, False) for code in row.recommended_codes
-            ]
-            for prereq_code, is_required in prerequisites:
+            # required_codes overwrite recommended_codes when a code appears in both
+            prereqs: dict[str, bool] = {code: False for code in row.recommended_codes}
+            prereqs.update({code: True for code in row.required_codes})
+            for prereq_code, is_required in prereqs.items():
                 prereq = courses.get(prereq_code)
                 if prereq is None:
                     logger.warning("import_prerequisites: prerequisite course not found — code=%s", prereq_code)

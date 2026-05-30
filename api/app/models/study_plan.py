@@ -11,6 +11,7 @@ from app.db.base import AuditMixin, Base, generate_uuid
 
 if TYPE_CHECKING:
     from app.models.course import Course
+    from app.models.course_prerequisite import CoursePrerequisite
     from app.models.degree import Degree
 
 
@@ -35,3 +36,6 @@ class StudyPlan(AuditMixin, Base):
 
     degree: Mapped[Degree] = relationship("Degree", back_populates="study_plans")
     courses: Mapped[list[Course]] = relationship("Course", secondary=study_plan_course, back_populates="study_plans")
+    course_prerequisites: Mapped[list[CoursePrerequisite]] = relationship(
+        "CoursePrerequisite", back_populates="plan"
+    )

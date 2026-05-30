@@ -1,4 +1,3 @@
-import csv
 import logging
 from pathlib import Path
 
@@ -53,25 +52,17 @@ def parse_prerequisites(path: Path) -> list[PrerequisiteRow]:
     def _split_codes(value: str) -> list[str]:
         return [c.strip() for c in value.strip().split(",") if c.strip()]
 
-    rows: list[PrerequisiteRow] = []
-    with open(path, encoding="utf-8", newline="") as f:
-        reader = csv.reader(f, delimiter=";")
-        next(reader)
-        for i, row in enumerate(reader, start=2):
-            try:
-                degree_code, plan_year_str, course_code, obligatorias_str, recomendadas_str = row[:5]
-                rows.append(
-                    PrerequisiteRow(
-                        degree_code=degree_code.strip(),
-                        plan_year=int(plan_year_str.strip()),
-                        course_code=course_code.strip(),
-                        required_codes=_split_codes(obligatorias_str),
-                        recommended_codes=_split_codes(recomendadas_str),
-                    )
-                )
-            except Exception as e:
-                logger.warning("%s fila %d inválida: %s", path.name, i, e)
-    return rows
+    def _row(row: list[str]) -> PrerequisiteRow:
+        degree_code, plan_year_str, course_code, obligatorias_str, recomendadas_str = row[:5]
+        return PrerequisiteRow(
+            degree_code=degree_code.strip(),
+            plan_year=int(plan_year_str.strip()),
+            course_code=course_code.strip(),
+            required_codes=_split_codes(obligatorias_str),
+            recommended_codes=_split_codes(recomendadas_str),
+        )
+
+    return parse_csv(path, _row)
 
 
 def parse_students(path: Path) -> list[StudentRow]:

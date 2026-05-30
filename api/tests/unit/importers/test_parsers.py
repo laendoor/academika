@@ -104,6 +104,7 @@ class TestParseCarreras:
         assert row.name == "Tecnicatura Universitaria en Programación Informática"
 
     def test_skips_invalid_row(self) -> None:
+        # fixture has 2 valid rows + 1 truncated row; truncated must be silently skipped
         rows = parse_degrees(FIXTURES / "carreras.csv")
         assert len(rows) == 2
 

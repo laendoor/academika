@@ -22,8 +22,10 @@ class CoursePrerequisite(AuditMixin, Base):
     prerequisite_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(native_uuid=True), ForeignKey("course.id"), primary_key=True
     )
-    is_required: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    is_required: Mapped[bool] = mapped_column(Boolean)
 
-    plan: Mapped[StudyPlan] = relationship("StudyPlan")
-    course: Mapped[Course] = relationship("Course", foreign_keys=[course_id])
-    prerequisite: Mapped[Course] = relationship("Course", foreign_keys=[prerequisite_id])
+    plan: Mapped[StudyPlan] = relationship("StudyPlan", back_populates="course_prerequisites")
+    course: Mapped[Course] = relationship("Course", foreign_keys=[course_id], back_populates="prerequisites_as_subject")
+    prerequisite: Mapped[Course] = relationship(
+        "Course", foreign_keys=[prerequisite_id], back_populates="prerequisites_as_prereq"
+    )
