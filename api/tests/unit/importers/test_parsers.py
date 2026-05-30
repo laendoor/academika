@@ -9,8 +9,8 @@ from app.importers.guarani.parsers import (
     parse_enrollment_history,
     parse_enrollments,
     parse_prerequisites,
-    parse_study_plan_courses,
     parse_students,
+    parse_study_plan_courses,
 )
 from app.importers.utils import date_to_year_term
 
