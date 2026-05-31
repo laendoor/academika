@@ -1,3 +1,5 @@
+from collections.abc import AsyncGenerator
+
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
@@ -61,7 +63,7 @@ def db_url(postgres_container):
 
 
 @pytest_asyncio.fixture
-async def test_engine(db_url) -> AsyncEngine:
+async def test_engine(db_url) -> AsyncGenerator[AsyncEngine]:
     """Engine NullPool compartido por db_session, client y clean_db dentro de un mismo test."""
     engine = create_async_engine(db_url, poolclass=NullPool)
     yield engine
@@ -74,7 +76,7 @@ async def session_factory(test_engine) -> async_sessionmaker:
 
 
 @pytest_asyncio.fixture
-async def db_session(session_factory) -> AsyncSession:
+async def db_session(session_factory) -> AsyncGenerator[AsyncSession]:
     """Cada test recibe su propia sesión con rollback al finalizar."""
     async with session_factory() as session:
         yield session
@@ -82,13 +84,13 @@ async def db_session(session_factory) -> AsyncSession:
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def clean_db(test_engine: AsyncEngine) -> None:
+async def clean_db(test_engine: AsyncEngine) -> AsyncGenerator[None]:
     """Trunca tablas de negocio después de cada test. Las lkp son session-scoped y no se tocan."""
     yield
     async with AsyncSession(test_engine) as session:
         await session.execute(
             text(
-                "TRUNCATE course_enrollment, study_plan_course, student, study_plan, course, degree"
+                "TRUNCATE course_enrollments, study_plans_courses, students, study_plans, courses, degrees"
                 " RESTART IDENTITY CASCADE"
             )
         )
@@ -96,7 +98,7 @@ async def clean_db(test_engine: AsyncEngine) -> None:
 
 
 @pytest_asyncio.fixture
-async def client(session_factory) -> AsyncClient:
+async def client(session_factory) -> AsyncGenerator[AsyncClient]:
     """Cliente HTTP con sesión del mismo engine que el resto del test."""
 
     async def override_get_session():

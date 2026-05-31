@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class Student(AuditMixin, Base):
-    __tablename__ = "student"
+    __tablename__ = "students"
     __table_args__ = (UniqueConstraint("unq_id", name="uq_student_unq_id"),)
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
@@ -26,9 +26,9 @@ class Student(AuditMixin, Base):
     doc_id: Mapped[str] = mapped_column(String(20), unique=True)
     unq_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    degree_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("degree.id"))
+    degree_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("degrees.id"))
     plan_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid(native_uuid=True), ForeignKey("study_plan.id"), nullable=True
+        Uuid(native_uuid=True), ForeignKey("study_plans.id"), nullable=True
     )
     enrolled_at: Mapped[date | None] = mapped_column(Date, nullable=True)
     academic_status: Mapped[str] = mapped_column(String(50), ForeignKey("lkp_academic_status.key"))

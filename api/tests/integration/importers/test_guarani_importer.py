@@ -10,7 +10,8 @@ from app.models.course_enrollment import CourseEnrollment
 from app.models.course_prerequisite import CoursePrerequisite
 from app.models.degree import Degree
 from app.models.student import Student
-from app.models.study_plan import StudyPlan, study_plan_course
+from app.models.study_plan import StudyPlan
+from app.models.study_plans_courses import study_plans_courses
 from app.services.guarani_importer import GuaraniImporterService
 
 SAMPLE_DATA = Path(__file__).parents[3] / "sample-data"
@@ -129,6 +130,7 @@ async def test_reimport_preserves_manual_academic_status(db_session: AsyncSessio
     await service.import_students(SAMPLE_DATA / "datos_personales.csv")
 
     student = (await db_session.execute(select(Student))).scalars().first()
+    assert student is not None
     student.academic_status = "no_regular"
     await db_session.commit()
 
@@ -232,7 +234,7 @@ async def test_import_study_plans_from_csv(db_session: AsyncSession) -> None:
     upserted, skipped = await service.import_study_plans(paths)
 
     plans = (await db_session.execute(select(StudyPlan))).scalars().all()
-    links = (await db_session.execute(select(study_plan_course))).all()
+    links = (await db_session.execute(select(study_plans_courses))).all()
     assert upserted > 0
     # Real data may reference courses not present in materias.csv — skips are expected
     assert skipped >= 0
@@ -249,7 +251,7 @@ async def test_idempotency_study_plans(db_session: AsyncSession) -> None:
     upserted_1, _ = await service.import_study_plans(paths)
     upserted_2, _ = await service.import_study_plans(paths)
 
-    links = (await db_session.execute(select(study_plan_course))).all()
+    links = (await db_session.execute(select(study_plans_courses))).all()
     assert upserted_1 == upserted_2
     assert len(links) == upserted_1
 

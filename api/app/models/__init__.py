@@ -6,7 +6,8 @@ from app.models.lkp_academic_status import LkpAcademicStatus
 from app.models.lkp_enrollment_status import LkpEnrollmentStatus
 from app.models.lkp_enrollment_type import LkpEnrollmentType
 from app.models.student import Student
-from app.models.study_plan import StudyPlan, study_plan_course
+from app.models.study_plan import StudyPlan
+from app.models.study_plans_courses import study_plans_courses
 
 __all__ = [
     "Course",
@@ -18,5 +19,5 @@ __all__ = [
     "LkpEnrollmentType",
     "Student",
     "StudyPlan",
-    "study_plan_course",
+    "study_plans_courses",
 ]

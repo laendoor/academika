@@ -5,7 +5,8 @@ from sqlalchemy.exc import IntegrityError
 
 from app.db.base import generate_uuid
 from app.errors import ConflictError
-from app.models.study_plan import StudyPlan, study_plan_course
+from app.models.study_plan import StudyPlan
+from app.models.study_plans_courses import study_plans_courses
 from app.schemas.study_plans import StudyPlanCreate, StudyPlanUpdate
 from app.services.base import BaseService
 
@@ -44,8 +45,8 @@ class StudyPlanService(BaseService[StudyPlan, StudyPlanCreate, StudyPlanUpdate])
         return instance
 
     async def _set_courses(self, plan_id: uuid.UUID, course_ids: list[uuid.UUID]) -> None:
-        await self.session.execute(delete(study_plan_course).where(study_plan_course.c.plan_id == plan_id))
+        await self.session.execute(delete(study_plans_courses).where(study_plans_courses.c.plan_id == plan_id))
         if course_ids:
             await self.session.execute(
-                insert(study_plan_course).values([{"plan_id": plan_id, "course_id": cid} for cid in course_ids])
+                insert(study_plans_courses).values([{"plan_id": plan_id, "course_id": cid} for cid in course_ids])
             )
