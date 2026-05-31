@@ -16,6 +16,7 @@ from app.main import app
 from app.models.lkp_academic_status import LkpAcademicStatus
 from app.models.lkp_enrollment_status import LkpEnrollmentStatus
 from app.models.lkp_enrollment_type import LkpEnrollmentType
+from app.models.lkp_user_role import LkpUserRole
 
 
 def _seed_lkp(engine) -> None:
@@ -40,6 +41,12 @@ def _seed_lkp(engine) -> None:
             [
                 LkpEnrollmentType(key="regular", label="Cursada Regular"),
                 LkpEnrollmentType(key="libre", label="Libre"),
+            ]
+        )
+        session.add_all(
+            [
+                LkpUserRole(key="admin", label="Administrador"),
+                LkpUserRole(key="director", label="Director de Carrera"),
             ]
         )
         session.commit()
