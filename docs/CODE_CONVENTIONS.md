@@ -86,6 +86,49 @@ a un modelo completo con `mapped_column()`.
 
 ---
 
+## Estilo de código
+
+### Ramas positivas
+
+Preferir condiciones positivas sobre negaciones, especialmente en alternativas cortas donde se retorna
+en uno u otro camino. Las negaciones (y más aún sus combinaciones con `and`/`or`) aumentan la carga
+cognitiva al leer.
+
+```python
+# Preferido
+if user and verify_password(password, user.hashed_password):
+    return tokens
+raise UnauthorizedError(...)
+
+# Evitar
+if not user or not verify_password(password, user.hashed_password):
+    raise UnauthorizedError(...)
+return tokens
+```
+
+### Helpers `ensure_*` para guard clauses con efectos secundarios
+
+Cuando una validación implica un `try/except` o un `if` que lanza una excepción, extraerla a una
+función `_ensure_*`. El nombre comunica la intención ("garantizar que X sea válido") sin que el lector
+tenga que parsear la mecánica del error.
+
+```python
+def _ensure_payload_decoded(token: str, expected_type: str) -> dict:
+    try:
+        return decode_token(token, expected_type=expected_type)
+    except jwt.InvalidTokenError as e:
+        raise UnauthorizedError("Token inválido o expirado") from e
+
+# En el método:
+payload = _ensure_payload_decoded(token, "reset")  # flujo feliz, sin ruido
+user = await self.session.get(User, uuid.UUID(payload["sub"]))
+```
+
+Aplicar cuando la alternativa inline dificulta ver el flujo principal del método.
+No aplicar mecánicamente: un `if x is None: raise` de una línea no necesita helper.
+
+---
+
 ## IDs
 
 UUID v7 via `generate_uuid()` de `app.db.base`. Nunca `uuid_utils.uuid7()` directo.

@@ -22,3 +22,13 @@ class ConflictError(AcademikaError):
 class BusinessError(AcademikaError):
     def __init__(self, detail: str) -> None:
         super().__init__(detail)
+
+
+class UnauthorizedError(AcademikaError):
+    def __init__(self, detail: str = "No autorizado") -> None:
+        super().__init__(detail)
+
+
+class ForbiddenError(AcademikaError):
+    def __init__(self, detail: str = "Acceso denegado") -> None:
+        super().__init__(detail)
