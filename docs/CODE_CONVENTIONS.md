@@ -5,6 +5,26 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 
 ---
 
+## Componentes (frontend)
+
+El criterio es conceptual: componentizar cuando mejora la legibilidad y la estructura del código, no mecánicamente. El fragmento merece ser componente cuando tiene nombre propio y cuando su extracción hace que el código que queda sea más fácil de leer y razonar.
+
+La repetición es la señal práctica más confiable. Los programadores la usan como heurística para no sobrediseñar: si aparece una sola vez, la abstracción puede ser prematura; cuando aparece por segunda vez, el componente se justifica. La IA tiende a estar enfocada en la tarea puntual y puede no ver patrones entre archivos — hay que proponer candidatos activamente cuando aparezca repetición o cuando la extracción mejore claramente una página.
+
+### Ubicación
+
+```txt
+ui/src/components/
+  auth/      ← componentes de dominio (auth, recovery)
+  ui/        ← primitivos sin dominio (futuro)
+```
+
+### Server vs Client components
+
+Sin `"use client"` por defecto. Agregar solo cuando el componente necesita hooks (`useState`, `useActionState`, `useSearchParams`) o event handlers interactivos. Los componentes de presentación pura funcionan en ambos contextos sin `"use client"`.
+
+---
+
 ## Variables de entorno
 
 Nunca acceder a `process.env.*` (frontend) ni a `os.environ` (backend) directamente en código de negocio. Toda lectura de env vars va en un módulo central:
