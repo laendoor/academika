@@ -5,6 +5,26 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 
 ---
 
+## Variables de entorno
+
+Nunca acceder a `process.env.*` (frontend) ni a `os.environ` (backend) directamente en código de negocio. Toda lectura de env vars va en un módulo central:
+
+- **Frontend:** `ui/src/lib/constants.ts`
+- **Backend:** `api/app/config.py` (pydantic-settings)
+
+```typescript
+// constants.ts
+export const API_URL = process.env.API_URL ?? "http://localhost:8000";
+export const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+// En el código de negocio:
+import { API_URL, IS_PRODUCTION } from "@/lib/constants";
+```
+
+Ventaja: un solo lugar para auditar qué env vars usa la app, y fácil de mockear en tests.
+
+---
+
 ## Testing
 
 ### Unit vs Integration
