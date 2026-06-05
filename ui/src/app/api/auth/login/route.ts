@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { API_URL, IS_PRODUCTION } from "@/lib/constants";
 

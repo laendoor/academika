@@ -115,17 +115,17 @@ async def test_refresh_user_not_found(service: AuthService, mock_user: MagicMock
 @pytest.mark.asyncio
 async def test_forgot_password_sends_email(service: AuthService, session: AsyncMock, mock_user: MagicMock):
     _mock_execute(session, mock_user)
-    with patch("app.services.auth.resend") as mock_resend:
+    with patch("app.services.auth.send_mail") as mock_send:
         await service.forgot_password("steve@unq.edu.ar")
-        mock_resend.Emails.send.assert_called_once()
+        mock_send.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_forgot_password_silent_fail(service: AuthService, session: AsyncMock):
     _mock_execute(session, None)
-    with patch("app.services.auth.resend") as mock_resend:
+    with patch("app.services.auth.send_mail") as mock_send:
         await service.forgot_password("nadie@unq.edu.ar")
-        mock_resend.Emails.send.assert_not_called()
+        mock_send.assert_not_called()
 
 
 # ── reset_password ───────────────────────────────────────────────────────────
