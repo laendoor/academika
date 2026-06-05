@@ -3,7 +3,7 @@ from app.errors import UnauthorizedError
 
 class InvalidCredentialsError(UnauthorizedError):
     def __init__(self) -> None:
-        super().__init__("Credenciales inválidas")
+        super().__init__("Credenciales incorrectas")
 
 
 class InvalidTokenError(UnauthorizedError):

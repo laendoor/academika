@@ -1,6 +1,5 @@
 import uuid
 
-import resend
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +10,7 @@ from app.auth.tokens import create_access_token, create_refresh_token, create_re
 from app.config import settings
 from app.db.session import SessionDep
 from app.models.user import User
+from app.services.mail import send_mail
 
 
 class AuthService:
@@ -53,17 +53,13 @@ class AuthService:
         token = create_reset_token(user.id, user.email)
         reset_url = f"{settings.frontend_url}/reset-password?token={token}"
 
-        resend.api_key = settings.resend_api_key
-        resend.Emails.send(
-            {
-                "from": settings.resend_from_email,
-                "to": user.email,
-                "subject": "Recuperación de contraseña — Académika",
-                "html": (
-                    f'<p>Hacé clic <a href="{reset_url}">acá</a> para resetear tu contraseña.'
-                    " El enlace expira en 1 hora.</p>"
-                ),
-            }
+        send_mail(
+            to=user.email,
+            subject="Recuperación de contraseña - Academika",
+            html=(
+                f'<p>Hacé clic <a href="{reset_url}">acá</a> para resetear tu contraseña.'
+                " El enlace expira en 1 hora.</p>"
+            ),
         )
 
     async def reset_password(self, token: str, new_password: str) -> None:
