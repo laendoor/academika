@@ -33,7 +33,8 @@ from app.models.course_enrollment import CourseEnrollment
 from app.models.course_prerequisite import CoursePrerequisite
 from app.models.degree import Degree
 from app.models.student import Student
-from app.models.study_plan import StudyPlan, study_plan_course
+from app.models.study_plan import StudyPlan
+from app.models.study_plans_courses import study_plans_courses
 
 logger = logging.getLogger(__name__)
 
@@ -340,7 +341,9 @@ class GuaraniImporterService:
                 )
                 skipped += 1
                 continue
-            link_stmt = insert(study_plan_course).values(plan_id=plan.id, course_id=course.id).on_conflict_do_nothing()
+            link_stmt = (
+                insert(study_plans_courses).values(plan_id=plan.id, course_id=course.id).on_conflict_do_nothing()
+            )
             await self.session.execute(link_stmt)
             upserted += 1
 

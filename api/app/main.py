@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.exception_handlers import add_error_handlers
 from app.routers import (
+    auth,
     course_enrollments,
     courses,
     degrees,
@@ -18,6 +19,8 @@ add_error_handlers(app)
 app.include_router(health.router, prefix="/health", tags=["health"])
 
 api_prefix = "/api/v1"
+
+app.include_router(auth.router, prefix=f"{api_prefix}/auth", tags=["auth"])
 
 app.include_router(degrees.router, prefix=f"{api_prefix}/carreras", tags=["carreras"])
 app.include_router(courses.router, prefix=f"{api_prefix}/materias", tags=["materias"])

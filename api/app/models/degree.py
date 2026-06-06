@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class Degree(AuditMixin, Base):
-    __tablename__ = "degree"
+    __tablename__ = "degrees"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     name: Mapped[str] = mapped_column(String(255))

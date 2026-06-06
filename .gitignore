@@ -13,6 +13,9 @@ __pycache__/
 # Env files
 .env
 
+# Dev logs
+dev-api.log
+
 # Node
 ui/node_modules/
 ui/.next/
@@ -22,3 +25,6 @@ datos-prueba/*_anon.*
 
 # OS
 .DS_Store
+
+# Schema dumps
+schema.sql

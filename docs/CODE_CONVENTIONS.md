@@ -5,6 +5,46 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 
 ---
 
+## Componentes (frontend)
+
+El criterio es conceptual: componentizar cuando mejora la legibilidad y la estructura del código, no mecánicamente. El fragmento merece ser componente cuando tiene nombre propio y cuando su extracción hace que el código que queda sea más fácil de leer y razonar.
+
+La repetición es la señal práctica más confiable. Los programadores la usan como heurística para no sobrediseñar: si aparece una sola vez, la abstracción puede ser prematura; cuando aparece por segunda vez, el componente se justifica. La IA tiende a estar enfocada en la tarea puntual y puede no ver patrones entre archivos — hay que proponer candidatos activamente cuando aparezca repetición o cuando la extracción mejore claramente una página.
+
+### Ubicación
+
+```txt
+ui/src/components/
+  auth/      ← componentes de dominio (auth, recovery)
+  ui/        ← primitivos sin dominio (futuro)
+```
+
+### Server vs Client components
+
+Sin `"use client"` por defecto. Agregar solo cuando el componente necesita hooks (`useState`, `useActionState`, `useSearchParams`) o event handlers interactivos. Los componentes de presentación pura funcionan en ambos contextos sin `"use client"`.
+
+---
+
+## Variables de entorno
+
+Nunca acceder a `process.env.*` (frontend) ni a `os.environ` (backend) directamente en código de negocio. Toda lectura de env vars va en un módulo central:
+
+- **Frontend:** `ui/src/lib/constants.ts`
+- **Backend:** `api/app/config.py` (pydantic-settings)
+
+```typescript
+// constants.ts
+export const API_URL = process.env.API_URL ?? "http://localhost:8000";
+export const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+// En el código de negocio:
+import { API_URL, IS_PRODUCTION } from "@/lib/constants";
+```
+
+Ventaja: un solo lugar para auditar qué env vars usa la app, y fácil de mockear en tests.
+
+---
+
 ## Testing
 
 ### Unit vs Integration
@@ -83,6 +123,49 @@ study_plan_course = Table(
 `Table()` standalone no acepta `mapped_column()` ni `Mapped[]` — `Column()` es correcto aquí.
 Si la tabla de asociación necesita columnas extra (ej. `order`, `created_at`), convertirla
 a un modelo completo con `mapped_column()`.
+
+---
+
+## Estilo de código
+
+### Ramas positivas
+
+Preferir condiciones positivas sobre negaciones, especialmente en alternativas cortas donde se retorna
+en uno u otro camino. Las negaciones (y más aún sus combinaciones con `and`/`or`) aumentan la carga
+cognitiva al leer.
+
+```python
+# Preferido
+if user and verify_password(password, user.hashed_password):
+    return tokens
+raise UnauthorizedError(...)
+
+# Evitar
+if not user or not verify_password(password, user.hashed_password):
+    raise UnauthorizedError(...)
+return tokens
+```
+
+### Helpers `ensure_*` para guard clauses con efectos secundarios
+
+Cuando una validación implica un `try/except` o un `if` que lanza una excepción, extraerla a una
+función `_ensure_*`. El nombre comunica la intención ("garantizar que X sea válido") sin que el lector
+tenga que parsear la mecánica del error.
+
+```python
+def _ensure_payload_decoded(token: str, expected_type: str) -> dict:
+    try:
+        return decode_token(token, expected_type=expected_type)
+    except jwt.InvalidTokenError as e:
+        raise UnauthorizedError("Token inválido o expirado") from e
+
+# En el método:
+payload = _ensure_payload_decoded(token, "reset")  # flujo feliz, sin ruido
+user = await self.session.get(User, uuid.UUID(payload["sub"]))
+```
+
+Aplicar cuando la alternativa inline dificulta ver el flujo principal del método.
+No aplicar mecánicamente: un `if x is None: raise` de una línea no necesita helper.
 
 ---
 

@@ -23,7 +23,7 @@ class CourseEnrollment(AuditMixin, Base):
     como el estado final (regular, aprobado, etc.).
     """
 
-    __tablename__ = "course_enrollment"
+    __tablename__ = "course_enrollments"
     __table_args__ = (
         UniqueConstraint(
             "student_id",
@@ -36,13 +36,13 @@ class CourseEnrollment(AuditMixin, Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
-    student_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("student.id"))
-    course_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("course.id"))
-    degree_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("degree.id"))
+    student_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("students.id"))
+    course_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("courses.id"))
+    degree_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("degrees.id"))
     year: Mapped[int] = mapped_column(Integer)
     term: Mapped[str] = mapped_column(String(5))  # "1C", "2C"
     section: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    enrollment_type: Mapped[str] = mapped_column(String(50), ForeignKey("lkp_enrollment_type.key"))
+    enrollment_type: Mapped[str] = mapped_column(String(50), ForeignKey("lkp_enrollment_types.key"))
     enrollment_status: Mapped[str] = mapped_column(String(50), ForeignKey("lkp_enrollment_status.key"))
     grade: Mapped[str | None] = mapped_column(String(5), nullable=True)
     enrolled_at: Mapped[date | None] = mapped_column(Date, nullable=True)

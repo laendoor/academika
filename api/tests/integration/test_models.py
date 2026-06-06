@@ -7,7 +7,8 @@ from app.models.course import Course
 from app.models.course_enrollment import CourseEnrollment
 from app.models.degree import Degree
 from app.models.student import Student
-from app.models.study_plan import StudyPlan, study_plan_course
+from app.models.study_plan import StudyPlan
+from app.models.study_plans_courses import study_plans_courses
 
 
 @pytest.mark.asyncio
@@ -52,7 +53,7 @@ async def test_course_linked_to_study_plan(db_session: AsyncSession) -> None:
 
     # En async SQLAlchemy los lazy loads sincrónicos no funcionan —
     # insertar en la association table directamente y verificar con selectinload.
-    await db_session.execute(insert(study_plan_course).values(plan_id=plan.id, course_id=course.id))
+    await db_session.execute(insert(study_plans_courses).values(plan_id=plan.id, course_id=course.id))
     await db_session.commit()
 
     result = await db_session.execute(

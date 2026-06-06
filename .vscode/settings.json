@@ -38,8 +38,8 @@
 		"editor.defaultFormatter": "charliermarsh.ruff",
 		"editor.formatOnSave": true,
 		"editor.codeActionsOnSave": {
-			"source.fixAll.ruff": "explicit",
-			"source.organizeImports.ruff": "explicit"
+			"source.fixAll": "always",
+			"source.organizeImports": "always"
 		}
 	},
 	"ruff.path": ["/Users/laendor/unq/seminario/academika/api/.venv/bin/ruff"],

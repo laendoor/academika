@@ -10,7 +10,7 @@ class LkpEnrollmentType(Base):
     Valores: regular (cursada presencial), libre (solo examen final).
     """
 
-    __tablename__ = "lkp_enrollment_type"
+    __tablename__ = "lkp_enrollment_types"
 
     key: Mapped[str] = mapped_column(String(50), primary_key=True)
     label: Mapped[str] = mapped_column(String(100))

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
 from app.db.base import AuditMixin, Base, generate_uuid
-from app.models.study_plan import study_plan_course
+from app.models.study_plans_courses import study_plans_courses
 
 if TYPE_CHECKING:
     from app.models.course_enrollment import CourseEnrollment
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class Course(AuditMixin, Base):
-    __tablename__ = "course"
+    __tablename__ = "courses"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     name: Mapped[str] = mapped_column(String(255))
@@ -25,7 +25,7 @@ class Course(AuditMixin, Base):
     abbreviation: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     study_plans: Mapped[list[StudyPlan]] = relationship(
-        "StudyPlan", secondary=study_plan_course, back_populates="courses"
+        "StudyPlan", secondary=study_plans_courses, back_populates="courses"
     )
     course_enrollments: Mapped[list[CourseEnrollment]] = relationship("CourseEnrollment", back_populates="course")
     prerequisites_as_subject: Mapped[list[CoursePrerequisite]] = relationship(

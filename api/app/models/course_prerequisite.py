@@ -15,12 +15,12 @@ if TYPE_CHECKING:
 
 
 class CoursePrerequisite(AuditMixin, Base):
-    __tablename__ = "course_prerequisite"
+    __tablename__ = "course_prerequisites"
 
-    plan_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("study_plan.id"), primary_key=True)
-    course_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("course.id"), primary_key=True)
+    plan_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("study_plans.id"), primary_key=True)
+    course_id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), ForeignKey("courses.id"), primary_key=True)
     prerequisite_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid(native_uuid=True), ForeignKey("course.id"), primary_key=True
+        Uuid(native_uuid=True), ForeignKey("courses.id"), primary_key=True
     )
     is_required: Mapped[bool] = mapped_column(Boolean)
 
