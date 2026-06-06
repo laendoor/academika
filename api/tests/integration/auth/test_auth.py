@@ -83,18 +83,18 @@ async def test_refresh_wrong_type(client: AsyncClient, test_user: User):
 
 @pytest.mark.asyncio
 async def test_forgot_password_sends_email(client: AsyncClient, test_user: User):
-    with patch("app.services.auth.resend") as mock_resend:
+    with patch("app.services.auth.send_mail") as mock_send:
         response = await client.post("/api/v1/auth/forgot-password", json={"email": "hari@unq.edu.ar"})
     assert response.status_code == 204
-    mock_resend.Emails.send.assert_called_once()
+    mock_send.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_forgot_password_unknown_email(client: AsyncClient):
-    with patch("app.services.auth.resend") as mock_resend:
+    with patch("app.services.auth.send_mail") as mock_send:
         response = await client.post("/api/v1/auth/forgot-password", json={"email": "nadie@unq.edu.ar"})
     assert response.status_code == 204
-    mock_resend.Emails.send.assert_not_called()
+    mock_send.assert_not_called()
 
 
 # ── POST /reset-password ──────────────────────────────────────────────────────
