@@ -28,13 +28,14 @@ from app.importers.guarani.types import (
     StudyPlanCourseRow,
 )
 from app.importers.utils import date_to_year_term
-from app.models.course import Course
-from app.models.course_enrollment import CourseEnrollment
-from app.models.course_prerequisite import CoursePrerequisite
-from app.models.degree import Degree
-from app.models.student import Student
-from app.models.study_plan import StudyPlan
-from app.models.study_plans_courses import study_plans_courses
+from app.models.alumno import Alumno
+from app.models.alumno_carrera import AlumnoCarrera
+from app.models.carrera import Carrera
+from app.models.correlativa import Correlativa
+from app.models.cursada import Cursada
+from app.models.materia import Materia
+from app.models.plan_de_estudio import PlanDeEstudio
+from app.models.planes_materias import planes_materias
 
 logger = logging.getLogger(__name__)
 
@@ -63,104 +64,127 @@ class GuaraniImporterService:
 
     async def import_degrees(self, path: Path) -> tuple[int, int]:
         rows = parse_degrees(path)
-        return await self._upsert_degrees(rows)
+        return await self._upsert_carreras(rows)
 
     async def import_courses(self, path: Path) -> tuple[int, int]:
         rows = parse_courses(path)
-        return await self._upsert_courses(rows)
+        return await self._upsert_materias(rows)
 
     async def import_study_plans(self, paths: list[Path]) -> tuple[int, int]:
         rows: list[StudyPlanCourseRow] = []
         for path in paths:
             rows.extend(parse_study_plan_courses(path))
-        return await self._upsert_study_plans(rows)
+        return await self._upsert_planes(rows)
 
     async def import_prerequisites(self, paths: list[Path]) -> tuple[int, int]:
         rows: list[PrerequisiteRow] = []
         for path in paths:
             rows.extend(parse_prerequisites(path))
-        return await self._upsert_prerequisites(rows)
+        return await self._upsert_correlativas(rows)
 
     async def import_students(self, path: Path) -> tuple[int, int]:
         rows = parse_students(path)
-        return await self._upsert_students(rows)
+        return await self._upsert_alumnos(rows)
 
     async def import_enrollment_history(self, path: Path) -> tuple[int, int]:
         rows = parse_enrollment_history(path)
-        return await self._upsert_enrollment_history(rows)
+        return await self._upsert_historial_cursadas(rows)
 
     async def import_enrollments(self, path: Path) -> tuple[int, int]:
         rows = parse_enrollments(path)
-        return await self._upsert_enrollments(rows)
+        return await self._upsert_cursadas(rows)
 
-    async def _upsert_students(self, rows: list[StudentRow]) -> tuple[int, int]:
-        degrees = await self._fetch_degrees()
-        study_plans = await self._fetch_study_plans()
+    async def _upsert_alumnos(self, rows: list[StudentRow]) -> tuple[int, int]:
+        carreras = await self._fetch_carreras()
+        planes = await self._fetch_planes()
 
         upserted = 0
         skipped = 0
 
         for row in rows:
-            degree = degrees.get(row.degree_code)
-            if degree is None:
+            carrera = carreras.get(row.degree_code)
+            if carrera is None:
                 logger.warning(
-                    "import_students: degree '%s' not found — skipping doc_id=%s",
+                    "import_students: carrera '%s' not found — skipping doc_id=%s",
                     row.degree_code,
                     row.doc_id,
                 )
                 skipped += 1
                 continue
 
-            plan = study_plans.get((degree.id, row.study_plan_year))
+            plan = planes.get((carrera.id, row.study_plan_year))
+            if plan is None:
+                logger.warning(
+                    "import_students: plan year=%s not found for carrera '%s' — skipping enrollment for doc_id=%s",
+                    row.study_plan_year,
+                    row.degree_code,
+                    row.doc_id,
+                )
+                skipped += 1
+                continue
 
-            stmt = (
-                insert(Student)
+            alumno_id = generate_uuid()
+            stmt_alumno = (
+                insert(Alumno)
                 .values(
-                    id=generate_uuid(),
-                    doc_id=row.doc_id,
-                    unq_id=row.unq_id,
-                    first_name=row.first_name,
-                    last_name=row.last_name,
+                    id=alumno_id,
+                    dni=row.doc_id,
+                    legajo=row.unq_id,
+                    nombre=row.first_name,
+                    apellido=row.last_name,
                     email=row.email,
-                    enrolled_at=row.enrolled_at,
-                    degree_id=degree.id,
-                    plan_id=plan.id if plan else None,
-                    academic_status="alumno_regular",
                 )
                 .on_conflict_do_update(
-                    index_elements=["doc_id"],
-                    set_={  # academic_status intentionally absent: preserve manual overrides
-                        "unq_id": row.unq_id,
-                        "first_name": row.first_name,
-                        "last_name": row.last_name,
+                    index_elements=["dni"],
+                    set_={
+                        "legajo": row.unq_id,
+                        "nombre": row.first_name,
+                        "apellido": row.last_name,
                         "email": row.email,
-                        "enrolled_at": row.enrolled_at,
-                        "degree_id": degree.id,
-                        "plan_id": plan.id if plan else None,
+                        "updated_at": func.now(),
+                    },
+                )
+                .returning(Alumno.id)
+            )
+            result = await self.session.execute(stmt_alumno)
+            alumno_id = result.scalar_one()
+
+            stmt_carrera = (
+                insert(AlumnoCarrera)
+                .values(
+                    alumno_id=alumno_id,
+                    plan_id=plan.id,
+                    fecha_ingreso=row.enrolled_at,
+                    estado_academico="alumno_regular",
+                )
+                .on_conflict_do_update(
+                    index_elements=["alumno_id", "plan_id"],
+                    set_={  # estado_academico intentionally absent: preserve manual overrides
+                        "fecha_ingreso": row.enrolled_at,
                         "updated_at": func.now(),
                     },
                 )
             )
-            await self.session.execute(stmt)
+            await self.session.execute(stmt_carrera)
             upserted += 1
 
         await self.session.commit()
         return upserted, skipped
 
-    async def _upsert_enrollment_history(self, rows: list[EnrollmentHistoryRow]) -> tuple[int, int]:
-        students = await self._fetch_students()
-        courses = await self._fetch_courses()
-        degrees = await self._fetch_degrees()
+    async def _upsert_historial_cursadas(self, rows: list[EnrollmentHistoryRow]) -> tuple[int, int]:
+        alumnos = await self._fetch_alumnos()
+        materias = await self._fetch_materias()
+        carreras = await self._fetch_carreras()
 
         upserted = 0
         skipped = 0
 
         for row in rows:
-            student = students.get(row.doc_id)
-            course = courses.get(row.course_code)
-            degree = degrees.get(row.degree_code)
+            alumno = alumnos.get(row.doc_id)
+            materia = materias.get(row.course_code)
+            carrera = carreras.get(row.degree_code)
 
-            if student is None or course is None or degree is None:
+            if alumno is None or materia is None or carrera is None:
                 logger.warning(
                     "import_enrollment_history: missing refs — skipping doc_id=%s course=%s degree=%s",
                     row.doc_id,
@@ -170,37 +194,35 @@ class GuaraniImporterService:
                 skipped += 1
                 continue
 
-            year, term = date_to_year_term(row.enrollment_date)
-            status = _result_to_status(row.result)
+            anio, cuatrimestre = date_to_year_term(row.enrollment_date)
+            estado = _result_to_status(row.result)
 
             stmt = (
-                insert(CourseEnrollment)
+                insert(Cursada)
                 .values(
                     id=generate_uuid(),
-                    student_id=student.id,
-                    course_id=course.id,
-                    degree_id=degree.id,
-                    year=year,
-                    term=term,
-                    enrollment_type=row.enrollment_type,
-                    enrollment_status=status,
-                    grade=row.grade,
-                    enrolled_at=row.enrollment_date,
-                    is_regular=row.is_regular,
-                    approval_type=row.approval_type,
-                    credits=row.credits,
-                    plan_year=row.plan_year,
+                    alumno_id=alumno.id,
+                    materia_id=materia.id,
+                    carrera_id=carrera.id,
+                    anio=anio,
+                    cuatrimestre=cuatrimestre,
+                    tipo_cursada=row.enrollment_type,
+                    estado_cursada=estado,
+                    nota=row.grade,
+                    fecha_inscripcion=row.enrollment_date,
+                    es_regular=row.is_regular,
+                    tipo_aprobacion=row.approval_type,
+                    anio_plan=row.plan_year,
                 )
                 .on_conflict_do_update(
-                    constraint="uq_enrollment_student_course_degree_term",
+                    constraint="uq_cursada_alumno_materia_carrera_cuatrimestre",
                     set_={
-                        "enrollment_status": status,
-                        "grade": row.grade,
-                        "enrolled_at": row.enrollment_date,
-                        "is_regular": row.is_regular,
-                        "approval_type": row.approval_type,
-                        "credits": row.credits,
-                        "plan_year": row.plan_year,
+                        "estado_cursada": estado,
+                        "nota": row.grade,
+                        "fecha_inscripcion": row.enrollment_date,
+                        "es_regular": row.is_regular,
+                        "tipo_aprobacion": row.approval_type,
+                        "anio_plan": row.plan_year,
                         "updated_at": func.now(),
                     },
                 )
@@ -211,20 +233,20 @@ class GuaraniImporterService:
         await self.session.commit()
         return upserted, skipped
 
-    async def _upsert_enrollments(self, rows: list[EnrollmentRow]) -> tuple[int, int]:
-        students = await self._fetch_students()
-        courses = await self._fetch_courses()
-        degrees = await self._fetch_degrees()
+    async def _upsert_cursadas(self, rows: list[EnrollmentRow]) -> tuple[int, int]:
+        alumnos = await self._fetch_alumnos()
+        materias = await self._fetch_materias()
+        carreras = await self._fetch_carreras()
 
         upserted = 0
         skipped = 0
 
         for row in rows:
-            student = students.get(row.doc_id)
-            course = courses.get(row.course_code)
-            degree = degrees.get(row.degree_code)
+            alumno = alumnos.get(row.doc_id)
+            materia = materias.get(row.course_code)
+            carrera = carreras.get(row.degree_code)
 
-            if student is None or course is None or degree is None:
+            if alumno is None or materia is None or carrera is None:
                 logger.warning(
                     "import_enrollments: missing refs — skipping doc_id=%s course=%s degree=%s",
                     row.doc_id,
@@ -234,27 +256,27 @@ class GuaraniImporterService:
                 skipped += 1
                 continue
 
-            year, term = date_to_year_term(row.enrollment_date)
+            anio, cuatrimestre = date_to_year_term(row.enrollment_date)
 
             stmt = (
-                insert(CourseEnrollment)
+                insert(Cursada)
                 .values(
                     id=generate_uuid(),
-                    student_id=student.id,
-                    course_id=course.id,
-                    degree_id=degree.id,
-                    year=year,
-                    term=term,
-                    section=row.section,
-                    enrollment_type="regular",
-                    enrollment_status="inscripto",
-                    enrolled_at=row.enrollment_date,
+                    alumno_id=alumno.id,
+                    materia_id=materia.id,
+                    carrera_id=carrera.id,
+                    anio=anio,
+                    cuatrimestre=cuatrimestre,
+                    comision=row.section,
+                    tipo_cursada="regular",
+                    estado_cursada="inscripto",
+                    fecha_inscripcion=row.enrollment_date,
                 )
                 .on_conflict_do_update(
-                    constraint="uq_enrollment_student_course_degree_term",
+                    constraint="uq_cursada_alumno_materia_carrera_cuatrimestre",
                     set_={
-                        "section": row.section,
-                        "enrolled_at": row.enrollment_date,
+                        "comision": row.section,
+                        "fecha_inscripcion": row.enrollment_date,
                         "updated_at": func.now(),
                     },
                 )
@@ -265,66 +287,71 @@ class GuaraniImporterService:
         await self.session.commit()
         return upserted, skipped
 
-    async def _upsert_degrees(self, rows: list[DegreeRow]) -> tuple[int, int]:
+    async def _upsert_carreras(self, rows: list[DegreeRow]) -> tuple[int, int]:
         for row in rows:
             stmt = (
-                insert(Degree)
-                .values(id=generate_uuid(), code=row.code, name=row.name)
+                insert(Carrera)
+                .values(id=generate_uuid(), codigo=row.code, nombre=row.name)
                 .on_conflict_do_update(
-                    index_elements=["code"],
-                    set_={"name": row.name, "updated_at": func.now()},
+                    index_elements=["codigo"],
+                    set_={"nombre": row.name, "updated_at": func.now()},
                 )
             )
             await self.session.execute(stmt)
         await self.session.commit()
         return len(rows), 0
 
-    async def _upsert_courses(self, rows: list[CourseRow]) -> tuple[int, int]:
+    async def _upsert_materias(self, rows: list[CourseRow]) -> tuple[int, int]:
         for row in rows:
             stmt = (
-                insert(Course)
-                .values(id=generate_uuid(), code=row.code, name=row.name, abbreviation=row.abbreviation)
+                insert(Materia)
+                .values(id=generate_uuid(), codigo=row.code, nombre=row.name, sigla=row.abbreviation)
                 .on_conflict_do_update(
-                    index_elements=["code"],
-                    set_={"name": row.name, "abbreviation": row.abbreviation, "updated_at": func.now()},
+                    index_elements=["codigo"],
+                    set_={"nombre": row.name, "sigla": row.abbreviation, "updated_at": func.now()},
                 )
             )
             await self.session.execute(stmt)
         await self.session.commit()
         return len(rows), 0
 
-    async def _upsert_study_plans(self, rows: list[StudyPlanCourseRow]) -> tuple[int, int]:
-        degrees = await self._fetch_degrees()
-        courses = await self._fetch_courses()
+    async def _upsert_planes(self, rows: list[StudyPlanCourseRow]) -> tuple[int, int]:
+        carreras = await self._fetch_carreras()
+        materias = await self._fetch_materias()
 
         seen: set[tuple[str, int]] = set()
         for row in rows:
-            degree = degrees.get(row.degree_code)
-            if degree is None:
+            carrera = carreras.get(row.degree_code)
+            if carrera is None:
                 continue
             key = (row.degree_code, row.plan_year)
             if key in seen:
                 continue
             seen.add(key)
             stmt = (
-                insert(StudyPlan)
-                .values(id=generate_uuid(), degree_id=degree.id, name=f"Plan {row.plan_year}", year=row.plan_year)
+                insert(PlanDeEstudio)
+                .values(
+                    id=generate_uuid(),
+                    carrera_id=carrera.id,
+                    nombre=f"Plan {row.plan_year}",
+                    anio=row.plan_year,
+                )
                 .on_conflict_do_update(
-                    constraint="uq_study_plan_degree_year",
+                    constraint="uq_plan_carrera_anio",
                     set_={"updated_at": func.now()},
                 )
             )
             await self.session.execute(stmt)
         await self.session.flush()
 
-        plans = await self._fetch_study_plans()
+        planes = await self._fetch_planes()
         upserted = 0
         skipped = 0
 
         for row in rows:
-            degree = degrees.get(row.degree_code)
-            course = courses.get(row.course_code)
-            if degree is None or course is None:
+            carrera = carreras.get(row.degree_code)
+            materia = materias.get(row.course_code)
+            if carrera is None or materia is None:
                 logger.warning(
                     "import_study_plans: missing refs — skipping degree=%s course=%s",
                     row.degree_code,
@@ -332,7 +359,7 @@ class GuaraniImporterService:
                 )
                 skipped += 1
                 continue
-            plan = plans.get((degree.id, row.plan_year))
+            plan = planes.get((carrera.id, row.plan_year))
             if plan is None:
                 logger.warning(
                     "import_study_plans: plan not found after upsert — degree=%s year=%d",
@@ -341,64 +368,45 @@ class GuaraniImporterService:
                 )
                 skipped += 1
                 continue
-            link_stmt = (
-                insert(study_plans_courses).values(plan_id=plan.id, course_id=course.id).on_conflict_do_nothing()
-            )
+            link_stmt = insert(planes_materias).values(plan_id=plan.id, materia_id=materia.id).on_conflict_do_nothing()
             await self.session.execute(link_stmt)
             upserted += 1
 
         await self.session.commit()
         return upserted, skipped
 
-    async def _upsert_prerequisites(self, rows: list[PrerequisiteRow]) -> tuple[int, int]:
-        degrees = await self._fetch_degrees()
-        courses = await self._fetch_courses()
-        plans = await self._fetch_study_plans()
+    async def _upsert_correlativas(self, rows: list[PrerequisiteRow]) -> tuple[int, int]:
+        materias = await self._fetch_materias()
 
         upserted = 0
         skipped = 0
 
         for row in rows:
-            degree = degrees.get(row.degree_code)
-            course = courses.get(row.course_code)
-            if degree is None or course is None:
-                logger.warning(
-                    "import_prerequisites: missing refs — skipping degree=%s course=%s",
-                    row.degree_code,
-                    row.course_code,
-                )
-                skipped += 1
-                continue
-            plan = plans.get((degree.id, row.plan_year))
-            if plan is None:
-                logger.warning(
-                    "import_prerequisites: plan not found — degree=%s year=%d",
-                    row.degree_code,
-                    row.plan_year,
-                )
+            materia = materias.get(row.course_code)
+            if materia is None:
+                logger.warning("import_prerequisites: materia not found — code=%s", row.course_code)
                 skipped += 1
                 continue
 
             # required_codes overwrite recommended_codes when a code appears in both
             prereqs: dict[str, bool] = {code: False for code in row.recommended_codes}
             prereqs.update({code: True for code in row.required_codes})
-            for prereq_code, is_required in prereqs.items():
-                prereq = courses.get(prereq_code)
+            for prereq_code, es_obligatoria in prereqs.items():
+                prereq = materias.get(prereq_code)
                 if prereq is None:
-                    logger.warning("import_prerequisites: prerequisite course not found — code=%s", prereq_code)
+                    logger.warning("_upsert_correlativas: materia requerida not found — code=%s", prereq_code)
                     skipped += 1
                     continue
                 stmt = (
-                    insert(CoursePrerequisite)
+                    insert(Correlativa)
                     .values(
-                        plan_id=plan.id,
-                        course_id=course.id,
-                        prerequisite_id=prereq.id,
-                        is_required=is_required,
+                        materia_id=materia.id,
+                        requisito_id=prereq.id,
+                        es_obligatoria=es_obligatoria,
                     )
                     .on_conflict_do_update(
-                        index_elements=["plan_id", "course_id", "prerequisite_id"],
-                        set_={"is_required": is_required, "updated_at": func.now()},
+                        index_elements=["materia_id", "requisito_id"],
+                        set_={"es_obligatoria": es_obligatoria, "updated_at": func.now()},
                     )
                 )
                 await self.session.execute(stmt)
@@ -407,18 +415,18 @@ class GuaraniImporterService:
         await self.session.commit()
         return upserted, skipped
 
-    async def _fetch_degrees(self) -> dict[str, Degree]:
-        result = await self.session.execute(select(Degree))
-        return {d.code: d for d in result.scalars().all()}
+    async def _fetch_carreras(self) -> dict[str, Carrera]:
+        result = await self.session.execute(select(Carrera))
+        return {c.codigo: c for c in result.scalars().all()}
 
-    async def _fetch_study_plans(self) -> dict[tuple[uuid.UUID, int], StudyPlan]:
-        result = await self.session.execute(select(StudyPlan))
-        return {(sp.degree_id, sp.year): sp for sp in result.scalars().all()}
+    async def _fetch_planes(self) -> dict[tuple[uuid.UUID, int], PlanDeEstudio]:
+        result = await self.session.execute(select(PlanDeEstudio))
+        return {(p.carrera_id, p.anio): p for p in result.scalars().all()}
 
-    async def _fetch_students(self) -> dict[str, Student]:
-        result = await self.session.execute(select(Student))
-        return {s.doc_id: s for s in result.scalars().all()}
+    async def _fetch_alumnos(self) -> dict[str, Alumno]:
+        result = await self.session.execute(select(Alumno))
+        return {a.dni: a for a in result.scalars().all()}
 
-    async def _fetch_courses(self) -> dict[str, Course]:
-        result = await self.session.execute(select(Course))
-        return {c.code: c for c in result.scalars().all()}
+    async def _fetch_materias(self) -> dict[str, Materia]:
+        result = await self.session.execute(select(Materia))
+        return {m.codigo: m for m in result.scalars().all()}

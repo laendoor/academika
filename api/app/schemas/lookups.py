@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 
 
-class AcademicStatusResponse(BaseModel):
+class EstadoAcademicoResponse(BaseModel):
     key: str
     label: str
 
     model_config = {"from_attributes": True}
 
 
-class EnrollmentStatusResponse(BaseModel):
+class EstadoCursadaResponse(BaseModel):
     key: str
     code: str
     label: str
@@ -16,7 +16,7 @@ class EnrollmentStatusResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class EnrollmentTypeResponse(BaseModel):
+class TipoCursadaResponse(BaseModel):
     key: str
     label: str
 

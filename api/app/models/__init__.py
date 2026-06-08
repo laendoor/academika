@@ -1,27 +1,33 @@
-from app.models.course import Course
-from app.models.course_enrollment import CourseEnrollment
-from app.models.course_prerequisite import CoursePrerequisite
-from app.models.degree import Degree
-from app.models.lkp_academic_status import LkpAcademicStatus
-from app.models.lkp_enrollment_status import LkpEnrollmentStatus
-from app.models.lkp_enrollment_type import LkpEnrollmentType
+from app.models.alumno import Alumno
+from app.models.alumno_carrera import AlumnoCarrera
+from app.models.carrera import Carrera
+from app.models.correlativa import Correlativa
+from app.models.cursada import Cursada
+from app.models.lkp_estado_academico import LkpEstadoAcademico
+from app.models.lkp_estado_cursada import LkpEstadoCursada
+from app.models.lkp_nivel_carrera import LkpNivelCarrera
+from app.models.lkp_nucleo_carrera import LkpNucleoCarrera
+from app.models.lkp_tipo_cursada import LkpTipoCursada
 from app.models.lkp_user_role import LkpUserRole
-from app.models.student import Student
-from app.models.study_plan import StudyPlan
-from app.models.study_plans_courses import study_plans_courses
+from app.models.materia import Materia
+from app.models.plan_de_estudio import PlanDeEstudio
+from app.models.planes_materias import planes_materias
 from app.models.user import User
 
 __all__ = [
-    "Course",
-    "CourseEnrollment",
-    "CoursePrerequisite",
-    "Degree",
-    "LkpAcademicStatus",
-    "LkpEnrollmentStatus",
-    "LkpEnrollmentType",
+    "Alumno",
+    "AlumnoCarrera",
+    "Carrera",
+    "Correlativa",
+    "Cursada",
+    "LkpEstadoAcademico",
+    "LkpEstadoCursada",
+    "LkpNivelCarrera",
+    "LkpNucleoCarrera",
+    "LkpTipoCursada",
     "LkpUserRole",
-    "Student",
-    "StudyPlan",
+    "Materia",
+    "PlanDeEstudio",
     "User",
-    "study_plans_courses",
+    "planes_materias",
 ]

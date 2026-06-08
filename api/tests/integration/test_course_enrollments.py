@@ -3,79 +3,72 @@ from httpx import AsyncClient
 
 
 async def _setup(client: AsyncClient) -> dict:
-    degree = (await client.post("/api/v1/carreras", json={"name": "TPI", "code": "TPI"})).json()
-    course = (await client.post("/api/v1/materias", json={"name": "Intro", "code": "IP"})).json()
-    student = (
-        await client.post(
-            "/api/v1/alumnos",
-            json={
-                "first_name": "Ana",
-                "last_name": "García",
-                "doc_id": "12345678",
-                "degree_id": degree["id"],
-                "academic_status": "alumno_regular",
-            },
-        )
+    carrera = (await client.post("/api/v1/carreras", json={"nombre": "TPI", "codigo": "TPI"})).json()
+    materia = (await client.post("/api/v1/materias", json={"nombre": "Intro", "codigo": "IP"})).json()
+    alumno = (
+        await client.post("/api/v1/alumnos", json={"nombre": "Ana", "apellido": "García", "dni": "12345678"})
     ).json()
-    return {"degree": degree, "course": course, "student": student}
+    return {"carrera": carrera, "materia": materia, "alumno": alumno}
 
 
-def _enrollment_payload(student_id: str, course_id: str, degree_id: str, year: int = 2024, term: str = "1C") -> dict:
+def _cursada_payload(
+    alumno_id: str, materia_id: str, carrera_id: str, anio: int = 2024, cuatrimestre: str = "1C"
+) -> dict:
     return {
-        "student_id": student_id,
-        "course_id": course_id,
-        "degree_id": degree_id,
-        "year": year,
-        "term": term,
-        "enrollment_type": "regular",
-        "enrollment_status": "inscripto",
+        "alumno_id": alumno_id,
+        "materia_id": materia_id,
+        "carrera_id": carrera_id,
+        "anio": anio,
+        "cuatrimestre": cuatrimestre,
+        "tipo_cursada": "regular",
+        "estado_cursada": "inscripto",
     }
 
 
 @pytest.mark.asyncio
-async def test_create_enrollment(client: AsyncClient) -> None:
+async def test_create_cursada(client: AsyncClient) -> None:
     data = await _setup(client)
-    payload = _enrollment_payload(data["student"]["id"], data["course"]["id"], data["degree"]["id"])
-    response = await client.post("/api/v1/inscripciones", json=payload)
+    payload = _cursada_payload(data["alumno"]["id"], data["materia"]["id"], data["carrera"]["id"])
+    response = await client.post("/api/v1/cursadas", json=payload)
     assert response.status_code == 201
-    assert response.json()["term"] == "1C"
+    assert response.json()["cuatrimestre"] == "1C"
 
 
 @pytest.mark.asyncio
-async def test_filter_by_student(client: AsyncClient) -> None:
+async def test_filter_by_alumno(client: AsyncClient) -> None:
     data = await _setup(client)
-    payload = _enrollment_payload(data["student"]["id"], data["course"]["id"], data["degree"]["id"])
-    await client.post("/api/v1/inscripciones", json=payload)
-    response = await client.get("/api/v1/inscripciones", params={"student_id": data["student"]["id"]})
+    payload = _cursada_payload(data["alumno"]["id"], data["materia"]["id"], data["carrera"]["id"])
+    await client.post("/api/v1/cursadas", json=payload)
+    response = await client.get("/api/v1/cursadas", params={"alumno_id": data["alumno"]["id"]})
     assert response.status_code == 200
     body = response.json()
     assert body["total"] == 1
-    assert body["items"][0]["student_id"] == data["student"]["id"]
+    assert body["items"][0]["alumno_id"] == data["alumno"]["id"]
 
 
 @pytest.mark.asyncio
-async def test_filter_by_year_and_term(client: AsyncClient) -> None:
+async def test_filter_by_anio_and_cuatrimestre(client: AsyncClient) -> None:
     data = await _setup(client)
-    s_id, c_id, d_id = data["student"]["id"], data["course"]["id"], data["degree"]["id"]
-    await client.post("/api/v1/inscripciones", json=_enrollment_payload(s_id, c_id, d_id, year=2023, term="1C"))
-    await client.post("/api/v1/inscripciones", json=_enrollment_payload(s_id, c_id, d_id, year=2024, term="2C"))
-    response = await client.get("/api/v1/inscripciones", params={"year": 2024, "term": "2C"})
+    a_id, m_id, c_id = data["alumno"]["id"], data["materia"]["id"], data["carrera"]["id"]
+    await client.post("/api/v1/cursadas", json=_cursada_payload(a_id, m_id, c_id, anio=2023, cuatrimestre="1C"))
+    await client.post("/api/v1/cursadas", json=_cursada_payload(a_id, m_id, c_id, anio=2024, cuatrimestre="2C"))
+    response = await client.get("/api/v1/cursadas", params={"anio": 2024, "cuatrimestre": "2C"})
     body = response.json()
     assert body["total"] == 1
-    assert body["items"][0]["year"] == 2024
+    assert body["items"][0]["anio"] == 2024
 
 
 @pytest.mark.asyncio
-async def test_update_enrollment_status(client: AsyncClient) -> None:
+async def test_update_cursada_estado(client: AsyncClient) -> None:
     data = await _setup(client)
-    payload = _enrollment_payload(data["student"]["id"], data["course"]["id"], data["degree"]["id"])
-    created = (await client.post("/api/v1/inscripciones", json=payload)).json()
-    response = await client.put(f"/api/v1/inscripciones/{created['id']}", json={"enrollment_status": "regular"})
+    payload = _cursada_payload(data["alumno"]["id"], data["materia"]["id"], data["carrera"]["id"])
+    created = (await client.post("/api/v1/cursadas", json=payload)).json()
+    response = await client.put(f"/api/v1/cursadas/{created['id']}", json={"estado_cursada": "regular"})
     assert response.status_code == 200
-    assert response.json()["enrollment_status"] == "regular"
+    assert response.json()["estado_cursada"] == "regular"
 
 
 @pytest.mark.asyncio
-async def test_get_enrollment_not_found(client: AsyncClient) -> None:
-    response = await client.get("/api/v1/inscripciones/00000000-0000-0000-0000-000000000000")
+async def test_get_cursada_not_found(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/cursadas/00000000-0000-0000-0000-000000000000")
     assert response.status_code == 404
