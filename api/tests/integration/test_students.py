@@ -9,7 +9,7 @@ async def _create_carrera(client: AsyncClient, codigo: str = "TPI") -> dict:
 async def _create_plan(client: AsyncClient, carrera_id: str, anio: int = 2015) -> dict:
     return (
         await client.post(
-            "/api/v1/planes-de-estudio",
+            "/api/v1/planes",
             json={"carrera_id": carrera_id, "nombre": f"Plan {anio}", "anio": anio, "vigente": True},
         )
     ).json()

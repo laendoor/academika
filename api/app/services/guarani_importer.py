@@ -394,7 +394,7 @@ class GuaraniImporterService:
             for prereq_code, es_obligatoria in prereqs.items():
                 prereq = materias.get(prereq_code)
                 if prereq is None:
-                    logger.warning("import_prerequisites: prerequisite materia not found — code=%s", prereq_code)
+                    logger.warning("_upsert_correlativas: materia requerida not found — code=%s", prereq_code)
                     skipped += 1
                     continue
                 stmt = (

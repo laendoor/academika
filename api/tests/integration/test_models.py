@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.alumno import Alumno
+from app.models.alumno_carrera import AlumnoCarrera
 from app.models.carrera import Carrera
 from app.models.cursada import Cursada
 from app.models.materia import Materia
@@ -70,11 +71,15 @@ async def test_create_alumno(db_session: AsyncSession) -> None:
     db_session.add(carrera)
     await db_session.commit()
 
+    plan = PlanDeEstudio(carrera_id=carrera.id, nombre="Plan 2020", anio=2020)
+    db_session.add(plan)
+    await db_session.commit()
+
     alumno = Alumno(nombre="Ana", apellido="Pérez", dni="30123456")
     db_session.add(alumno)
     await db_session.commit()
 
-    inscripcion = AlumnoCarrera(alumno_id=alumno.id, carrera_id=carrera.id, estado_academico="alumno_regular")
+    inscripcion = AlumnoCarrera(alumno_id=alumno.id, plan_id=plan.id, estado_academico="alumno_regular")
     db_session.add(inscripcion)
     await db_session.commit()
     await db_session.refresh(alumno)

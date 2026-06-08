@@ -28,7 +28,11 @@ async def _seed(session: AsyncSession) -> None:
         [
             PlanDeEstudio(id=generate_uuid(), carrera_id=tpi_id, nombre="Plan TPI 2015", anio=2015),
             PlanDeEstudio(id=generate_uuid(), carrera_id=tpi_id, nombre="Plan TPI 2018", anio=2018),
+            PlanDeEstudio(id=generate_uuid(), carrera_id=tpi_id, nombre="Plan TPI 2020", anio=2020),
+            PlanDeEstudio(id=generate_uuid(), carrera_id=tpi_id, nombre="Plan TPI 2021", anio=2021),
             PlanDeEstudio(id=generate_uuid(), carrera_id=li_id, nombre="Plan LI 2018", anio=2018),
+            PlanDeEstudio(id=generate_uuid(), carrera_id=li_id, nombre="Plan LI 2020", anio=2020),
+            PlanDeEstudio(id=generate_uuid(), carrera_id=li_id, nombre="Plan LI 2021", anio=2021),
         ]
     )
     for codigo in ["80005", "80010", "80015", "80020", "80025", "80030", "80035"]:

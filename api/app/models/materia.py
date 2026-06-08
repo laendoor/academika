@@ -36,5 +36,5 @@ class Materia(AuditMixin, Base):
         "Correlativa", foreign_keys="Correlativa.materia_id", back_populates="materia"
     )
     requerida_por: Mapped[list[Correlativa]] = relationship(
-        "Correlativa", foreign_keys="Correlativa.prerequisite_id", back_populates="prerequisite"
+        "Correlativa", foreign_keys="Correlativa.requisito_id", back_populates="requisito"
     )
