@@ -3,121 +3,112 @@ from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.course import Course
-from app.models.course_enrollment import CourseEnrollment
-from app.models.degree import Degree
-from app.models.student import Student
-from app.models.study_plan import StudyPlan
-from app.models.study_plans_courses import study_plans_courses
+from app.models.alumno import Alumno
+from app.models.carrera import Carrera
+from app.models.cursada import Cursada
+from app.models.materia import Materia
+from app.models.plan_de_estudio import PlanDeEstudio
+from app.models.planes_materias import planes_materias
 
 
 @pytest.mark.asyncio
-async def test_create_degree(db_session: AsyncSession) -> None:
-    degree = Degree(name="Tecnicatura en Programación Informática", code="TPI")
-    db_session.add(degree)
+async def test_create_carrera(db_session: AsyncSession) -> None:
+    carrera = Carrera(nombre="Tecnicatura en Programación Informática", codigo="TPI")
+    db_session.add(carrera)
     await db_session.commit()
-    await db_session.refresh(degree)
+    await db_session.refresh(carrera)
 
-    result = await db_session.execute(select(Degree).where(Degree.code == "TPI"))
+    result = await db_session.execute(select(Carrera).where(Carrera.codigo == "TPI"))
     found = result.scalar_one()
-    assert found.name == "Tecnicatura en Programación Informática"
+    assert found.nombre == "Tecnicatura en Programación Informática"
     assert found.id is not None
     assert found.created_at is not None
 
 
 @pytest.mark.asyncio
-async def test_study_plan_linked_to_degree(db_session: AsyncSession) -> None:
-    degree = Degree(name="Licenciatura en Informática", code="LI")
-    db_session.add(degree)
+async def test_plan_linked_to_carrera(db_session: AsyncSession) -> None:
+    carrera = Carrera(nombre="Licenciatura en Informática", codigo="LI")
+    db_session.add(carrera)
     await db_session.commit()
 
-    plan = StudyPlan(degree_id=degree.id, name="Plan 2015", year=2015)
+    plan = PlanDeEstudio(carrera_id=carrera.id, nombre="Plan 2015", anio=2015)
     db_session.add(plan)
     await db_session.commit()
     await db_session.refresh(plan)
 
-    assert plan.degree_id == degree.id
-    assert plan.is_active is True
+    assert plan.carrera_id == carrera.id
+    assert plan.vigente is True
 
 
 @pytest.mark.asyncio
-async def test_course_linked_to_study_plan(db_session: AsyncSession) -> None:
-    degree = Degree(name="Tecnicatura en Programación Informática", code="TPI2")
-    db_session.add(degree)
+async def test_materia_linked_to_plan(db_session: AsyncSession) -> None:
+    carrera = Carrera(nombre="Tecnicatura en Programación Informática", codigo="TPI2")
+    db_session.add(carrera)
     await db_session.commit()
 
-    plan = StudyPlan(degree_id=degree.id, name="Plan 2018", year=2018)
-    course = Course(name="Introducción a la Programación", code="IP", abbreviation="IP")
-    db_session.add_all([plan, course])
+    plan = PlanDeEstudio(carrera_id=carrera.id, nombre="Plan 2018", anio=2018)
+    materia = Materia(nombre="Introducción a la Programación", codigo="IP", sigla="IP")
+    db_session.add_all([plan, materia])
     await db_session.commit()
 
     # En async SQLAlchemy los lazy loads sincrónicos no funcionan —
     # insertar en la association table directamente y verificar con selectinload.
-    await db_session.execute(insert(study_plans_courses).values(plan_id=plan.id, course_id=course.id))
+    await db_session.execute(insert(planes_materias).values(plan_id=plan.id, materia_id=materia.id))
     await db_session.commit()
 
     result = await db_session.execute(
-        select(StudyPlan).options(selectinload(StudyPlan.courses)).where(StudyPlan.id == plan.id)
+        select(PlanDeEstudio).options(selectinload(PlanDeEstudio.materias)).where(PlanDeEstudio.id == plan.id)
     )
     loaded_plan = result.scalar_one()
-    assert len(loaded_plan.courses) == 1
-    assert loaded_plan.courses[0].code == "IP"
+    assert len(loaded_plan.materias) == 1
+    assert loaded_plan.materias[0].codigo == "IP"
 
 
 @pytest.mark.asyncio
-async def test_create_student(db_session: AsyncSession) -> None:
-    degree = Degree(name="Licenciatura en Informática", code="LI2")
-    db_session.add(degree)
+async def test_create_alumno(db_session: AsyncSession) -> None:
+    carrera = Carrera(nombre="Licenciatura en Informática", codigo="LI2")
+    db_session.add(carrera)
     await db_session.commit()
 
-    student = Student(
-        first_name="Ana",
-        last_name="Pérez",
-        doc_id="30123456",
-        degree_id=degree.id,
-        academic_status="alumno_regular",
-    )
-    db_session.add(student)
+    alumno = Alumno(nombre="Ana", apellido="Pérez", dni="30123456")
+    db_session.add(alumno)
     await db_session.commit()
-    await db_session.refresh(student)
 
-    assert student.id is not None
-    assert student.doc_id == "30123456"
-    assert student.plan_id is None
-    assert student.academic_status == "alumno_regular"
+    inscripcion = AlumnoCarrera(alumno_id=alumno.id, carrera_id=carrera.id, estado_academico="alumno_regular")
+    db_session.add(inscripcion)
+    await db_session.commit()
+    await db_session.refresh(alumno)
+
+    assert alumno.id is not None
+    assert alumno.dni == "30123456"
+    assert inscripcion.estado_academico == "alumno_regular"
 
 
 @pytest.mark.asyncio
-async def test_create_course_enrollment(db_session: AsyncSession) -> None:
-    degree = Degree(name="Tecnicatura en Programación Informática", code="TPI3")
-    course = Course(name="Algoritmos", code="ALG")
-    db_session.add_all([degree, course])
+async def test_create_cursada(db_session: AsyncSession) -> None:
+    carrera = Carrera(nombre="Tecnicatura en Programación Informática", codigo="TPI3")
+    materia = Materia(nombre="Algoritmos", codigo="ALG")
+    db_session.add_all([carrera, materia])
     await db_session.commit()
 
-    student = Student(
-        first_name="Bruno",
-        last_name="López",
-        doc_id="31111111",
-        degree_id=degree.id,
-        academic_status="alumno_regular",
+    alumno = Alumno(nombre="Bruno", apellido="López", dni="31111111")
+    db_session.add(alumno)
+    await db_session.commit()
+
+    cursada = Cursada(
+        alumno_id=alumno.id,
+        materia_id=materia.id,
+        carrera_id=carrera.id,
+        anio=2024,
+        cuatrimestre="1C",
+        tipo_cursada="regular",
+        estado_cursada="inscripto",
     )
-    db_session.add(student)
+    db_session.add(cursada)
     await db_session.commit()
+    await db_session.refresh(cursada)
 
-    enrollment = CourseEnrollment(
-        student_id=student.id,
-        course_id=course.id,
-        degree_id=degree.id,
-        year=2024,
-        term="1C",
-        enrollment_type="regular",
-        enrollment_status="inscripto",
-    )
-    db_session.add(enrollment)
-    await db_session.commit()
-    await db_session.refresh(enrollment)
-
-    assert enrollment.id is not None
-    assert enrollment.enrollment_status == "inscripto"
-    assert enrollment.grade is None
-    assert enrollment.status_changed_at is None
+    assert cursada.id is not None
+    assert cursada.estado_cursada == "inscripto"
+    assert cursada.nota is None
+    assert cursada.fecha_cambio_estado is None

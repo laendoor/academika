@@ -13,9 +13,11 @@ import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
 from app.db.base import Base
 from app.db.session import get_session
 from app.main import app
-from app.models.lkp_academic_status import LkpAcademicStatus
-from app.models.lkp_enrollment_status import LkpEnrollmentStatus
-from app.models.lkp_enrollment_type import LkpEnrollmentType
+from app.models.lkp_estado_academico import LkpEstadoAcademico
+from app.models.lkp_estado_cursada import LkpEstadoCursada
+from app.models.lkp_nivel_carrera import LkpNivelCarrera
+from app.models.lkp_nucleo_carrera import LkpNucleoCarrera
+from app.models.lkp_tipo_cursada import LkpTipoCursada
 from app.models.lkp_user_role import LkpUserRole
 
 
@@ -24,29 +26,42 @@ def _seed_lkp(engine) -> None:
     with Session(engine) as session:
         session.add_all(
             [
-                LkpAcademicStatus(key="alumno_regular", label="Alumno Regular"),
-                LkpAcademicStatus(key="no_regular", label="No Regular"),
+                LkpEstadoAcademico(key="alumno_regular", label="Alumno Regular"),
+                LkpEstadoAcademico(key="no_regular", label="No Regular"),
             ]
         )
         session.add_all(
             [
-                LkpEnrollmentStatus(key="inscripto", code="I", label="Inscripto"),
-                LkpEnrollmentStatus(key="regular", code="R", label="Regular"),
-                LkpEnrollmentStatus(key="promocionado", code="P", label="Promocionado"),
-                LkpEnrollmentStatus(key="aprobado", code="A", label="Aprobado"),
-                LkpEnrollmentStatus(key="pendiente_aprobacion", code="PA", label="Pendiente de Aprobación"),
+                LkpEstadoCursada(key="inscripto", code="I", label="Inscripto"),
+                LkpEstadoCursada(key="regular", code="R", label="Regular"),
+                LkpEstadoCursada(key="promocionado", code="P", label="Promocionado"),
+                LkpEstadoCursada(key="aprobado", code="A", label="Aprobado"),
+                LkpEstadoCursada(key="pendiente_aprobacion", code="PA", label="Pendiente de Aprobación"),
             ]
         )
         session.add_all(
             [
-                LkpEnrollmentType(key="regular", label="Cursada Regular"),
-                LkpEnrollmentType(key="libre", label="Libre"),
+                LkpTipoCursada(key="regular", label="Cursada Regular"),
+                LkpTipoCursada(key="libre", label="Libre"),
             ]
         )
         session.add_all(
             [
                 LkpUserRole(key="admin", label="Administrador"),
                 LkpUserRole(key="director", label="Director de Carrera"),
+            ]
+        )
+        session.add_all(
+            [
+                LkpNivelCarrera(key="grado", label="Grado"),
+                LkpNivelCarrera(key="pregrado", label="Pregrado"),
+            ]
+        )
+        session.add_all(
+            [
+                LkpNucleoCarrera(key="basico", label="Núcleo Básico"),
+                LkpNucleoCarrera(key="avanzado", label="Núcleo Avanzado"),
+                LkpNucleoCarrera(key="orientacion", label="Núcleo de Orientación"),
             ]
         )
         session.commit()
@@ -97,7 +112,7 @@ async def clean_db(test_engine: AsyncEngine) -> AsyncGenerator[None]:
     async with AsyncSession(test_engine) as session:
         await session.execute(
             text(
-                "TRUNCATE users, course_enrollments, study_plans_courses, students, study_plans, courses, degrees"
+                "TRUNCATE users, cursadas, planes_materias, alumno_carrera, alumnos, planes_de_estudio, correlativas, materias, carreras"
                 " RESTART IDENTITY CASCADE"
             )
         )

@@ -3,51 +3,51 @@ from sqlalchemy import select
 
 from app.db.session import SessionDep
 from app.errors import NotFoundError
-from app.models.lkp_academic_status import LkpAcademicStatus
-from app.models.lkp_enrollment_status import LkpEnrollmentStatus
-from app.models.lkp_enrollment_type import LkpEnrollmentType
-from app.schemas.lookups import AcademicStatusResponse, EnrollmentStatusResponse, EnrollmentTypeResponse
+from app.models.lkp_estado_academico import LkpEstadoAcademico
+from app.models.lkp_estado_cursada import LkpEstadoCursada
+from app.models.lkp_tipo_cursada import LkpTipoCursada
+from app.schemas.lookups import EstadoAcademicoResponse, EstadoCursadaResponse, TipoCursadaResponse
 
 router = APIRouter()
 
 
-@router.get("/academic-status", response_model=list[AcademicStatusResponse])
-async def list_academic_status(session: SessionDep) -> list[LkpAcademicStatus]:
-    result = await session.execute(select(LkpAcademicStatus))
+@router.get("/estado-academico", response_model=list[EstadoAcademicoResponse])
+async def list_estado_academico(session: SessionDep) -> list[LkpEstadoAcademico]:
+    result = await session.execute(select(LkpEstadoAcademico))
     return list(result.scalars().all())
 
 
-@router.get("/academic-status/{key}", response_model=AcademicStatusResponse)
-async def get_academic_status(key: str, session: SessionDep) -> LkpAcademicStatus:
-    instance = await session.get(LkpAcademicStatus, key)
+@router.get("/estado-academico/{key}", response_model=EstadoAcademicoResponse)
+async def get_estado_academico(key: str, session: SessionDep) -> LkpEstadoAcademico:
+    instance = await session.get(LkpEstadoAcademico, key)
     if instance is None:
-        raise NotFoundError("academic_status", key)
+        raise NotFoundError("estado_academico", key)
     return instance
 
 
-@router.get("/enrollment-status", response_model=list[EnrollmentStatusResponse])
-async def list_enrollment_status(session: SessionDep) -> list[LkpEnrollmentStatus]:
-    result = await session.execute(select(LkpEnrollmentStatus))
+@router.get("/estado-cursada", response_model=list[EstadoCursadaResponse])
+async def list_estado_cursada(session: SessionDep) -> list[LkpEstadoCursada]:
+    result = await session.execute(select(LkpEstadoCursada))
     return list(result.scalars().all())
 
 
-@router.get("/enrollment-status/{key}", response_model=EnrollmentStatusResponse)
-async def get_enrollment_status(key: str, session: SessionDep) -> LkpEnrollmentStatus:
-    instance = await session.get(LkpEnrollmentStatus, key)
+@router.get("/estado-cursada/{key}", response_model=EstadoCursadaResponse)
+async def get_estado_cursada(key: str, session: SessionDep) -> LkpEstadoCursada:
+    instance = await session.get(LkpEstadoCursada, key)
     if instance is None:
-        raise NotFoundError("enrollment_status", key)
+        raise NotFoundError("estado_cursada", key)
     return instance
 
 
-@router.get("/enrollment-type", response_model=list[EnrollmentTypeResponse])
-async def list_enrollment_type(session: SessionDep) -> list[LkpEnrollmentType]:
-    result = await session.execute(select(LkpEnrollmentType))
+@router.get("/tipo-cursada", response_model=list[TipoCursadaResponse])
+async def list_tipo_cursada(session: SessionDep) -> list[LkpTipoCursada]:
+    result = await session.execute(select(LkpTipoCursada))
     return list(result.scalars().all())
 
 
-@router.get("/enrollment-type/{key}", response_model=EnrollmentTypeResponse)
-async def get_enrollment_type(key: str, session: SessionDep) -> LkpEnrollmentType:
-    instance = await session.get(LkpEnrollmentType, key)
+@router.get("/tipo-cursada/{key}", response_model=TipoCursadaResponse)
+async def get_tipo_cursada(key: str, session: SessionDep) -> LkpTipoCursada:
+    instance = await session.get(LkpTipoCursada, key)
     if instance is None:
-        raise NotFoundError("enrollment_type", key)
+        raise NotFoundError("tipo_cursada", key)
     return instance
