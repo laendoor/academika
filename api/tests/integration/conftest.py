@@ -36,6 +36,7 @@ def _seed_lkp(engine) -> None:
                 LkpEstadoCursada(key="regular", code="R", label="Regular"),
                 LkpEstadoCursada(key="promocionado", code="P", label="Promocionado"),
                 LkpEstadoCursada(key="aprobado", code="A", label="Aprobado"),
+                LkpEstadoCursada(key="desaprobado", code="D", label="Desaprobado"),
                 LkpEstadoCursada(key="pendiente_aprobacion", code="PA", label="Pendiente de Aprobación"),
             ]
         )
