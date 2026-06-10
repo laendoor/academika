@@ -1,35 +1,55 @@
 {
-	"[markdown]": {
-		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
-		"editor.wordWrap": "on",
-		"editor.rulers": []
-	},
-	"markdownlint.config": {
-		"MD013": false,
-		"MD033": false,
-		"MD041": false
-	},
-	"cSpell.language": "en,es",
-	"[python]": {
-		"editor.defaultFormatter": "charliermarsh.ruff",
-		"editor.formatOnSave": true,
-		"editor.codeActionsOnSave": {
-			"source.fixAll": "always",
-			"source.organizeImports": "always"
-		}
-	},
-	"ruff.path": ["/Users/laendor/unq/seminario/academika/api/.venv/bin/ruff"],
-	"python.defaultInterpreterPath": "${workspaceFolder}/academika/api/.venv/bin/python",
-	"python.terminal.activateEnvironment": false,
-	"editor.tabSize": 2,
-	"files.trimTrailingWhitespace": true,
-	"files.insertFinalNewline": true,
-	"python-envs.pythonProjects": [
-		{
-			"path": ".",
-			"envManager": "ms-python.python:venv",
-			"packageManager": "ms-python.python:pip"
-		}
-	]
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on",
+    "editor.rulers": []
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "always",
+      "source.organizeImports.ruff": "always"
+    }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "always",
+      "source.fixAll.biome": "always"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.biome": "always",
+      "source.fixAll.biome": "always"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false,
+    "MD041": false
+  },
+  "cSpell.language": "en,es",
+  "ruff.path": ["/Users/laendor/unq/seminario/academika/api/.venv/bin/ruff"],
+  "python.defaultInterpreterPath": "${workspaceFolder}/academika/api/.venv/bin/python",
+  "python.terminal.activateEnvironment": false,
+  "python-envs.pythonProjects": [
+    {
+      "path": ".",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ]
 }
