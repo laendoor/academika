@@ -19,7 +19,8 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO lkp_user_roles (key, label) VALUES
     ('admin',    'Administrador'),
-    ('director', 'Director de Carrera')
+    ('director', 'Dirección de Carrera'),
+    ('docente',  'Docente')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO lkp_nivel_carrera (key, label) VALUES

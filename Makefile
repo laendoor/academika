@@ -88,11 +88,11 @@ alembic-revision:
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic revision --autogenerate -m "$(MSG)"
 
 seed:
-	cd api && DATABASE_URL=$(DB_URL) uv run python -m app.seeds.runner reference
+	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference
 
 seed-dev:
-	cd api && DATABASE_URL=$(DB_URL) uv run python -m app.seeds.runner reference && \
-	          DATABASE_URL=$(DB_URL) uv run python -m app.seeds.runner dev
+	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference && \
+	          DATABASE_URL=$(DB_URL) uv run python -m seeds.runner dev
 
 seed-admin:
-	cd api && DATABASE_URL=$(DB_URL) uv run python -m app.seeds.create_admin
+	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.create_admin

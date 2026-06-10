@@ -1,7 +1,7 @@
 """CLI interactivo para crear el primer usuario admin.
 
 Uso:
-    python -m app.seeds.create_admin      (via make seed-admin)
+    python -m seeds.create_admin      (via make seed-admin)
 
 Funciona en dev y prod. El password nunca toca el repo.
 Requiere que los seeds de referencia (make seed) ya hayan corrido.
