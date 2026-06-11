@@ -1,4 +1,8 @@
+from typing import Literal
+
 from pydantic import BaseModel
+
+UserRole = Literal["admin", "director", "docente"]
 
 
 class LoginRequest(BaseModel):
@@ -19,6 +23,11 @@ class RefreshRequest(BaseModel):
 class RefreshResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class InviteRequest(BaseModel):
+    email: str
+    role: UserRole
 
 
 class ForgotPasswordRequest(BaseModel):

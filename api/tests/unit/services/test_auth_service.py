@@ -6,7 +6,9 @@ import pytest
 from app.auth.errors import InvalidCredentialsError, InvalidTokenError, UnauthorizedDomainError
 from app.auth.password import hash_password
 from app.auth.tokens import create_access_token, create_refresh_token, create_reset_token
+from app.errors import ConflictError
 from app.services.auth import AuthService
+from app.services.users import UserService
 
 
 @pytest.fixture
@@ -16,7 +18,7 @@ def session() -> AsyncMock:
 
 @pytest.fixture
 def service(session: AsyncMock) -> AuthService:
-    return AuthService(session)
+    return AuthService(session, UserService(session))
 
 
 @pytest.fixture
@@ -107,6 +109,30 @@ async def test_refresh_user_not_found(service: AuthService, mock_user: MagicMock
     session.get.return_value = None
     with pytest.raises(InvalidTokenError):
         await service.refresh(token)
+
+
+# ── invite ───────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_invite_success(service: AuthService, session: AsyncMock):
+    _mock_execute(session, None)
+    with patch("app.services.auth.send_mail") as mock_send:
+        await service.invite("nuevo@unq.edu.ar", "docente")
+        mock_send.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_invite_wrong_domain(service: AuthService):
+    with pytest.raises(UnauthorizedDomainError):
+        await service.invite("nuevo@gmail.com", "docente")
+
+
+@pytest.mark.asyncio
+async def test_invite_user_already_exists(service: AuthService, session: AsyncMock, mock_user: MagicMock):
+    _mock_execute(session, mock_user)
+    with pytest.raises(ConflictError):
+        await service.invite("steve@unq.edu.ar", "docente")
 
 
 # ── forgot_password ──────────────────────────────────────────────────────────

@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
     reset_token_expire_hours: int = 1
+    invite_token_expire_hours: int = 72
 
     # Requerido en producción: RESEND_API_KEY. Sin él, el envío de emails falla en runtime.
     resend_api_key: str = ""

@@ -5,6 +5,7 @@ import pytest
 
 from app.auth.tokens import (
     create_access_token,
+    create_invite_token,
     create_refresh_token,
     create_reset_token,
     decode_token,
@@ -37,6 +38,14 @@ def test_reset_token_payload(user_id):
     assert payload["sub"] == str(user_id)
     assert payload["email"] == "lean@unq.edu.ar"
     assert payload["type"] == "reset"
+
+
+def test_invite_token_payload():
+    token = create_invite_token("director@unq.edu.ar", "director")
+    payload = decode_token(token, expected_type="invite")
+    assert payload["sub"] == "director@unq.edu.ar"
+    assert payload["role"] == "director"
+    assert payload["type"] == "invite"
 
 
 def test_wrong_type_raises(user_id):

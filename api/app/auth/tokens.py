@@ -35,6 +35,16 @@ def create_reset_token(user_id: uuid.UUID, email: str) -> str:
     return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
 
+def create_invite_token(email: str, role: str) -> str:
+    payload = {
+        "sub": email,
+        "role": role,
+        "type": "invite",
+        "exp": datetime.now(UTC) + timedelta(hours=settings.invite_token_expire_hours),
+    }
+    return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
+
+
 def decode_token(token: str, expected_type: str | None = None) -> dict:
     payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
     if expected_type is not None and payload.get("type") != expected_type:
