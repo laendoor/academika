@@ -2,7 +2,12 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { ACCESS_TOKEN } from "@/lib/cookies";
 
-const PUBLIC_ROUTES = ["/login", "/forgot-password", "/reset-password"];
+const PUBLIC_ROUTES = [
+	"/login",
+	"/forgot-password",
+	"/reset-password",
+	"/register",
+];
 const HOME_ROUTE = "/workspace";
 
 export function proxy(request: NextRequest) {
