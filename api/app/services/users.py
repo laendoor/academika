@@ -3,10 +3,11 @@ import uuid
 from sqlalchemy import select
 
 from app.models.user import User
+from app.schemas.users import UserCreate
 from app.services.base import BaseService
 
 
-class UserService(BaseService[User, None, None]):
+class UserService(BaseService[User, UserCreate, None]):
     model = User
 
     async def find_by_id(self, id: uuid.UUID) -> User | None:

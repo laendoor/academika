@@ -10,6 +10,8 @@ from app.schemas.auth import (
     LoginResponse,
     RefreshRequest,
     RefreshResponse,
+    RegisterRequest,
+    RegisterResponse,
     ResetPasswordRequest,
 )
 from app.services.auth import AuthService
@@ -35,6 +37,12 @@ async def refresh(body: RefreshRequest, service: ServiceDep) -> RefreshResponse:
 @router.post("/invite", status_code=204, dependencies=[AdminRole])
 async def invite(body: InviteRequest, service: ServiceDep) -> None:
     await service.invite(body.email, body.role)
+
+
+@router.post("/register", response_model=RegisterResponse, status_code=201)
+async def register(body: RegisterRequest, service: ServiceDep) -> RegisterResponse:
+    tokens = await service.register(body.token, body.password)
+    return RegisterResponse(**tokens)
 
 
 @router.post("/forgot-password", status_code=204)

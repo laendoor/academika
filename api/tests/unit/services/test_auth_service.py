@@ -5,7 +5,7 @@ import pytest
 
 from app.auth.errors import InvalidCredentialsError, InvalidTokenError, UnauthorizedDomainError
 from app.auth.password import hash_password
-from app.auth.tokens import create_access_token, create_refresh_token, create_reset_token
+from app.auth.tokens import create_access_token, create_invite_token, create_refresh_token, create_reset_token
 from app.errors import ConflictError
 from app.services.auth import AuthService
 from app.services.users import UserService
@@ -133,6 +133,40 @@ async def test_invite_user_already_exists(service: AuthService, session: AsyncMo
     _mock_execute(session, mock_user)
     with pytest.raises(ConflictError):
         await service.invite("steve@unq.edu.ar", "docente")
+
+
+# ── register ─────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_register_success(service: AuthService, session: AsyncMock):
+    _mock_execute(session, None)  # no existe usuario activo con ese email
+    token = create_invite_token("nuevo@unq.edu.ar", "docente")
+    result = await service.register(token, "password123")
+    assert "access_token" in result
+    assert "refresh_token" in result
+
+
+@pytest.mark.asyncio
+async def test_register_invalid_token(service: AuthService):
+    with pytest.raises(InvalidTokenError):
+        await service.register("token.invalido.xxx", "password123")
+
+
+@pytest.mark.asyncio
+async def test_register_wrong_type(service: AuthService):
+    # Un access token no debe funcionar como invite token
+    token = create_access_token(uuid.uuid4(), "director")
+    with pytest.raises(InvalidTokenError):
+        await service.register(token, "password123")
+
+
+@pytest.mark.asyncio
+async def test_register_user_already_exists(service: AuthService, session: AsyncMock, mock_user: MagicMock):
+    _mock_execute(session, mock_user)
+    token = create_invite_token("steve@unq.edu.ar", "docente")
+    with pytest.raises(ConflictError):
+        await service.register(token, "password123")
 
 
 # ── forgot_password ──────────────────────────────────────────────────────────

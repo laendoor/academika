@@ -11,6 +11,7 @@ from app.auth.tokens import create_access_token, create_invite_token, create_ref
 from app.config import settings
 from app.db.session import SessionDep
 from app.errors import ConflictError
+from app.schemas.users import UserCreate
 from app.services.mail import send_mail
 from app.services.users import UserService
 
@@ -63,6 +64,20 @@ class AuthService:
                 f" El enlace expira en {settings.invite_token_expire_hours} horas.</p>"
             ),
         )
+
+    async def register(self, token: str, password: str) -> dict:
+        payload = ensure_token_decoded(token, "invite")
+        email = payload["sub"]
+        role = payload["role"]
+
+        if await self.users.find_active_by_email(email) is not None:
+            raise ConflictError(f"Ya existe un usuario activo con email '{email}'")
+
+        user = await self.users.create(UserCreate(email=email, role=role, hashed_password=hash_password(password)))
+        return {
+            "access_token": create_access_token(user.id, user.role),
+            "refresh_token": create_refresh_token(user.id),
+        }
 
     async def forgot_password(self, email: str) -> None:
         user = await self.users.find_by_email(email)
