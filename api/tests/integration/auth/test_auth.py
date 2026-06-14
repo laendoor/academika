@@ -83,7 +83,7 @@ async def test_refresh_wrong_type(client: AsyncClient, test_user: User):
 
 @pytest.mark.asyncio
 async def test_forgot_password_sends_email(client: AsyncClient, test_user: User):
-    with patch("app.services.auth.send_mail") as mock_send:
+    with patch("app.services.mail.ConsoleMailService.send") as mock_send:
         response = await client.post("/api/v1/auth/forgot-password", json={"email": "hari@unq.edu.ar"})
     assert response.status_code == 204
     mock_send.assert_called_once()
@@ -91,7 +91,7 @@ async def test_forgot_password_sends_email(client: AsyncClient, test_user: User)
 
 @pytest.mark.asyncio
 async def test_forgot_password_unknown_email(client: AsyncClient):
-    with patch("app.services.auth.send_mail") as mock_send:
+    with patch("app.services.mail.ConsoleMailService.send") as mock_send:
         response = await client.post("/api/v1/auth/forgot-password", json={"email": "nadie@unq.edu.ar"})
     assert response.status_code == 204
     mock_send.assert_not_called()
@@ -135,7 +135,7 @@ async def test_reset_password_wrong_type(client: AsyncClient, test_user: User):
 
 @pytest.mark.asyncio
 async def test_invite_success(client: AsyncClient, test_admin: User, admin_token: str):
-    with patch("app.services.auth.send_mail") as mock_send:
+    with patch("app.services.mail.ConsoleMailService.send") as mock_send:
         response = await client.post(
             "/api/v1/auth/invite",
             json={"email": "nuevo@unq.edu.ar", "role": "docente"},
@@ -233,7 +233,7 @@ async def test_invite_then_register_flow(client: AsyncClient, test_admin: User, 
     email = "salvor@unq.edu.ar"
     password = "hardin456"
 
-    with patch("app.services.auth.send_mail"):
+    with patch("app.services.mail.ConsoleMailService.send"):
         invite_response = await client.post(
             "/api/v1/auth/invite",
             json={"email": email, "role": "docente"},
