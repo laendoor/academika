@@ -2,6 +2,7 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "[markdown]": {
@@ -18,6 +19,7 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome",
+    "editor.insertSpaces": false,
     "editor.codeActionsOnSave": {
       "source.organizeImports.biome": "always",
       "source.fixAll.biome": "always"
@@ -25,16 +27,31 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome",
+    "editor.insertSpaces": false,
     "editor.codeActionsOnSave": {
       "source.organizeImports.biome": "always",
       "source.fixAll.biome": "always"
     }
   },
   "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.insertSpaces": false
   },
+  "css.validate": false,
   "[css]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.insertSpaces": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.biome": "always"
+    }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.insertSpaces": false
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.insertSpaces": false
   },
   "markdownlint.config": {
     "MD013": false,
