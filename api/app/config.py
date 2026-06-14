@@ -26,8 +26,10 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
     reset_token_expire_hours: int = 1
+    invite_token_expire_hours: int = 72
 
-    # Requerido en producción: RESEND_API_KEY. Sin él, el envío de emails falla en runtime.
+    # Requerido en producción: RESEND_API_KEY. Sin él, los emails se loguean
+    # en lugar de enviarse (ConsoleMailService — útil para dev local).
     resend_api_key: str = ""
     resend_from_email: str = "noreply@academika.unq.edu.ar"
     frontend_url: str = "http://localhost:3000"

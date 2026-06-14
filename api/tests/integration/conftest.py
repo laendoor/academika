@@ -50,6 +50,7 @@ def _seed_lkp(engine) -> None:
             [
                 LkpUserRole(key="admin", label="Administrador"),
                 LkpUserRole(key="director", label="Director de Carrera"),
+                LkpUserRole(key="docente", label="Docente"),
             ]
         )
         session.add_all(

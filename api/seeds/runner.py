@@ -1,8 +1,8 @@
 """Ejecuta seeds SQL de un directorio en orden alfabético.
 
 Uso:
-    python -m app.seeds.runner reference   ← prod-safe, idempotente
-    python -m app.seeds.runner dev         ← solo local
+    python -m seeds.runner reference   ← prod-safe, idempotente
+    python -m seeds.runner dev         ← solo local
 """
 
 import asyncio

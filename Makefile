@@ -1,6 +1,6 @@
 .PHONY: help install docker-dev db-start db-stop dev-api dev-ui check format test test-integration clean \
         alembic-current alembic-upgrade alembic-downgrade alembic-check alembic-revision \
-        seed seed-dev
+        seed seed-dev seed-admin
 
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
@@ -26,7 +26,8 @@ help:
 	@echo "  make alembic-revision MSG=\"...\"     - Generar migración (NO aplica — revisar antes)
 	@echo ""
 	@echo "  make seed                           - Seeds de referencia (LKPs) — prod-safe, idempotente"
-	@echo "  make seed-dev                       - Seeds de desarrollo (datos de muestra) — solo local""
+	@echo "  make seed-admin                     - Crear primer usuario admin (interactivo, dev y prod)"
+	@echo "  make seed-dev                       - Seeds de desarrollo (datos de muestra) — solo local"
 
 install:
 	cd api && uv sync
@@ -87,8 +88,11 @@ alembic-revision:
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic revision --autogenerate -m "$(MSG)"
 
 seed:
-	cd api && DATABASE_URL=$(DB_URL) uv run python -m app.seeds.runner reference
+	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference
 
 seed-dev:
-	cd api && DATABASE_URL=$(DB_URL) uv run python -m app.seeds.runner reference && \
-	          DATABASE_URL=$(DB_URL) uv run python -m app.seeds.runner dev
+	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference && \
+	          DATABASE_URL=$(DB_URL) uv run python -m seeds.runner dev
+
+seed-admin:
+	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.create_admin

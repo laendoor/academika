@@ -11,6 +11,10 @@ from app.errors import ConflictError, NotFoundError
 
 
 class BaseService[ModelT, CreateSchemaT, UpdateSchemaT]:
+    """
+    BaseService[Model, CreateSchema, UpdateSchema]
+    """
+
     model: ClassVar[type]
 
     def __init__(self, session: AsyncSession) -> None:

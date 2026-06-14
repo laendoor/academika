@@ -1,4 +1,14 @@
-from pydantic import BaseModel
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+UserRole = Literal["admin", "director", "docente"]
+
+
+class AuthTokens(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
 
 
 class LoginRequest(BaseModel):
@@ -6,10 +16,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class LoginResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
+class LoginResponse(AuthTokens): ...
 
 
 class RefreshRequest(BaseModel):
@@ -19,6 +26,19 @@ class RefreshRequest(BaseModel):
 class RefreshResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class InviteRequest(BaseModel):
+    email: str
+    role: UserRole
+
+
+class RegisterRequest(BaseModel):
+    token: str
+    password: str = Field(min_length=8)
+
+
+class RegisterResponse(AuthTokens): ...
 
 
 class ForgotPasswordRequest(BaseModel):

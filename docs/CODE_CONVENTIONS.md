@@ -126,6 +126,56 @@ a un modelo completo con `mapped_column()`.
 
 ---
 
+## Services
+
+Cada service es responsable de las queries sobre sus propios modelos.
+Si necesita datos de otro modelo debe invocar al service correspondiente,
+pero no escribir la query directamente.
+
+### Naming de métodos de búsqueda
+
+| Prefijo  | Retorno                     | Cuándo usarlo                                                 |
+| -------- | --------------------------- | ------------------------------------------------------------- |
+| `find_*` | `T \| None`                 | la ausencia es un outcome válido — el caller decide qué hacer |
+| `get_*`  | `T` o lanza `NotFoundError` | la ausencia es un error del caller                            |
+
+```python
+user = await self.users.find_active_by_email(email)  # None si no existe
+user = await self.users.get_by_id(user_id)           # lanza NotFoundError si no existe
+```
+
+```python
+# Evitar: AuthService hace una query directa sobre la tabla de User
+result = await self.session.execute(select(User).where(...))
+
+# Correcto: AuthService recibe UserService por inyección y lo usa
+user = await self.users.find_active_by_email(email)
+```
+
+### Inyección de services en services
+
+Las dependencias entre services se declaran en el constructor e inyectan desde `dep()`.
+`dep()` es el único lugar que sabe cómo construir sus dependencias.
+
+```python
+class AuthService:
+    def __init__(self, session: AsyncSession, users: UserService) -> None:
+        self.session = session
+        self.users = users
+
+    @classmethod
+    def dep(cls, session: SessionDep, users: Annotated[UserService, Depends(UserService.dep)]) -> "AuthService":
+        return cls(session, users)
+```
+
+Ventaja: el constructor es puro y testeable sin FastAPI:
+`AuthService(mock_session, mock_users)`.
+
+Para uso fuera de FastAPI (seeds, scripts): instanciar manualmente:
+`AuthService(session, UserService(session))`.
+
+---
+
 ## Estilo de código
 
 ### Ramas positivas
