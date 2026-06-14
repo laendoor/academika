@@ -12,18 +12,24 @@ from app.config import settings
 from app.db.session import SessionDep
 from app.errors import ConflictError
 from app.schemas.users import UserCreate
-from app.services.mail import send_mail
+from app.services.mail import MailService, get_mail_service
 from app.services.users import UserService
 
 
 class AuthService:
-    def __init__(self, session: AsyncSession, users: UserService) -> None:
+    def __init__(self, session: AsyncSession, users: UserService, mail: MailService) -> None:
         self.session = session
         self.users = users
+        self.mail = mail
 
     @classmethod
-    def dep(cls, session: SessionDep, users: Annotated[UserService, Depends(UserService.dep)]) -> "AuthService":
-        return cls(session, users)
+    def dep(
+        cls,
+        session: SessionDep,
+        users: Annotated[UserService, Depends(UserService.dep)],
+        mail: Annotated[MailService, Depends(get_mail_service)],
+    ) -> "AuthService":
+        return cls(session, users, mail)
 
     async def login(self, email: str, password: str) -> dict:
         ensure_authorized_domain(email)
@@ -56,7 +62,7 @@ class AuthService:
         token = create_invite_token(email, role)
         invite_url = f"{settings.frontend_url}/register?token={token}"
 
-        send_mail(
+        self.mail.send(
             to=email,
             subject="Invitación a Académika",
             html=(
@@ -87,7 +93,7 @@ class AuthService:
         token = create_reset_token(user.id, user.email)
         reset_url = f"{settings.frontend_url}/reset-password?token={token}"
 
-        send_mail(
+        self.mail.send(
             to=user.email,
             subject="Recuperación de contraseña - Academika",
             html=(

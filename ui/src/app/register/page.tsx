@@ -10,6 +10,15 @@ import { FormError } from "@/components/auth/FormError";
 import { FormField } from "@/components/auth/FormField";
 import { register } from "@/lib/api/auth";
 
+function isTokenValid(token: string): boolean {
+	try {
+		const payload = JSON.parse(atob(token.split(".")[1]));
+		return Date.now() / 1000 < (payload.exp ?? 0);
+	} catch {
+		return false;
+	}
+}
+
 function InvalidInviteToken() {
 	return (
 		<AuthCard className="space-y-4 text-center">
@@ -32,7 +41,7 @@ function RegisterForm() {
 	const [error, setError] = useState<string | undefined>();
 	const [pending, setPending] = useState(false);
 
-	if (!token) return <InvalidInviteToken />;
+	if (!token || !isTokenValid(token)) return <InvalidInviteToken />;
 
 	async function handleAction(formData: FormData) {
 		setError(undefined);

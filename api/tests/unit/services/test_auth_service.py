@@ -1,5 +1,5 @@
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -17,8 +17,13 @@ def session() -> AsyncMock:
 
 
 @pytest.fixture
-def service(session: AsyncMock) -> AuthService:
-    return AuthService(session, UserService(session))
+def mail() -> MagicMock:
+    return MagicMock()
+
+
+@pytest.fixture
+def service(session: AsyncMock, mail: MagicMock) -> AuthService:
+    return AuthService(session, UserService(session), mail)
 
 
 @pytest.fixture
@@ -115,11 +120,10 @@ async def test_refresh_user_not_found(service: AuthService, mock_user: MagicMock
 
 
 @pytest.mark.asyncio
-async def test_invite_success(service: AuthService, session: AsyncMock):
+async def test_invite_success(service: AuthService, session: AsyncMock, mail: MagicMock):
     _mock_execute(session, None)
-    with patch("app.services.auth.send_mail") as mock_send:
-        await service.invite("nuevo@unq.edu.ar", "docente")
-        mock_send.assert_called_once()
+    await service.invite("nuevo@unq.edu.ar", "docente")
+    mail.send.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -173,19 +177,19 @@ async def test_register_user_already_exists(service: AuthService, session: Async
 
 
 @pytest.mark.asyncio
-async def test_forgot_password_sends_email(service: AuthService, session: AsyncMock, mock_user: MagicMock):
+async def test_forgot_password_sends_email(
+    service: AuthService, session: AsyncMock, mock_user: MagicMock, mail: MagicMock
+):
     _mock_execute(session, mock_user)
-    with patch("app.services.auth.send_mail") as mock_send:
-        await service.forgot_password("steve@unq.edu.ar")
-        mock_send.assert_called_once()
+    await service.forgot_password("steve@unq.edu.ar")
+    mail.send.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_forgot_password_silent_fail(service: AuthService, session: AsyncMock):
+async def test_forgot_password_silent_fail(service: AuthService, session: AsyncMock, mail: MagicMock):
     _mock_execute(session, None)
-    with patch("app.services.auth.send_mail") as mock_send:
-        await service.forgot_password("nadie@unq.edu.ar")
-        mock_send.assert_not_called()
+    await service.forgot_password("nadie@unq.edu.ar")
+    mail.send.assert_not_called()
 
 
 # ── reset_password ───────────────────────────────────────────────────────────

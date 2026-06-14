@@ -23,9 +23,21 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ ok: true });
 	}
 
-	if (res.status === 401 || res.status === 409) {
+	if (res.status === 401) {
 		const body = await res.json();
-		return NextResponse.json({ error: body.detail }, { status: res.status });
+		return NextResponse.json({ error: body.detail }, { status: 401 });
+	}
+
+	if (res.status === 409) {
+		const body = await res.json();
+		return NextResponse.json({ error: body.detail }, { status: 409 });
+	}
+
+	if (res.status === 422) {
+		const body = await res.json();
+		const detail = body.detail;
+		const message = Array.isArray(detail) ? detail[0]?.msg : UNEXPECTED_ERROR;
+		return NextResponse.json({ error: message }, { status: 422 });
 	}
 
 	return NextResponse.json({ error: UNEXPECTED_ERROR }, { status: 500 });
