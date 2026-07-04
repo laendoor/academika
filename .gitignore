@@ -20,6 +20,9 @@ dev-api.log
 ui/node_modules/
 ui/.next/
 
+# Claude
+.claude/
+
 # Output files del anonimizador
 datos-prueba/*_anon.*
 
