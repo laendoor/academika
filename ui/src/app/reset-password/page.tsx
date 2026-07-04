@@ -1,6 +1,6 @@
 "use client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthFooterLink } from "@/components/auth/AuthFooterLink";
@@ -8,7 +8,7 @@ import { AuthHeader } from "@/components/auth/AuthHeader";
 import { FormButton } from "@/components/auth/FormButton";
 import { FormError } from "@/components/auth/FormError";
 import { FormField } from "@/components/auth/FormField";
-import { resetPassword } from "@/lib/api/auth";
+import { useResetPasswordForm } from "@/hooks/auth";
 
 function InvalidResetToken() {
 	return (
@@ -27,30 +27,9 @@ function InvalidResetToken() {
 function ResetPasswordForm() {
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token") ?? "";
-	const router = useRouter();
-
-	const [error, setError] = useState<string | undefined>();
-	const [pending, setPending] = useState(false);
+	const { handleAction, error, pending } = useResetPasswordForm(token);
 
 	if (!token) return <InvalidResetToken />;
-
-	async function handleAction(formData: FormData) {
-		setPending(true);
-		setError(undefined);
-
-		const result = await resetPassword(
-			token,
-			formData.get("new_password") as string,
-		);
-
-		if (result.ok) {
-			router.push("/login");
-			return;
-		}
-
-		setError(result.error);
-		setPending(false);
-	}
 
 	return (
 		<AuthCard>

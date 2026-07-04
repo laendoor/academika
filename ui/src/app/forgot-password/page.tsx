@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
-
 import { AuthCard } from "@/components/auth/AuthCard";
 import { AuthFooterLink } from "@/components/auth/AuthFooterLink";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { FormButton } from "@/components/auth/FormButton";
 import { FormError } from "@/components/auth/FormError";
 import { FormField } from "@/components/auth/FormField";
-import { forgotPassword } from "@/lib/api/auth";
+import { useForgotPasswordForm } from "@/hooks/auth";
 
 function EmailSentConfirmation() {
 	return (
@@ -23,26 +21,9 @@ function EmailSentConfirmation() {
 }
 
 export default function ForgotPasswordPage() {
-	const [sent, setSent] = useState(false);
-	const [error, setError] = useState<string | undefined>();
-	const [pending, setPending] = useState(false);
+	const { handleAction, error, pending, sent } = useForgotPasswordForm();
 
 	if (sent) return <EmailSentConfirmation />;
-
-	async function handleAction(formData: FormData) {
-		setPending(true);
-		setError(undefined);
-
-		const result = await forgotPassword(formData.get("email") as string);
-
-		if (result.ok) {
-			setSent(true);
-			return;
-		}
-
-		setError(result.error);
-		setPending(false);
-	}
 
 	return (
 		<AuthCard>
