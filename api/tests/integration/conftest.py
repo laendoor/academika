@@ -10,7 +10,9 @@ from sqlalchemy.pool import NullPool
 from testcontainers.postgres import PostgresContainer
 
 import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
-from app.db.base import Base
+from app.auth.password import hash_password
+from app.auth.tokens import create_access_token
+from app.db.base import Base, generate_uuid
 from app.db.session import get_session
 from app.main import app
 from app.models.lkp_estado_academico import LkpEstadoAcademico
@@ -19,6 +21,7 @@ from app.models.lkp_nivel_carrera import LkpNivelCarrera
 from app.models.lkp_nucleo_carrera import LkpNucleoCarrera
 from app.models.lkp_tipo_cursada import LkpTipoCursada
 from app.models.lkp_user_role import LkpUserRole
+from app.models.user import User
 
 
 def _seed_lkp(engine) -> None:
@@ -134,3 +137,38 @@ async def client(session_factory) -> AsyncGenerator[AsyncClient]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def test_user(db_session: AsyncSession) -> User:
+    user = User(
+        id=generate_uuid(),
+        email="hari@unq.edu.ar",
+        hashed_password=hash_password("seldon123"),
+        role="director",
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def test_admin(db_session: AsyncSession) -> User:
+    user = User(
+        id=generate_uuid(),
+        email="admin@unq.edu.ar",
+        hashed_password=hash_password("admin123"),
+        role="admin",
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def admin_token(test_admin: User) -> str:
+    return create_access_token(test_admin.id, test_admin.role)
