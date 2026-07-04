@@ -16,6 +16,7 @@ export function useForgotPasswordForm() {
 
 		if (result.ok) {
 			setSent(true);
+			setPending(false);
 			return;
 		}
 

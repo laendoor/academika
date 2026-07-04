@@ -25,6 +25,7 @@ export function useRegisterForm(token: string) {
 
 		if (result.ok) {
 			router.push("/login");
+			setPending(false);
 			return;
 		}
 
