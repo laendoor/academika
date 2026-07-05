@@ -23,6 +23,9 @@ ui/.next/
 # Claude
 .claude/
 
+# OpenCode
+.opencode/
+
 # Output files del anonimizador
 datos-prueba/*_anon.*
 

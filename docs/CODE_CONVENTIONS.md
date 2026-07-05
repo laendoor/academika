@@ -16,12 +16,44 @@ La repetición es la señal práctica más confiable. Los programadores la usan 
 ```txt
 ui/src/components/
   auth/      ← componentes de dominio (auth, recovery)
-  ui/        ← primitivos sin dominio (futuro)
+  ui/        ← primitivos sin dominio (PageState, ...)
 ```
 
 ### Server vs Client components
 
 Sin `"use client"` por defecto. Agregar solo cuando el componente necesita hooks (`useState`, `useActionState`, `useSearchParams`) o event handlers interactivos. Los componentes de presentación pura funcionan en ambos contextos sin `"use client"`.
+
+---
+
+## Hooks (frontend)
+
+Los custom hooks encapsulan estado, efectos y llamadas a la API. Los componentes son presentación pura.
+
+```txt
+ui/src/hooks/
+  auth/      ← hooks de dominio auth (useLoginForm, useForgotPasswordForm, ...)
+  admin/     ← hooks de dominio admin (useAdminUsers, ...)
+```
+
+**Regla:** si un componente tiene `useState` + llamadas a la API, extraer a un hook del dominio correspondiente.
+
+```tsx
+// Correcto — página solo presenta
+export default function AdminPage() {
+  const { users, loading, error, updating, handleUpdate } = useAdminUsers();
+  // solo JSX
+}
+
+// Evitar — estado y lógica mezclados en el componente
+export default function AdminPage() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => { fetch(...).then(...) }, []);
+  async function handleUpdate(...) { ... }
+  // JSX
+}
+```
+
+Cada carpeta de dominio tiene un `index.ts` con barrel exports.
 
 ---
 
