@@ -25,6 +25,8 @@ export function useAdminUsers() {
 			setUsers((prev) =>
 				prev.map((u) => (u.id === result.data.id ? result.data : u)),
 			);
+		} else {
+			setError(result.error);
 		}
 	}
 

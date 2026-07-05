@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const UNEXPECTED_ERROR = "Error inesperado. Intentá de nuevo más tarde.";
+export const UNEXPECTED_ERROR = "Error inesperado. Intentá de nuevo más tarde.";
 
 export class RouteError extends Error {
 	constructor(
@@ -12,10 +12,14 @@ export class RouteError extends Error {
 	}
 }
 
-export function apiHandler(fn: (req: NextRequest) => Promise<NextResponse>) {
-	return async (req: NextRequest) => {
+type RouteContext = { params: Promise<Record<string, string>> };
+
+export function apiHandler(
+	fn: (req: NextRequest, ctx?: RouteContext) => Promise<NextResponse>,
+) {
+	return async (req: NextRequest, ctx?: RouteContext) => {
 		try {
-			return await fn(req);
+			return await fn(req, ctx);
 		} catch (err) {
 			if (err instanceof RouteError)
 				return NextResponse.json(

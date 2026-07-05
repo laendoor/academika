@@ -10,6 +10,8 @@ export const GET = apiHandler(async (req: NextRequest) => {
 	if (!token) throw new RouteError("No autorizado", 401);
 
 	const res = await fetch(`${API_URL}/api/v1/admin/users?skip=0&limit=100`, {
+		// limit=100 hardcodeado: el panel de usuarios de backoffice asume
+		// una cantidad pequeña de usuarios. Si escala, forwardear searchParams.
 		headers: { Authorization: `Bearer ${token}` },
 	});
 

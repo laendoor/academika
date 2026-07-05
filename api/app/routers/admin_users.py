@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.auth.dependencies import require_role
 from app.models.user import User
@@ -16,7 +16,7 @@ AdminRole = Depends(require_role("admin"))
 
 
 @router.get("", response_model=PaginatedResponse[UserResponse], dependencies=[AdminRole])
-async def list_users(service: ServiceDep, skip: int = 0, limit: int = 20):
+async def list_users(service: ServiceDep, skip: int = 0, limit: int = Query(default=20, le=100)):
     total, items = await service.list(skip=skip, limit=limit)
     return PaginatedResponse(total=total, items=items)
 
