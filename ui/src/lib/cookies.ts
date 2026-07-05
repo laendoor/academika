@@ -6,7 +6,7 @@ import { IS_PRODUCTION } from "@/lib/constants";
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";
 
-const ACCESS_TOKEN_MAX_AGE = 15 * 60;
+export const ACCESS_TOKEN_MAX_AGE = 15 * 60;
 const REFRESH_TOKEN_MAX_AGE = 7 * 24 * 60 * 60;
 
 type CookieStore = Awaited<ReturnType<typeof cookies>>;
