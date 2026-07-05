@@ -73,7 +73,7 @@ async def test_refresh_invalid_token(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_refresh_wrong_type(client: AsyncClient, test_user: User):
     # Un access token no debe ser aceptado como refresh token
-    token = create_access_token(test_user.id, test_user.role)
+    token = create_access_token(test_user.id, test_user.role, test_user.email)
     response = await client.post("/api/v1/auth/refresh", json={"refresh_token": token})
     assert response.status_code == 401
 
@@ -168,7 +168,7 @@ async def test_invite_user_already_exists(client: AsyncClient, test_admin: User,
 @pytest.mark.asyncio
 async def test_invite_forbidden(client: AsyncClient, test_user: User):
     # Un director no puede invitar — solo admin
-    token = create_access_token(test_user.id, test_user.role)
+    token = create_access_token(test_user.id, test_user.role, test_user.email)
     response = await client.post(
         "/api/v1/auth/invite",
         json={"email": "nuevo@unq.edu.ar", "role": "docente"},
@@ -206,7 +206,7 @@ async def test_register_invalid_token(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_register_wrong_type(client: AsyncClient, test_user: User):
     # Un access token no debe funcionar como invite token
-    token = create_access_token(test_user.id, test_user.role)
+    token = create_access_token(test_user.id, test_user.role, test_user.email)
     response = await client.post(
         "/api/v1/auth/register",
         json={"token": token, "password": "password123"},

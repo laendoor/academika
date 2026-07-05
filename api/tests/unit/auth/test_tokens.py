@@ -18,9 +18,10 @@ def user_id() -> uuid.UUID:
 
 
 def test_access_token_payload(user_id):
-    token = create_access_token(user_id, "director")
+    token = create_access_token(user_id, "director", "lean@unq.edu.ar")
     payload = decode_token(token, expected_type="access")
     assert payload["sub"] == str(user_id)
+    assert payload["email"] == "lean@unq.edu.ar"
     assert payload["role"] == "director"
     assert payload["type"] == "access"
 
@@ -55,7 +56,7 @@ def test_wrong_type_raises(user_id):
 
 
 def test_tampered_token_raises(user_id):
-    token = create_access_token(user_id, "admin")
+    token = create_access_token(user_id, "admin", "lean@unq.edu.ar")
     with pytest.raises(jwt.InvalidSignatureError):
         decode_token(token[:-4] + "xxxx")
 

@@ -171,4 +171,4 @@ async def test_admin(db_session: AsyncSession) -> User:
 
 @pytest_asyncio.fixture
 async def admin_token(test_admin: User) -> str:
-    return create_access_token(test_admin.id, test_admin.role)
+    return create_access_token(test_admin.id, test_admin.role, test_admin.email)
