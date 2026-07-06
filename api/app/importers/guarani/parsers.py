@@ -1,7 +1,9 @@
 import logging
 from pathlib import Path
 
-from app.importers.utils import or_none, parse_csv, parse_date
+from app.utils.csv import parse_csv
+from app.utils.dates import parse_date
+from app.utils.strings import or_none
 
 from .types import (
     CourseRow,

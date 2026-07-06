@@ -32,3 +32,7 @@ class UnauthorizedError(AcademikaError):
 class ForbiddenError(AcademikaError):
     def __init__(self, detail: str = "Acceso denegado") -> None:
         super().__init__(detail)
+
+
+class DetectorError(ValueError):
+    """Raised when a planilla's type cannot be detected from its headers."""

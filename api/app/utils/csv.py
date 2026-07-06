@@ -1,7 +1,6 @@
 import csv
 import logging
 from collections.abc import Callable
-from datetime import date
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -23,15 +22,9 @@ def parse_csv[T](
     return rows
 
 
-def parse_date(value: str) -> date:
-    return date(*reversed([int(p) for p in value.strip().split("/")]))
-
-
-def or_none(value: str) -> str | None:
-    stripped = value.strip()
-    return stripped if stripped else None
-
-
-def date_to_year_term(d: date) -> tuple[int, str]:
-    term = "2C" if d.month >= 7 else "1C"
-    return d.year, term
+def read_headers(path: Path) -> list[str]:
+    with open(path, encoding="utf-8", newline="") as f:
+        first_line = f.readline().rstrip("\r\n")
+    if not first_line:
+        return []
+    return [c.strip().lower() for c in first_line.split(";")]

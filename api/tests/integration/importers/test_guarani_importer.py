@@ -41,11 +41,11 @@ async def _seed(session: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
-async def test_import_students_from_csv(db_session: AsyncSession) -> None:
+async def test_importar_alumnos_desde_csv(db_session: AsyncSession) -> None:
     await _seed(db_session)
     service = GuaraniImporterService(db_session)
 
-    upserted, skipped = await service.import_students(SAMPLE_DATA / "datos_personales.csv")
+    upserted, skipped = await service.importar_alumnos([SAMPLE_DATA / "datos_personales.csv"])
 
     alumnos = (await db_session.execute(select(Alumno))).scalars().all()
     assert upserted > 0
@@ -54,12 +54,12 @@ async def test_import_students_from_csv(db_session: AsyncSession) -> None:
 
 
 @pytest.mark.asyncio
-async def test_import_enrollment_history_from_csv(db_session: AsyncSession) -> None:
+async def test_importar_historial_cursadas_desde_csv(db_session: AsyncSession) -> None:
     await _seed(db_session)
     service = GuaraniImporterService(db_session)
-    await service.import_students(SAMPLE_DATA / "datos_personales.csv")
+    await service.importar_alumnos([SAMPLE_DATA / "datos_personales.csv"])
 
-    upserted, skipped = await service.import_enrollment_history(SAMPLE_DATA / "alumnos_guarani.csv")
+    upserted, skipped = await service.importar_historial_cursadas([SAMPLE_DATA / "alumnos_guarani.csv"])
 
     cursadas = (await db_session.execute(select(Cursada))).scalars().all()
     assert upserted > 0
@@ -68,12 +68,12 @@ async def test_import_enrollment_history_from_csv(db_session: AsyncSession) -> N
 
 
 @pytest.mark.asyncio
-async def test_import_enrollments_from_csv(db_session: AsyncSession) -> None:
+async def test_importar_inscripciones_desde_csv(db_session: AsyncSession) -> None:
     await _seed(db_session)
     service = GuaraniImporterService(db_session)
-    await service.import_students(SAMPLE_DATA / "datos_personales.csv")
+    await service.importar_alumnos([SAMPLE_DATA / "datos_personales.csv"])
 
-    upserted, skipped = await service.import_enrollments(SAMPLE_DATA / "inscripciones.csv")
+    upserted, skipped = await service.importar_inscripciones([SAMPLE_DATA / "inscripciones.csv"])
 
     cursadas = (await db_session.execute(select(Cursada))).scalars().all()
     assert upserted > 0

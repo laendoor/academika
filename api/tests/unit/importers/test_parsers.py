@@ -12,7 +12,7 @@ from app.importers.guarani.parsers import (
     parse_students,
     parse_study_plan_courses,
 )
-from app.importers.utils import date_to_year_term
+from app.utils.dates import date_to_year_term
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
