@@ -1,7 +1,7 @@
 import { type JWTPayload, jwtVerify } from "jose";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { API_URL, IS_PRODUCTION } from "@/lib/constants";
+import { ADMIN_ROLE, API_URL, IS_PRODUCTION } from "@/lib/constants";
 import {
 	ACCESS_TOKEN,
 	ACCESS_TOKEN_MAX_AGE,
@@ -83,7 +83,7 @@ export async function proxy(request: NextRequest) {
 		return NextResponse.redirect(new URL("/login", request.nextUrl));
 	}
 
-	if (payload && path.startsWith(ADMIN_ROUTE) && payload.role !== "admin") {
+	if (payload && path.startsWith(ADMIN_ROUTE) && payload.role !== ADMIN_ROLE) {
 		return NextResponse.redirect(new URL(HOME_ROUTE, request.nextUrl));
 	}
 

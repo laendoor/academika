@@ -102,7 +102,7 @@ async def test_refresh_invalid_token(service: AuthService):
 @pytest.mark.asyncio
 async def test_refresh_wrong_type(service: AuthService):
     # Un access token no debe ser aceptado como refresh token
-    token = create_access_token(uuid.uuid4(), "director")
+    token = create_access_token(uuid.uuid4(), "director", "test@unq.edu.ar")
     with pytest.raises(InvalidTokenError):
         await service.refresh(token)
 
@@ -160,7 +160,7 @@ async def test_register_invalid_token(service: AuthService):
 @pytest.mark.asyncio
 async def test_register_wrong_type(service: AuthService):
     # Un access token no debe funcionar como invite token
-    token = create_access_token(uuid.uuid4(), "director")
+    token = create_access_token(uuid.uuid4(), "director", "test@unq.edu.ar")
     with pytest.raises(InvalidTokenError):
         await service.register(token, "password123")
 

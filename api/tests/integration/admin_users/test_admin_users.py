@@ -25,7 +25,7 @@ async def test_list_users_success(client: AsyncClient, test_admin: User, admin_t
 
 @pytest.mark.asyncio
 async def test_list_users_forbidden(client: AsyncClient, test_user: User):
-    token = create_access_token(test_user.id, test_user.role)
+    token = create_access_token(test_user.id, test_user.role, test_user.email)
     response = await client.get(
         "/api/v1/admin/users",
         headers={"Authorization": f"Bearer {token}"},
@@ -70,7 +70,7 @@ async def test_update_not_found(client: AsyncClient, test_admin: User, admin_tok
 
 @pytest.mark.asyncio
 async def test_update_forbidden(client: AsyncClient, test_user: User, test_admin: User):
-    token = create_access_token(test_user.id, test_user.role)
+    token = create_access_token(test_user.id, test_user.role, test_user.email)
     response = await client.put(
         f"/api/v1/admin/users/{test_admin.id}",
         json={"is_active": False},

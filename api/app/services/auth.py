@@ -38,7 +38,7 @@ class AuthService:
 
         if user and verify_password(password, user.hashed_password):
             return {
-                "access_token": create_access_token(user.id, user.role),
+                "access_token": create_access_token(user.id, user.role, user.email),
                 "refresh_token": create_refresh_token(user.id),
             }
 
@@ -49,7 +49,7 @@ class AuthService:
 
         user = await self.users.find_by_id(uuid.UUID(payload["sub"]))
         if user and user.is_active:
-            return {"access_token": create_access_token(user.id, user.role)}
+            return {"access_token": create_access_token(user.id, user.role, user.email)}
 
         raise InvalidTokenError()
 
@@ -81,7 +81,7 @@ class AuthService:
 
         user = await self.users.create(UserCreate(email=email, role=role, hashed_password=hash_password(password)))
         return {
-            "access_token": create_access_token(user.id, user.role),
+            "access_token": create_access_token(user.id, user.role, user.email),
             "refresh_token": create_refresh_token(user.id),
         }
 
