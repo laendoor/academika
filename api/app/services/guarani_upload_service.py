@@ -1,7 +1,7 @@
 import logging
 import os
 import tempfile
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,25 +23,17 @@ logger = logging.getLogger(__name__)
 # 3) correlativas (necesita materias)
 # 4) alumnos (necesita carreras + planes)
 # 5) historial_cursadas e inscripciones (necesitan alumnos + materias + carreras)
-_ORDER: list[GuaraniSheetType] = [
-    GuaraniSheetType.CARRERAS,
-    GuaraniSheetType.MATERIAS,
-    GuaraniSheetType.PLANES,
-    GuaraniSheetType.CORRELATIVAS,
-    GuaraniSheetType.ALUMNOS,
-    GuaraniSheetType.HISTORIAL_CURSADAS,
-    GuaraniSheetType.INSCRIPCIONES,
+# Cada entrada asocia el tipo con el método del importer que lo procesa (type-safe: si renombrás
+# el método sin actualizar esta lista, falla en import time, no en runtime).
+_ORDER: list[tuple[GuaraniSheetType, Callable[[GuaraniImporterService, list[Path]], Awaitable[tuple[int, int]]]]] = [
+    (GuaraniSheetType.CARRERAS, GuaraniImporterService.importar_carreras),
+    (GuaraniSheetType.MATERIAS, GuaraniImporterService.importar_materias),
+    (GuaraniSheetType.PLANES, GuaraniImporterService.importar_planes),
+    (GuaraniSheetType.CORRELATIVAS, GuaraniImporterService.importar_correlativas),
+    (GuaraniSheetType.ALUMNOS, GuaraniImporterService.importar_alumnos),
+    (GuaraniSheetType.HISTORIAL_CURSADAS, GuaraniImporterService.importar_historial_cursadas),
+    (GuaraniSheetType.INSCRIPCIONES, GuaraniImporterService.importar_inscripciones),
 ]
-
-_METHODS: dict[GuaraniSheetType, str] = {
-    GuaraniSheetType.CARRERAS: "importar_carreras",
-    GuaraniSheetType.MATERIAS: "importar_materias",
-    GuaraniSheetType.PLANES: "importar_planes",
-    GuaraniSheetType.CORRELATIVAS: "importar_correlativas",
-    GuaraniSheetType.ALUMNOS: "importar_alumnos",
-    GuaraniSheetType.HISTORIAL_CURSADAS: "importar_historial_cursadas",
-    GuaraniSheetType.INSCRIPCIONES: "importar_inscripciones",
-}
 
 
 @dataclass(slots=True)
@@ -86,12 +78,12 @@ class GuaraniUploadService:
         errors: list[ImportFailure],
     ) -> list[ImportResult]:
         results: list[ImportResult] = []
-        for sheet_type in _ORDER:
+        for sheet_type, method_fn in _ORDER:
             paths = paths_by_type.get(sheet_type)
             if not paths:
                 continue
             try:
-                processed, skipped = await getattr(self._importer, _METHODS[sheet_type])(paths)
+                processed, skipped = await method_fn(self._importer, paths)
             except (UnicodeDecodeError, OSError, ValueError) as e:
                 await self._importer.session.rollback()
                 errors.append(ImportFailure(file=f"({sheet_type.value})", error=f"importación fallida: {e}"))
