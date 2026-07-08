@@ -1,15 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import {
-	apiHandler,
-	requireAdminToken,
-	throwIfAuthError,
-} from "@/lib/api/route";
+import * as route from "@/lib/api/route";
 import { API_URL } from "@/lib/constants";
 
-export const GET = apiHandler(async (req: NextRequest) => {
-	const token = requireAdminToken(req);
+export const GET = route.apiHandler(async (req: NextRequest) => {
+	const token = route.requireAdminToken(req);
 
 	const res = await fetch(`${API_URL}/api/v1/admin/users?skip=0&limit=100`, {
 		// limit=100 hardcodeado: el panel de usuarios de backoffice asume
@@ -18,7 +14,7 @@ export const GET = apiHandler(async (req: NextRequest) => {
 	});
 
 	if (!res.ok) {
-		throwIfAuthError(res);
+		route.throwIfAuthError(res);
 		throw new Error();
 	}
 
