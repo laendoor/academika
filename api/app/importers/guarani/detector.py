@@ -32,9 +32,11 @@ def detect_type(path: Path) -> GuaraniSheetType:
         return GuaraniSheetType.PLANES
     if "apellido" in cols and "email" in cols:
         return GuaraniSheetType.ALUMNOS
-    if cols <= {"codigo", "nombre", "fecha"} and "codigo" in cols and "nombre" in cols:
+    if {"codigo", "nombre"} <= cols <= {"codigo", "nombre", "fecha"}:
         return GuaraniSheetType.CARRERAS
     if len(headers) == 5 and is_integer(headers[1]):
+        # ponytail: heurística fallback frágil — cualquier CSV de 5 cols con 2da entera
+        # cae acá. Strengthen cuando lleguen planillas reales y aparezca un caso.
         return GuaraniSheetType.MATERIAS
 
     raise DetectorError(f"no se pudo detectar el tipo de planilla: headers={headers}")

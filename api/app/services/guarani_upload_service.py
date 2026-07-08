@@ -69,13 +69,13 @@ class GuaraniUploadService:
             for staged_file in staged:
                 try:
                     sheet_type = detect_type(staged_file.path)
-                except DetectorError as e:
+                except (DetectorError, UnicodeDecodeError, OSError) as e:
                     errors.append(ImportFailure(file=staged_file.name, error=str(e)))
                     continue
                 files_by_type.setdefault(sheet_type, []).append(staged_file.name)
                 paths_by_type.setdefault(sheet_type, []).append(staged_file.path)
 
-            results = await self._process_in_order(paths_by_type, files_by_type)
+            results = await self._process_in_order(paths_by_type, files_by_type, errors)
 
         return ImportResponse(results=results, errors=errors)
 
@@ -83,13 +83,19 @@ class GuaraniUploadService:
         self,
         paths_by_type: dict[GuaraniSheetType, list[Path]],
         files_by_type: dict[GuaraniSheetType, list[str]],
+        errors: list[ImportFailure],
     ) -> list[ImportResult]:
         results: list[ImportResult] = []
         for sheet_type in _ORDER:
             paths = paths_by_type.get(sheet_type)
             if not paths:
                 continue
-            processed, skipped = await getattr(self._importer, _METHODS[sheet_type])(paths)
+            try:
+                processed, skipped = await getattr(self._importer, _METHODS[sheet_type])(paths)
+            except (UnicodeDecodeError, OSError, ValueError) as e:
+                await self._importer.session.rollback()
+                errors.append(ImportFailure(file=f"({sheet_type.value})", error=f"importación fallida: {e}"))
+                continue
             results.append(
                 ImportResult(
                     type=sheet_type.value,
