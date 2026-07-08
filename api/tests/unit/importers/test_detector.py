@@ -23,18 +23,15 @@ SAMPLE_DATA = Path(__file__).parents[3] / "sample-data"
     ],
 )
 def test_detect_type_from_sample_data(file: str, expected_type: GuaraniSheetType) -> None:
-    assert detect_type(SAMPLE_DATA / file) == expected_type
+    content = (SAMPLE_DATA / file).read_text(encoding="utf-8")
+    assert detect_type(content) == expected_type
 
 
-def test_detect_type_unknown_file_raises(tmp_path: Path) -> None:
-    p = tmp_path / "raro.csv"
-    p.write_text("foo;bar;baz\n1;2;3\n", encoding="utf-8")
+def test_detect_type_unknown_content_raises() -> None:
     with pytest.raises(DetectorError):
-        detect_type(p)
+        detect_type("foo;bar;baz\n1;2;3\n")
 
 
-def test_detect_type_empty_file_raises(tmp_path: Path) -> None:
-    p = tmp_path / "vacio.csv"
-    p.write_text("", encoding="utf-8")
+def test_detect_type_empty_content_raises() -> None:
     with pytest.raises(DetectorError):
-        detect_type(p)
+        detect_type("")

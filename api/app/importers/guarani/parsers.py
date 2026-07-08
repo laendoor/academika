@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 
 from app.utils.csv import parse_csv
 from app.utils.dates import parse_date
@@ -18,15 +17,15 @@ from .types import (
 logger = logging.getLogger(__name__)
 
 
-def parse_degrees(path: Path) -> list[DegreeRow]:
+def parse_degrees(content: str) -> list[DegreeRow]:
     def _row(row: list[str]) -> DegreeRow:
         code, name, _fecha = row
         return DegreeRow(code=code.strip(), name=name.strip())
 
-    return parse_csv(path, _row)
+    return parse_csv(content, _row)
 
 
-def parse_courses(path: Path) -> list[CourseRow]:
+def parse_courses(content: str) -> list[CourseRow]:
     def _row(row: list[str]) -> CourseRow:
         _degree_code, _plan_year, code, name, abbreviation = row
         return CourseRow(
@@ -35,10 +34,10 @@ def parse_courses(path: Path) -> list[CourseRow]:
             abbreviation=or_none(abbreviation),
         )
 
-    return parse_csv(path, _row, has_header=False)
+    return parse_csv(content, _row, has_header=False)
 
 
-def parse_study_plan_courses(path: Path) -> list[StudyPlanCourseRow]:
+def parse_study_plan_courses(content: str) -> list[StudyPlanCourseRow]:
     def _row(row: list[str]) -> StudyPlanCourseRow:
         degree_code, plan_year_str, _cuatrimestre, _nucleo, _area, course_code, _creditos, _nombre = row[:8]
         return StudyPlanCourseRow(
@@ -47,10 +46,10 @@ def parse_study_plan_courses(path: Path) -> list[StudyPlanCourseRow]:
             course_code=course_code.strip(),
         )
 
-    return parse_csv(path, _row)
+    return parse_csv(content, _row)
 
 
-def parse_prerequisites(path: Path) -> list[PrerequisiteRow]:
+def parse_prerequisites(content: str) -> list[PrerequisiteRow]:
     def _split_codes(value: str) -> list[str]:
         return [c.strip() for c in value.strip().split(",") if c.strip()]
 
@@ -64,10 +63,10 @@ def parse_prerequisites(path: Path) -> list[PrerequisiteRow]:
             recommended_codes=_split_codes(recomendadas_str),
         )
 
-    return parse_csv(path, _row)
+    return parse_csv(content, _row)
 
 
-def parse_students(path: Path) -> list[StudentRow]:
+def parse_students(content: str) -> list[StudentRow]:
     def _row(row: list[str]) -> StudentRow:
         internal_id, doc_id, last_name, first_name, email, date_str, degree_code, plan_year_str = row
         return StudentRow(
@@ -81,10 +80,10 @@ def parse_students(path: Path) -> list[StudentRow]:
             enrolled_at=parse_date(date_str),
         )
 
-    return parse_csv(path, _row)
+    return parse_csv(content, _row)
 
 
-def parse_enrollment_history(path: Path) -> list[EnrollmentHistoryRow]:
+def parse_enrollment_history(content: str) -> list[EnrollmentHistoryRow]:
     def _row(row: list[str]) -> EnrollmentHistoryRow:
         (
             _internal_id,
@@ -118,10 +117,10 @@ def parse_enrollment_history(path: Path) -> list[EnrollmentHistoryRow]:
             enrollment_date=parse_date(date_str),
         )
 
-    return parse_csv(path, _row)
+    return parse_csv(content, _row)
 
 
-def parse_enrollments(path: Path) -> list[EnrollmentRow]:
+def parse_enrollments(content: str) -> list[EnrollmentRow]:
     def _row(row: list[str]) -> EnrollmentRow:
         degree_code, doc_id, _internal_id, course_code, section_str, date_str = row
         return EnrollmentRow(
@@ -132,4 +131,4 @@ def parse_enrollments(path: Path) -> list[EnrollmentRow]:
             enrollment_date=parse_date(date_str),
         )
 
-    return parse_csv(path, _row)
+    return parse_csv(content, _row)

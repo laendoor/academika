@@ -1,6 +1,5 @@
 import logging
 import uuid
-from pathlib import Path
 from typing import Self
 
 from sqlalchemy import func, select
@@ -62,46 +61,46 @@ class GuaraniImporterService:
     def dep(cls, session: SessionDep) -> Self:
         return cls(session)
 
-    async def importar_carreras(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_carreras(self, contents: list[str]) -> tuple[int, int]:
         rows: list[DegreeRow] = []
-        for path in paths:
-            rows.extend(parse_degrees(path))
+        for content in contents:
+            rows.extend(parse_degrees(content))
         return await self._upsert_carreras(rows)
 
-    async def importar_materias(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_materias(self, contents: list[str]) -> tuple[int, int]:
         rows: list[CourseRow] = []
-        for path in paths:
-            rows.extend(parse_courses(path))
+        for content in contents:
+            rows.extend(parse_courses(content))
         return await self._upsert_materias(rows)
 
-    async def importar_planes(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_planes(self, contents: list[str]) -> tuple[int, int]:
         rows: list[StudyPlanCourseRow] = []
-        for path in paths:
-            rows.extend(parse_study_plan_courses(path))
+        for content in contents:
+            rows.extend(parse_study_plan_courses(content))
         return await self._upsert_planes(rows)
 
-    async def importar_correlativas(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_correlativas(self, contents: list[str]) -> tuple[int, int]:
         rows: list[PrerequisiteRow] = []
-        for path in paths:
-            rows.extend(parse_prerequisites(path))
+        for content in contents:
+            rows.extend(parse_prerequisites(content))
         return await self._upsert_correlativas(rows)
 
-    async def importar_alumnos(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_alumnos(self, contents: list[str]) -> tuple[int, int]:
         rows: list[StudentRow] = []
-        for path in paths:
-            rows.extend(parse_students(path))
+        for content in contents:
+            rows.extend(parse_students(content))
         return await self._upsert_alumnos(rows)
 
-    async def importar_historial_cursadas(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_historial_cursadas(self, contents: list[str]) -> tuple[int, int]:
         rows: list[EnrollmentHistoryRow] = []
-        for path in paths:
-            rows.extend(parse_enrollment_history(path))
+        for content in contents:
+            rows.extend(parse_enrollment_history(content))
         return await self._upsert_historial_cursadas(rows)
 
-    async def importar_inscripciones(self, paths: list[Path]) -> tuple[int, int]:
+    async def importar_inscripciones(self, contents: list[str]) -> tuple[int, int]:
         rows: list[EnrollmentRow] = []
-        for path in paths:
-            rows.extend(parse_enrollments(path))
+        for content in contents:
+            rows.extend(parse_enrollments(content))
         return await self._upsert_cursadas(rows)
 
     async def _upsert_alumnos(self, rows: list[StudentRow]) -> tuple[int, int]:

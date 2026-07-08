@@ -1,5 +1,4 @@
 from enum import StrEnum
-from pathlib import Path
 
 from app.errors import DetectorError
 from app.utils.csv import read_headers
@@ -16,8 +15,8 @@ class GuaraniSheetType(StrEnum):
     INSCRIPCIONES = "inscripciones"
 
 
-def detect_type(path: Path) -> GuaraniSheetType:
-    headers = read_headers(path)
+def detect_type(content: str) -> GuaraniSheetType:
+    headers = read_headers(content)
     if not headers:
         raise DetectorError("archivo vacío")
     cols = set(headers)
