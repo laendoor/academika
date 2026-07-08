@@ -1,3 +1,4 @@
+import { Table, Tbody, Th } from "@/components/ui/Table";
 import type { UserItem, UserRole, UserUpdate } from "@/lib/api/admin";
 
 const ROLE_LABELS: Record<UserRole, string> = {
@@ -96,32 +97,24 @@ export function UsersTable({
 	onUpdate: (id: string, data: UserUpdate) => void;
 }) {
 	return (
-		<div className="overflow-hidden rounded-lg border border-zinc-200">
-			<table className="w-full text-sm">
-				<thead className="bg-zinc-50">
-					<tr>
-						<th className="px-4 py-3 text-left font-medium text-zinc-600">
-							Email
-						</th>
-						<th className="px-4 py-3 text-left font-medium text-zinc-600">
-							Rol
-						</th>
-						<th className="px-4 py-3 text-left font-medium text-zinc-600">
-							Estado
-						</th>
-					</tr>
-				</thead>
-				<tbody className="divide-y divide-zinc-100">
-					{users.map((user) => (
-						<UserRow
-							key={user.id}
-							user={user}
-							isUpdating={updating === user.id}
-							onUpdate={onUpdate}
-						/>
-					))}
-				</tbody>
-			</table>
-		</div>
+		<Table>
+			<thead className="bg-zinc-50">
+				<tr>
+					<Th>Email</Th>
+					<Th>Rol</Th>
+					<Th>Estado</Th>
+				</tr>
+			</thead>
+			<Tbody>
+				{users.map((user) => (
+					<UserRow
+						key={user.id}
+						user={user}
+						isUpdating={updating === user.id}
+						onUpdate={onUpdate}
+					/>
+				))}
+			</Tbody>
+		</Table>
 	);
 }

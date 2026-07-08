@@ -1,14 +1,13 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { apiHandler, RouteError, UNEXPECTED_ERROR } from "@/lib/api/route";
+import * as route from "@/lib/api/route";
 import { API_URL } from "@/lib/constants";
-import { ACCESS_TOKEN } from "@/lib/cookies";
 
-export const PUT = apiHandler(async (req: NextRequest, ctx) => {
-	const { id } = await ctx!.params;
-	const token = req.cookies.get(ACCESS_TOKEN)?.value;
-	if (!token) throw new RouteError("No autorizado", 401);
+export const PUT = route.apiHandler(async (req: NextRequest, ctx) => {
+	if (!ctx) throw new route.RouteError("Falta contexto", 400);
+	const { id } = await ctx.params;
+	const token = route.requireAdminToken(req);
 
 	const body = await req.json();
 	const res = await fetch(`${API_URL}/api/v1/admin/users/${id}`, {
@@ -21,12 +20,13 @@ export const PUT = apiHandler(async (req: NextRequest, ctx) => {
 	});
 
 	if (!res.ok) {
-		if (res.status === 401 || res.status === 403)
-			throw new RouteError("No autorizado", res.status);
-		if (res.status === 404) throw new RouteError("Usuario no encontrado", 404);
+		route.throwIfAuthError(res);
+		if (res.status === 404)
+			throw new route.RouteError("Usuario no encontrado", 404);
 		const json = await res.json().catch(() => ({}));
-		const message = (json as { detail?: string }).detail ?? UNEXPECTED_ERROR;
-		throw new RouteError(message, res.status >= 500 ? 500 : res.status);
+		const message =
+			(json as { detail?: string }).detail ?? route.UNEXPECTED_ERROR;
+		throw new route.RouteError(message, res.status >= 500 ? 500 : res.status);
 	}
 
 	return NextResponse.json(await res.json());

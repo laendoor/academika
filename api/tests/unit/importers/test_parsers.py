@@ -12,18 +12,22 @@ from app.importers.guarani.parsers import (
     parse_students,
     parse_study_plan_courses,
 )
-from app.importers.utils import date_to_year_term
+from app.utils.dates import date_to_year_term
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
+def _read(name: str) -> str:
+    return (FIXTURES / name).read_text(encoding="utf-8")
+
+
 class TestParseDatosPersonales:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_students(FIXTURES / "datos_personales.csv")
+        rows = parse_students(_read("datos_personales.csv"))
         assert len(rows) == 2
 
     def test_fields(self) -> None:
-        row = parse_students(FIXTURES / "datos_personales.csv")[0]
+        row = parse_students(_read("datos_personales.csv"))[0]
         assert row.doc_id == "35120001"
         assert row.unq_id == "12001"
         assert row.first_name == "Martina"
@@ -34,21 +38,21 @@ class TestParseDatosPersonales:
         assert row.enrolled_at == date(2018, 3, 2)
 
     def test_optional_email_is_none(self) -> None:
-        rows = parse_students(FIXTURES / "datos_personales.csv")
+        rows = parse_students(_read("datos_personales.csv"))
         assert rows[1].email is None
 
     def test_skips_invalid_row(self) -> None:
-        rows = parse_students(FIXTURES / "datos_personales.csv")
+        rows = parse_students(_read("datos_personales.csv"))
         assert len(rows) == 2
 
 
 class TestParseAlumnosGuarani:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_enrollment_history(FIXTURES / "alumnos_guarani.csv")
+        rows = parse_enrollment_history(_read("alumnos_guarani.csv"))
         assert len(rows) == 3
 
     def test_fields(self) -> None:
-        row = parse_enrollment_history(FIXTURES / "alumnos_guarani.csv")[0]
+        row = parse_enrollment_history(_read("alumnos_guarani.csv"))[0]
         assert row.doc_id == "35120001"
         assert row.degree_code == "TPI"
         assert row.course_code == "80005"
@@ -61,27 +65,27 @@ class TestParseAlumnosGuarani:
         assert row.enrollment_date == date(2019, 12, 1)
 
     def test_calidad_libre(self) -> None:
-        rows = parse_enrollment_history(FIXTURES / "alumnos_guarani.csv")
+        rows = parse_enrollment_history(_read("alumnos_guarani.csv"))
         assert rows[1].enrollment_type == "libre"
 
     def test_optional_fields_are_none(self) -> None:
-        rows = parse_enrollment_history(FIXTURES / "alumnos_guarani.csv")
+        rows = parse_enrollment_history(_read("alumnos_guarani.csv"))
         assert rows[2].grade is None
         assert rows[2].credits is None
         assert rows[2].plan_year is None
 
     def test_skips_invalid_row(self) -> None:
-        rows = parse_enrollment_history(FIXTURES / "alumnos_guarani.csv")
+        rows = parse_enrollment_history(_read("alumnos_guarani.csv"))
         assert len(rows) == 3
 
 
 class TestParseInscripciones:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_enrollments(FIXTURES / "inscripciones.csv")
+        rows = parse_enrollments(_read("inscripciones.csv"))
         assert len(rows) == 2
 
     def test_fields(self) -> None:
-        row = parse_enrollments(FIXTURES / "inscripciones.csv")[0]
+        row = parse_enrollments(_read("inscripciones.csv"))[0]
         assert row.doc_id == "35120001"
         assert row.degree_code == "TPI"
         assert row.course_code == "80005"
@@ -89,78 +93,78 @@ class TestParseInscripciones:
         assert row.enrollment_date == date(2024, 3, 3)
 
     def test_optional_section_is_none(self) -> None:
-        rows = parse_enrollments(FIXTURES / "inscripciones.csv")
+        rows = parse_enrollments(_read("inscripciones.csv"))
         assert rows[1].section is None
 
 
 class TestParseCarreras:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_degrees(FIXTURES / "carreras.csv")
+        rows = parse_degrees(_read("carreras.csv"))
         assert len(rows) == 2
 
     def test_fields(self) -> None:
-        row = parse_degrees(FIXTURES / "carreras.csv")[0]
+        row = parse_degrees(_read("carreras.csv"))[0]
         assert row.code == "TPI"
         assert row.name == "Tecnicatura Universitaria en Programación Informática"
 
     def test_skips_invalid_row(self) -> None:
         # fixture has 2 valid rows + 1 truncated row; truncated must be silently skipped
-        rows = parse_degrees(FIXTURES / "carreras.csv")
+        rows = parse_degrees(_read("carreras.csv"))
         assert len(rows) == 2
 
 
 class TestParseMaterias:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_courses(FIXTURES / "materias.csv")
+        rows = parse_courses(_read("materias.csv"))
         assert len(rows) == 3
 
     def test_fields(self) -> None:
-        row = parse_courses(FIXTURES / "materias.csv")[0]
+        row = parse_courses(_read("materias.csv"))[0]
         assert row.code == "101"
         assert row.name == "Algoritmos"
         assert row.abbreviation == "algo"
 
     def test_optional_abbreviation_is_none(self) -> None:
-        rows = parse_courses(FIXTURES / "materias.csv")
+        rows = parse_courses(_read("materias.csv"))
         assert rows[2].abbreviation is None
 
 
 class TestParsePlanes:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_study_plan_courses(FIXTURES / "planes.csv")
+        rows = parse_study_plan_courses(_read("planes.csv"))
         assert len(rows) == 3
 
     def test_fields(self) -> None:
-        row = parse_study_plan_courses(FIXTURES / "planes.csv")[0]
+        row = parse_study_plan_courses(_read("planes.csv"))[0]
         assert row.degree_code == "TPI"
         assert row.plan_year == 2015
         assert row.course_code == "101"
 
     def test_multiple_degrees(self) -> None:
-        rows = parse_study_plan_courses(FIXTURES / "planes.csv")
+        rows = parse_study_plan_courses(_read("planes.csv"))
         assert rows[2].degree_code == "LDS"
         assert rows[2].plan_year == 2018
 
 
 class TestParseRequisitos:
     def test_parses_valid_rows(self) -> None:
-        rows = parse_prerequisites(FIXTURES / "requisitos.csv")
+        rows = parse_prerequisites(_read("requisitos.csv"))
         assert len(rows) == 3
 
     def test_single_required(self) -> None:
-        row = parse_prerequisites(FIXTURES / "requisitos.csv")[0]
+        row = parse_prerequisites(_read("requisitos.csv"))[0]
         assert row.course_code == "102"
         assert row.required_codes == ["101"]
         assert row.recommended_codes == []
 
     def test_multiple_required_and_recommended(self) -> None:
-        row = parse_prerequisites(FIXTURES / "requisitos.csv")[1]
+        row = parse_prerequisites(_read("requisitos.csv"))[1]
         assert row.course_code == "103"
         assert row.required_codes == ["101", "102"]
         assert row.recommended_codes == ["101"]
 
     def test_no_prerequisites(self) -> None:
-        row = parse_prerequisites(FIXTURES / "requisitos.csv")[2]
+        row = parse_prerequisites(_read("requisitos.csv"))[2]
         assert row.required_codes == []
         assert row.recommended_codes == []
 

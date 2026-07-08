@@ -1,13 +1,11 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { apiHandler, RouteError } from "@/lib/api/route";
+import * as route from "@/lib/api/route";
 import { API_URL } from "@/lib/constants";
-import { ACCESS_TOKEN } from "@/lib/cookies";
 
-export const GET = apiHandler(async (req: NextRequest) => {
-	const token = req.cookies.get(ACCESS_TOKEN)?.value;
-	if (!token) throw new RouteError("No autorizado", 401);
+export const GET = route.apiHandler(async (req: NextRequest) => {
+	const token = route.requireAdminToken(req);
 
 	const res = await fetch(`${API_URL}/api/v1/admin/users?skip=0&limit=100`, {
 		// limit=100 hardcodeado: el panel de usuarios de backoffice asume
@@ -16,8 +14,7 @@ export const GET = apiHandler(async (req: NextRequest) => {
 	});
 
 	if (!res.ok) {
-		if (res.status === 401 || res.status === 403)
-			throw new RouteError("No autorizado", res.status);
+		route.throwIfAuthError(res);
 		throw new Error();
 	}
 
