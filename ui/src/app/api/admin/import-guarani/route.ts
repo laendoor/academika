@@ -3,30 +3,25 @@ import { NextResponse } from "next/server";
 
 import {
 	apiHandler,
-	requireAdminToken,
 	RouteError,
+	requireAdminToken,
 	throwIfAuthError,
 	UNEXPECTED_ERROR,
 } from "@/lib/api/route";
 import { API_URL } from "@/lib/constants";
 
-export const PUT = apiHandler(async (req: NextRequest, ctx) => {
-	const { id } = await ctx!.params;
+export const POST = apiHandler(async (req: NextRequest) => {
 	const token = requireAdminToken(req);
 
-	const body = await req.json();
-	const res = await fetch(`${API_URL}/api/v1/admin/users/${id}`, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
-		body: JSON.stringify(body),
+	const formData = await req.formData();
+	const res = await fetch(`${API_URL}/api/v1/admin/import-guarani`, {
+		method: "POST",
+		headers: { Authorization: `Bearer ${token}` },
+		body: formData,
 	});
 
 	if (!res.ok) {
 		throwIfAuthError(res);
-		if (res.status === 404) throw new RouteError("Usuario no encontrado", 404);
 		const json = await res.json().catch(() => ({}));
 		const message = (json as { detail?: string }).detail ?? UNEXPECTED_ERROR;
 		throw new RouteError(message, res.status >= 500 ? 500 : res.status);

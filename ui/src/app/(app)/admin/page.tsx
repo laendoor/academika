@@ -1,18 +1,16 @@
-"use client";
-import { UsersTable } from "@/components/admin/UsersTable";
-import { ErrorState, LoadingState } from "@/components/ui/PageState";
-import { useAdminUsers } from "@/hooks/admin";
+import { ImportPlanillas } from "@/components/admin/ImportPlanillas";
+import { UsersPanel } from "@/components/admin/UsersPanel";
+import { type TabItem, Tabs } from "@/components/ui/Tabs";
+
+const ITEMS: TabItem[] = [
+	{ label: "Usuarios", content: <UsersPanel /> },
+	{ label: "Planillas", content: <ImportPlanillas /> },
+];
 
 export default function AdminPage() {
-	const { users, loading, error, updating, handleUpdate } = useAdminUsers();
-
-	if (loading) return <LoadingState />;
-	if (error) return <ErrorState error={error} />;
-
 	return (
 		<div className="p-8">
-			<h1 className="mb-6 text-lg font-semibold text-zinc-900">Usuarios</h1>
-			<UsersTable users={users} updating={updating} onUpdate={handleUpdate} />
+			<Tabs items={ITEMS} />
 		</div>
 	);
 }

@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { ACCESS_TOKEN } from "@/lib/cookies";
+
 export const UNEXPECTED_ERROR = "Error inesperado. Intentá de nuevo más tarde.";
 
 export class RouteError extends Error {
@@ -33,4 +35,15 @@ export function apiHandler(
 
 export function ok(): NextResponse {
 	return NextResponse.json({ ok: true });
+}
+
+export function requireAdminToken(req: NextRequest): string {
+	const token = req.cookies.get(ACCESS_TOKEN)?.value;
+	if (!token) throw new RouteError("No autorizado", 401);
+	return token;
+}
+
+export function throwIfAuthError(res: Response): void {
+	if (res.status === 401 || res.status === 403)
+		throw new RouteError("No autorizado", res.status);
 }
