@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.db.session import SessionFactoryDep
 from app.errors import DetectorError
 from app.importers.guarani.detector import GuaraniSheetType, detect_type
+from app.observability.log_event import LogEventContext, log_event, set_log_event_context
 from app.services.guarani_importer import GuaraniImporterService
-from app.services.log_event import LogEventContext, log_event, set_log_event_context
 
 logger = logging.getLogger(__name__)
 

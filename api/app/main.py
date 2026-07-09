@@ -12,6 +12,7 @@ from app.routers import (
     lookups,
     materias,
     planes_de_estudio,
+    sources,
 )
 
 app = FastAPI(title="Académika API")
@@ -32,3 +33,4 @@ app.include_router(planes_de_estudio.router, prefix=f"{api_prefix}/planes", tags
 app.include_router(alumnos.router, prefix=f"{api_prefix}/alumnos", tags=["alumnos"])
 app.include_router(cursadas.router, prefix=f"{api_prefix}/cursadas", tags=["cursadas"])
 app.include_router(lookups.router, prefix=f"{api_prefix}/lookups", tags=["lookups"])
+app.include_router(sources.router, prefix=f"{api_prefix}/sources", tags=["sources"])
