@@ -13,7 +13,7 @@ import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
 from app.auth.password import hash_password
 from app.auth.tokens import create_access_token
 from app.db.base import Base, generate_uuid
-from app.db.session import get_session
+from app.db.session import get_session, get_session_factory
 from app.main import app
 from app.models.lkp_estado_academico import LkpEstadoAcademico
 from app.models.lkp_estado_cursada import LkpEstadoCursada
@@ -147,7 +147,11 @@ async def client(session_factory) -> AsyncGenerator[AsyncClient]:
         async with session_factory() as session:
             yield session
 
+    def override_get_session_factory() -> async_sessionmaker:
+        return session_factory
+
     app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_session_factory] = override_get_session_factory
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
     app.dependency_overrides.clear()
