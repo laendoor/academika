@@ -1,44 +1,36 @@
 "use client";
-import { useRef, useState } from "react";
-
+import { useState } from "react";
+import { useSources } from "@/hooks/workspace";
 import * as admin from "@/lib/api/admin";
 
-type ResultRow = admin.ImportResult & { id: number };
-type ErrorRow = admin.ImportFailure & { id: number };
+const LIMIT = 15;
 
 export function useAdminImport() {
 	const [uploading, setUploading] = useState(false);
-	const [results, setResults] = useState<ResultRow[]>([]);
-	const [errors, setErrors] = useState<ErrorRow[]>([]);
-	const nextId = useRef(0);
+	const [expectedTarget, setExpectedTarget] = useState<number | null>(null);
+	const { items, total, loading, error, refresh } = useSources({
+		limit: LIMIT,
+		autoRefresh: uploading,
+	});
+
+	// Auto-stop: si el total llegó al expected, terminamos el upload.
+	// Se ejecuta durante render pero solo acciona si uploading y target se cumplen.
+	if (uploading && expectedTarget !== null && total >= expectedTarget) {
+		setUploading(false);
+		setExpectedTarget(null);
+	}
 
 	async function handleUpload(files: File[]) {
 		if (!files.length) return;
+		const baselineTotal = total;
 		setUploading(true);
 		const result = await admin.uploadGuaraniSheets(files);
-		setUploading(false);
-		const id = () => ++nextId.current;
 		if (result.ok) {
-			setResults((prev) => [
-				...prev,
-				...result.data.results.map((r) => ({ ...r, id: id() })),
-			]);
-			setErrors((prev) => [
-				...prev,
-				...result.data.errors.map((e) => ({ ...e, id: id() })),
-			]);
+			setExpectedTarget(baselineTotal + result.data.count);
 		} else {
-			setErrors((prev) => [
-				...prev,
-				{ file: "(upload)", error: result.error, id: id() },
-			]);
+			setUploading(false);
 		}
 	}
 
-	function handleClear() {
-		setResults([]);
-		setErrors([]);
-	}
-
-	return { uploading, results, errors, handleUpload, handleClear };
+	return { uploading, items, total, loading, error, handleUpload, refresh };
 }
