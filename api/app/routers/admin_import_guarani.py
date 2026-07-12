@@ -4,7 +4,6 @@ from fastapi import APIRouter, BackgroundTasks, Depends, File, UploadFile
 
 from app.auth.dependencies import require_role
 from app.db.session import SessionFactoryDep
-from app.errors import BusinessError
 from app.models.user import User
 from app.schemas.imports import ImportAcceptedResponse
 from app.services.guarani_upload_service import GuaraniUploadService
@@ -20,6 +19,8 @@ def _build_service(session_factory: SessionFactoryDep) -> GuaraniUploadService:
 
 UploadServiceDep = Annotated[GuaraniUploadService, Depends(_build_service)]
 
+_MAX_FILE_SIZE = 10 * 1024 * 1024
+
 
 @router.post("", response_model=ImportAcceptedResponse)
 async def accept_upload(
@@ -28,8 +29,12 @@ async def accept_upload(
     background_tasks: BackgroundTasks,
     files: Annotated[list[UploadFile], File()],
 ) -> ImportAcceptedResponse:
-    if not files:
-        raise BusinessError("no se recibieron archivos")
-    payloads = [(f.filename or "", await f.read()) for f in files]
+    payloads: list[tuple[str, bytes]] = []
+    for f in files:
+        if f.size and f.size > _MAX_FILE_SIZE:
+            # Skip oversized files at read time — _process_one re-checks but
+            # this prevents loading 2GB into RAM before the background task.
+            continue
+        payloads.append((f.filename or "", await f.read()))
     background_tasks.add_task(service.process_upload, user.id, payloads)
     return ImportAcceptedResponse(status="processing", count=len(payloads))

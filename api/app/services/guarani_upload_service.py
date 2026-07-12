@@ -1,6 +1,5 @@
 import logging
 import uuid
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Self
 
@@ -39,21 +38,16 @@ def _import_details(outcome: FileOutcome) -> dict[str, Any]:
 class GuaraniUploadService:
     def __init__(
         self,
-        importer_factory: Callable[[], GuaraniImporterService],
-        log_session_factory: async_sessionmaker[AsyncSession],
+        session_factory: async_sessionmaker[AsyncSession],
     ) -> None:
-        self._importer_factory = importer_factory
-        self._log_session_factory = log_session_factory
+        self._session_factory = session_factory
 
     @classmethod
     def dep(cls, session_factory: SessionFactoryDep) -> Self:
-        def importer_factory() -> GuaraniImporterService:
-            return GuaraniImporterService(session_factory())
-
-        return cls(importer_factory=importer_factory, log_session_factory=session_factory)
+        return cls(session_factory=session_factory)
 
     async def process_upload(self, user_id: uuid.UUID, payloads: list[tuple[str, bytes]]) -> None:
-        set_log_event_context(LogEventContext(user_id=user_id, log_session_factory=self._log_session_factory))
+        set_log_event_context(LogEventContext(user_id=user_id, log_session_factory=self._session_factory))
         prioritized = self._sort_by_dependency(payloads)
         for name, raw in prioritized:
             await self._process_one(name, raw)
@@ -93,7 +87,7 @@ class GuaraniUploadService:
         try:
             content = raw.decode("utf-8")
             sheet_type = detect_type(content)
-            importer = self._importer_factory()
+            importer = GuaraniImporterService(self._session_factory())
             processed, skipped = await importer.importar(sheet_type, [content])
             await importer.session.commit()
         except UnicodeDecodeError as e:
@@ -107,5 +101,14 @@ class GuaraniUploadService:
                 name=name,
                 sheet_type=sheet_type.value if sheet_type is not None else None,
                 error=f"importación fallida: {e}",
+            )
+        except Exception as e:
+            logger.exception("error inesperado procesando %s", name)
+            if importer is not None:
+                await importer.session.rollback()
+            return FileOutcome(
+                name=name,
+                sheet_type=sheet_type.value if sheet_type is not None else None,
+                error=f"error inesperado: {e}",
             )
         return FileOutcome(name=name, sheet_type=sheet_type.value, processed=processed, skipped=skipped)

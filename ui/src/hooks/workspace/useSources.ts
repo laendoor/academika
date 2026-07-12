@@ -21,6 +21,7 @@ export function useSources({
 	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
 	const refresh = useCallback(async () => {
+		setLoading(true);
 		const result = await sources.getSources(skip, limit);
 		if (result.ok) {
 			setItems(result.data.items);

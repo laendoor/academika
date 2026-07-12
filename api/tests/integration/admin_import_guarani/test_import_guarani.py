@@ -144,3 +144,53 @@ async def test_import_guarani_preserves_order_by_dependency(
     events = (await db_session.execute(select(LogEvent).order_by(LogEvent.created_at))).scalars().all()
     types = [e.details["sheet_type"] for e in events]
     assert types == ["carreras", "materias", "planes_de_estudio"]
+
+
+@pytest.mark.asyncio
+async def test_import_guarani_oversized_file_excluded_from_count(
+    client: AsyncClient, admin_token: str, test_admin: User, db_session
+) -> None:
+    big = b"x" * (11 * 1024 * 1024)
+    files = [("carreras.csv", await _read("carreras.csv")), ("big.csv", big)]
+    response = await _post(client, admin_token, files)
+    assert response.status_code == 200
+    body = response.json()
+    # Oversized file is skipped at router level — only carreras counted.
+    assert body["count"] == 1
+
+    events = (await db_session.execute(select(LogEvent).order_by(LogEvent.created_at))).scalars().all()
+    assert len(events) == 1
+    assert events[0].status == "ok"
+    assert events[0].details["sheet_type"] == "carreras"
+
+
+@pytest.mark.asyncio
+async def test_import_guarani_unexpected_exception_logged_and_continues(
+    client: AsyncClient, admin_token: str, test_admin: User, db_session, monkeypatch
+) -> None:
+    from app.services.guarani_importer import GuaraniImporterService
+
+    original_importar = GuaraniImporterService.importar
+    call_count = 0
+
+    async def flaky_importar(self, sheet_type, contents):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            raise RuntimeError("boom inesperado")
+        return await original_importar(self, sheet_type, contents)
+
+    monkeypatch.setattr(GuaraniImporterService, "importar", flaky_importar)
+
+    files = [
+        ("carreras.csv", await _read("carreras.csv")),
+        ("materias.csv", await _read("materias.csv")),
+    ]
+    await _post(client, admin_token, files)
+
+    events = (await db_session.execute(select(LogEvent).order_by(LogEvent.created_at))).scalars().all()
+    assert len(events) == 2
+    err = next(e for e in events if e.status == "error")
+    assert "error inesperado" in err.details["error"]
+    ok = next(e for e in events if e.status == "ok")
+    assert ok.details["sheet_type"] == "materias"

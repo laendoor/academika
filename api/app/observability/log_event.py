@@ -1,12 +1,16 @@
+import logging
 from collections.abc import Awaitable, Callable
 from contextvars import ContextVar
 from dataclasses import dataclass
+from functools import wraps
 from typing import Any, TypeVar
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.models.log_event import LogEvent
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -38,24 +42,27 @@ def log_event(
     action: str, details_extractor: DetailsExtractor
 ) -> Callable[[Callable[..., Awaitable[T]]], Callable[..., Awaitable[T]]]:
     def decorator(fn: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
+        @wraps(fn)
         async def wrapper(*args: Any, **kwargs: Any) -> T:
             result = await fn(*args, **kwargs)
             details = details_extractor(result)
             status = "error" if details.get("error") is not None else "ok"
             ctx = get_log_event_context()
-            async with ctx.log_session_factory() as session:
-                session.add(
-                    LogEvent(
-                        user_id=ctx.user_id,
-                        action=action,
-                        status=status,
-                        details=details,
+            try:
+                async with ctx.log_session_factory() as session:
+                    session.add(
+                        LogEvent(
+                            user_id=ctx.user_id,
+                            action=action,
+                            status=status,
+                            details=details,
+                        )
                     )
-                )
-                await session.commit()
+                    await session.commit()
+            except Exception:
+                logger.exception("no se pudo persistir log event action=%s status=%s", action, status)
             return result
 
-        wrapper.__wrapped__ = fn  # type: ignore[attr-defined]
         return wrapper
 
     return decorator

@@ -156,3 +156,23 @@ async def test_sources_returns_error_status_in_response(client: AsyncClient, tes
     item = response.json()["items"][0]
     assert item["status"] == "error"
     assert "boom" in item["details"]["error"]
+
+
+@pytest.mark.asyncio
+async def test_sources_rejects_docente(client: AsyncClient, db_session) -> None:
+    from app.auth.password import hash_password
+    from app.db.base import generate_uuid
+
+    docente = User(
+        id=generate_uuid(),
+        email="docente@unq.edu.ar",
+        hashed_password=hash_password("x"),
+        role="docente",
+        is_active=True,
+    )
+    db_session.add(docente)
+    await db_session.commit()
+    token = create_access_token(docente.id, docente.role, docente.email)
+
+    response = await client.get("/api/v1/sources", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 403
