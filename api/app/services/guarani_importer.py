@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.base import generate_uuid
 from app.db.session import SessionDep
+from app.importers.guarani.detector import GuaraniSheetType
 from app.importers.guarani.parsers import (
     parse_courses,
     parse_degrees,
@@ -60,6 +61,18 @@ class GuaraniImporterService:
     @classmethod
     def dep(cls, session: SessionDep) -> Self:
         return cls(session)
+
+    async def importar(self, sheet_type: GuaraniSheetType, contents: list[str]) -> tuple[int, int]:
+        method = {
+            GuaraniSheetType.CARRERAS: self.importar_carreras,
+            GuaraniSheetType.MATERIAS: self.importar_materias,
+            GuaraniSheetType.PLANES: self.importar_planes,
+            GuaraniSheetType.CORRELATIVAS: self.importar_correlativas,
+            GuaraniSheetType.ALUMNOS: self.importar_alumnos,
+            GuaraniSheetType.HISTORIAL_CURSADAS: self.importar_historial_cursadas,
+            GuaraniSheetType.INSCRIPCIONES: self.importar_inscripciones,
+        }[sheet_type]
+        return await method(contents)
 
     async def importar_carreras(self, contents: list[str]) -> tuple[int, int]:
         rows: list[DegreeRow] = []

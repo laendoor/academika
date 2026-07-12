@@ -33,3 +33,13 @@ INSERT INTO lkp_nucleo_carrera (key, label) VALUES
     ('avanzado',    'Núcleo Avanzado'),
     ('orientacion', 'Núcleo de Orientación')
 ON CONFLICT DO NOTHING;
+
+INSERT INTO lkp_log_action (key, label) VALUES
+    ('import_guarani', 'Importación Guaraní')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO lkp_log_status (key, label) VALUES
+    ('ok',         'OK'),
+    ('processing', 'Procesando'),
+    ('error',      'Error')
+ON CONFLICT DO NOTHING;

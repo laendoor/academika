@@ -21,21 +21,9 @@ export interface UserUpdate {
 	is_active?: boolean;
 }
 
-export interface ImportResult {
-	type: string;
-	files: string[];
-	processed: number;
-	skipped: number;
-}
-
-export interface ImportFailure {
-	file: string;
-	error: string;
-}
-
-export interface ImportResponse {
-	results: ImportResult[];
-	errors: ImportFailure[];
+export interface ImportAcceptedResponse {
+	status: "processing";
+	count: number;
 }
 
 export function getUsers(): Promise<ApiResult<UsersResponse>> {
@@ -51,10 +39,13 @@ export function updateUser(
 
 export function uploadGuaraniSheets(
 	files: File[],
-): Promise<ApiResult<ImportResponse>> {
+): Promise<ApiResult<ImportAcceptedResponse>> {
 	const formData = new FormData();
 	for (const file of files) {
 		formData.append("files", file);
 	}
-	return postFormData<ImportResponse>("/api/admin/import-guarani", formData);
+	return postFormData<ImportAcceptedResponse>(
+		"/api/admin/import-guarani",
+		formData,
+	);
 }

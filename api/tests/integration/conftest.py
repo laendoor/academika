@@ -13,10 +13,12 @@ import app.models  # noqa: F401 — registra todos los modelos en Base.metadata
 from app.auth.password import hash_password
 from app.auth.tokens import create_access_token
 from app.db.base import Base, generate_uuid
-from app.db.session import get_session
+from app.db.session import get_session, get_session_factory
 from app.main import app
 from app.models.lkp_estado_academico import LkpEstadoAcademico
 from app.models.lkp_estado_cursada import LkpEstadoCursada
+from app.models.lkp_log_action import LkpLogAction
+from app.models.lkp_log_status import LkpLogStatus
 from app.models.lkp_nivel_carrera import LkpNivelCarrera
 from app.models.lkp_nucleo_carrera import LkpNucleoCarrera
 from app.models.lkp_tipo_cursada import LkpTipoCursada
@@ -69,6 +71,18 @@ def _seed_lkp(engine) -> None:
                 LkpNucleoCarrera(key="orientacion", label="Núcleo de Orientación"),
             ]
         )
+        session.add_all(
+            [
+                LkpLogAction(key="import_guarani", label="Importación Guaraní"),
+            ]
+        )
+        session.add_all(
+            [
+                LkpLogStatus(key="ok", label="OK"),
+                LkpLogStatus(key="processing", label="Procesando"),
+                LkpLogStatus(key="error", label="Error"),
+            ]
+        )
         session.commit()
 
 
@@ -117,7 +131,7 @@ async def clean_db(test_engine: AsyncEngine) -> AsyncGenerator[None]:
     async with AsyncSession(test_engine) as session:
         await session.execute(
             text(
-                "TRUNCATE users, cursadas, planes_materias, alumno_carrera, alumnos,"
+                "TRUNCATE log_events, users, cursadas, planes_materias, alumno_carrera, alumnos,"
                 " planes_de_estudio, correlativas, materias, carreras"
                 " RESTART IDENTITY CASCADE"
             )
@@ -133,7 +147,11 @@ async def client(session_factory) -> AsyncGenerator[AsyncClient]:
         async with session_factory() as session:
             yield session
 
+    def override_get_session_factory() -> async_sessionmaker:
+        return session_factory
+
     app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_session_factory] = override_get_session_factory
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
     app.dependency_overrides.clear()
