@@ -22,6 +22,7 @@ export function useSources({ skip = 0, limit = 20 }: UseSourcesOptions = {}) {
 	const [error, setError] = useState<string | undefined>();
 	const [wsEventCount, setWsEventCount] = useState(0);
 	const [wsToken, setWsToken] = useState<string | null>(null);
+	const [wsReady, setWsReady] = useState(false);
 
 	useEffect(() => {
 		fetch("/api/auth/ws-token")
@@ -38,6 +39,7 @@ export function useSources({ skip = 0, limit = 20 }: UseSourcesOptions = {}) {
 			setTotal((prev) => prev + 1);
 			setWsEventCount((prev) => prev + 1);
 		},
+		onConnected: () => setWsReady(true),
 	});
 
 	const refresh = useCallback(async () => {
@@ -56,6 +58,11 @@ export function useSources({ skip = 0, limit = 20 }: UseSourcesOptions = {}) {
 	useEffect(() => {
 		refresh();
 	}, [refresh]);
+
+	// Re-fetch cuando WS se conecta para cubrir eventos del gap inicial
+	useEffect(() => {
+		if (wsReady) refresh();
+	}, [wsReady, refresh]);
 
 	return { items, total, loading, error, refresh, wsEventCount };
 }

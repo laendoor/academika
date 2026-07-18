@@ -9,7 +9,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.models.log_event import LogEvent
-from app.routers.ws import manager
+from app.observability.ws_manager import manager
 
 logger = logging.getLogger(__name__)
 

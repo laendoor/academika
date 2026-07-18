@@ -26,13 +26,15 @@ def test_ws_rejects_invalid_token():
 
 
 def test_ws_broadcast():
-    from app.routers.ws import manager
+    from app.observability.ws_manager import manager
 
     user_id = generate_uuid()
     token = create_access_token(user_id, "director", "test@unq.edu.ar")
     client = TestClient(app)
 
     with client.websocket_connect(f"/ws?token={token}") as ws:
+        # TestClient WS usa canales en memoria (no sockets reales),
+        # asyncio.run funciona entre loops porque send/receive son queues
         asyncio.run(
             manager.broadcast(
                 {

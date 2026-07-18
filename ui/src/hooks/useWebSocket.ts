@@ -1,18 +1,24 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 interface UseWebSocketOptions<T> {
 	url: string;
 	onMessage: (data: T) => void;
+	onConnected?: () => void;
 }
 
-export function useWebSocket<T>({ url, onMessage }: UseWebSocketOptions<T>) {
-	const [connected, setConnected] = useState(false);
+export function useWebSocket<T>({
+	url,
+	onMessage,
+	onConnected,
+}: UseWebSocketOptions<T>) {
 	const wsRef = useRef<WebSocket | null>(null);
 	const retriesRef = useRef(0);
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const onMessageRef = useRef(onMessage);
 	onMessageRef.current = onMessage;
+	const onConnectedRef = useRef(onConnected);
+	onConnectedRef.current = onConnected;
 
 	const connect = useCallback(() => {
 		if (!url) return;
@@ -22,8 +28,8 @@ export function useWebSocket<T>({ url, onMessage }: UseWebSocketOptions<T>) {
 		wsRef.current = ws;
 
 		ws.onopen = () => {
-			setConnected(true);
 			retriesRef.current = 0;
+			onConnectedRef.current?.();
 		};
 
 		ws.onmessage = (event) => {
@@ -36,7 +42,6 @@ export function useWebSocket<T>({ url, onMessage }: UseWebSocketOptions<T>) {
 		};
 
 		ws.onclose = () => {
-			setConnected(false);
 			wsRef.current = null;
 			const delay = Math.min(1000 * 2 ** retriesRef.current, 30_000);
 			retriesRef.current++;
@@ -51,6 +56,4 @@ export function useWebSocket<T>({ url, onMessage }: UseWebSocketOptions<T>) {
 			if (wsRef.current) wsRef.current.close();
 		};
 	}, [connect]);
-
-	return { connected };
 }
