@@ -11,7 +11,6 @@ export function SourcesList() {
 	const { items, total, loading, error, refresh } = useSources({
 		skip,
 		limit: PAGE_SIZE,
-		autoRefresh: false,
 	});
 
 	const hasNext = skip + PAGE_SIZE < total;

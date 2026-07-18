@@ -1,4 +1,5 @@
 export const API_URL = process.env.API_URL ?? "http://localhost:8000";
+export const WS_URL = process.env.WS_URL ?? "ws://localhost:8000/ws";
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 export const ADMIN_ROLE = "admin";
 
