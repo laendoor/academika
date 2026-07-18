@@ -9,6 +9,7 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.models.log_event import LogEvent
+from app.observability.ws_manager import manager
 
 logger = logging.getLogger(__name__)
 
@@ -50,17 +51,34 @@ def log_event(
             ctx = get_log_event_context()
             try:
                 async with ctx.log_session_factory() as session:
-                    session.add(
-                        LogEvent(
-                            user_id=ctx.user_id,
-                            action=action,
-                            status=status,
-                            details=details,
-                        )
+                    event = LogEvent(
+                        user_id=ctx.user_id,
+                        action=action,
+                        status=status,
+                        details=details,
                     )
+                    session.add(event)
+                    await session.flush()
                     await session.commit()
             except Exception:
                 logger.exception("no se pudo persistir log event action=%s status=%s", action, status)
+                return result
+
+            try:
+                await manager.broadcast(
+                    {
+                        "type": "log_event",
+                        "payload": {
+                            "id": str(event.id),
+                            "created_at": str(event.created_at),
+                            "action": action,
+                            "status": status,
+                            "details": details,
+                        },
+                    }
+                )
+            except Exception:
+                logger.exception("ws broadcast falló para action=%s", action)
             return result
 
         return wrapper
