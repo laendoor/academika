@@ -45,6 +45,39 @@ export function getEstadosAcademicos(): Promise<ApiResult<EstadoOption[]>> {
 	return get("/api/lookups/estado-academico");
 }
 
+export interface PlanInfo {
+	plan_id: string;
+	plan_nombre: string;
+	anio: number;
+	vigente: boolean;
+	carrera_id: string;
+	carrera_nombre: string;
+}
+
+export interface MateriaRow {
+	id: string;
+	nombre: string;
+	codigo: string;
+	sigla: string | null;
+	creditos: number | null;
+	plan_vigente: PlanInfo | null;
+	planes: PlanInfo[];
+}
+
+export interface MateriasResponse {
+	total: number;
+	items: MateriaRow[];
+}
+
+export function getMaterias(
+	skip = 0,
+	limit = 20,
+): Promise<ApiResult<MateriasResponse>> {
+	return get<MateriasResponse>(
+		`/api/workspace/materias?skip=${skip}&limit=${limit}`,
+	);
+}
+
 export function getEstudiantes(
 	skip = 0,
 	limit = 20,
