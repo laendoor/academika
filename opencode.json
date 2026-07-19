@@ -7,5 +7,25 @@
 		"ruff": {
 			"command": ["uvx", "ruff", "format", "$FILE"]
 		}
+	},
+	"permission": {
+		"bash": {
+			"git push": "deny",
+			"git push *": "deny",
+			"git commit": "ask",
+			"git commit *": "ask",
+			"git merge": "ask",
+			"git merge *": "ask",
+			"git rebase": "ask",
+			"git rebase *": "ask",
+			"git reset": "ask",
+			"git reset *": "ask",
+			"git revert": "ask",
+			"git revert *": "ask",
+			"git rm": "ask",
+			"git rm *": "ask",
+			"git mv": "ask",
+			"git mv *": "ask"
+		}
 	}
 }
