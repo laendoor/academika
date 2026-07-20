@@ -7,20 +7,19 @@ import { API_URL } from "@/lib/constants";
 export const PUT = route.apiHandler(async (req: NextRequest, ctx) => {
 	if (!ctx) throw new route.RouteError("Falta contexto", 400);
 	const { id } = await ctx.params;
-	const token = route.requireAdminToken(req);
 
 	const body = await req.json();
-	const res = await fetch(`${API_URL}/api/v1/admin/users/${id}`, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
+	const res = await route.fetchWithToken(
+		req,
+		`${API_URL}/api/v1/admin/users/${id}`,
+		{
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body),
 		},
-		body: JSON.stringify(body),
-	});
+	);
 
 	if (!res.ok) {
-		route.throwIfAuthError(res);
 		if (res.status === 404)
 			throw new route.RouteError("Usuario no encontrado", 404);
 		const json = await res.json().catch(() => ({}));

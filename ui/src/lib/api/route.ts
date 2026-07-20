@@ -37,13 +37,23 @@ export function ok(): NextResponse {
 	return NextResponse.json({ ok: true });
 }
 
-export function requireAdminToken(req: NextRequest): string {
+function requireAdminToken(req: NextRequest): string {
 	const token = req.cookies.get(ACCESS_TOKEN)?.value;
 	if (!token) throw new RouteError("No autorizado", 401);
 	return token;
 }
 
-export function throwIfAuthError(res: Response): void {
+export async function fetchWithToken(
+	req: NextRequest,
+	url: string,
+	init?: RequestInit,
+): Promise<Response> {
+	const token = requireAdminToken(req);
+	const res = await fetch(url, {
+		...init,
+		headers: { ...init?.headers, Authorization: `Bearer ${token}` },
+	});
 	if (res.status === 401 || res.status === 403)
 		throw new RouteError("No autorizado", res.status);
+	return res;
 }
