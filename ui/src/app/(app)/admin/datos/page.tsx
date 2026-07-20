@@ -1,6 +1,6 @@
 import { SourcesList } from "@/components/workspace/SourcesList";
 
-export default function WorkspacePage() {
+export default function AdminFuentesPage() {
 	return (
 		<div className="p-8">
 			<SourcesList />

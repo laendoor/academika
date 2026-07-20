@@ -19,6 +19,25 @@ ui/src/components/
   ui/        ← primitivos sin dominio (PageState, ...)
 ```
 
+### Íconos
+
+Usar `lucide-react` para todos los íconos. No SVG inline. Import tree-shakeable por ícono.
+
+```tsx
+// Correcto
+import { ChevronLeft, FileText } from "lucide-react";
+<ChevronLeft className="h-4 w-4" />
+
+// Evitar — SVG inline
+<svg width="16" height="16" viewBox="0 0 24 24" ...>
+  <path d="..." />
+</svg>
+```
+
+`lucide-react` se elige sobre otras librerías de íconos (Heroicons, Tabler, Phosphor) porque es el estándar en el ecosistema Next.js/Tailwind (usado por shadcn/ui), tiene ~1,400 íconos y es tree-shakeable.
+
+---
+
 ### Server vs Client components
 
 Sin `"use client"` por defecto. Agregar solo cuando el componente necesita hooks (`useState`, `useActionState`, `useSearchParams`) o event handlers interactivos. Los componentes de presentación pura funcionan en ambos contextos sin `"use client"`.

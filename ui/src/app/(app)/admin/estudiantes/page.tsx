@@ -1,5 +1,5 @@
 import { EstudiantesList } from "@/components/workspace/EstudiantesList";
 
-export default function EstudiantesPage() {
+export default function AdminEstudiantesPage() {
 	return <EstudiantesList />;
 }
