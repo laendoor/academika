@@ -37,7 +37,7 @@ export function ok(): NextResponse {
 	return NextResponse.json({ ok: true });
 }
 
-export function requireAdminToken(req: NextRequest): string {
+function requireAdminToken(req: NextRequest): string {
 	const token = req.cookies.get(ACCESS_TOKEN)?.value;
 	if (!token) throw new RouteError("No autorizado", 401);
 	return token;

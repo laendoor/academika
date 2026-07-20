@@ -30,9 +30,9 @@ export function MateriasList() {
 			<Table>
 				<thead className="bg-zinc-50">
 					<tr>
-						<Th>Nombre</Th>
 						<Th>Código</Th>
 						<Th>Sigla</Th>
+						<Th>Nombre</Th>
 						<Th>Créditos</Th>
 						<Th>Plan vigente</Th>
 						<Th>Carrera</Th>
@@ -41,9 +41,9 @@ export function MateriasList() {
 				<Tbody>
 					{items.map((item) => (
 						<tr key={item.id} className="bg-white">
-							<td className="px-4 py-3 text-zinc-800">{item.nombre}</td>
 							<td className="px-4 py-3 text-zinc-600">{item.codigo}</td>
 							<td className="px-4 py-3 text-zinc-600">{item.sigla ?? "—"}</td>
+							<td className="px-4 py-3 text-zinc-800">{item.nombre}</td>
 							<td className="px-4 py-3 text-zinc-600">
 								{item.creditos?.toString() ?? "—"}
 							</td>

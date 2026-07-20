@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { fetchWithToken, UNEXPECTED_ERROR } from "@/lib/api/route";
+import { fetchWithToken, RouteError, UNEXPECTED_ERROR } from "@/lib/api/route";
 import { API_URL } from "@/lib/constants";
 
 export async function GET(
@@ -20,7 +20,9 @@ export async function GET(
 		}
 
 		return NextResponse.json(await res.json());
-	} catch {
+	} catch (err) {
+		if (err instanceof RouteError)
+			return NextResponse.json({ error: err.message }, { status: err.status });
 		return NextResponse.json({ error: UNEXPECTED_ERROR }, { status: 500 });
 	}
 }

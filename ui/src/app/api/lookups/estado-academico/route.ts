@@ -9,5 +9,6 @@ export const GET = route.apiHandler(async (req: NextRequest) => {
 		req,
 		`${API_URL}/api/v1/lookups/estado-academico`,
 	);
+	if (!res.ok) throw new Error();
 	return NextResponse.json(await res.json());
 });

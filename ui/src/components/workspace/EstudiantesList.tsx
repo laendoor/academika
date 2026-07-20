@@ -27,17 +27,13 @@ export function EstudiantesList() {
 	useEffect(() => {
 		workspace.getCarreras().then((r) => {
 			if (r.ok) setCarreras(r.data.items);
+			else console.warn("Error fetching carreras:", r.error);
 		});
 		workspace.getEstadosAcademicos().then((r) => {
 			if (r.ok) setEstadosAcademicos(r.data);
+			else console.warn("Error fetching estados:", r.error);
 		});
 	}, []);
-
-	const handleFilterChange =
-		(setter: typeof setCarreraId) => (value: string) => {
-			setter(value);
-			setSkip(0);
-		};
 
 	const hasNext = skip + PAGE_SIZE < total;
 	const hasPrev = skip > 0;
@@ -49,7 +45,10 @@ export function EstudiantesList() {
 			<div className="mb-4 flex gap-4">
 				<select
 					value={carreraId}
-					onChange={(e) => handleFilterChange(setCarreraId)(e.target.value)}
+					onChange={(e) => {
+						setCarreraId(e.target.value);
+						setSkip(0);
+					}}
 					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
 				>
 					<option value="">Todas las carreras</option>
@@ -62,9 +61,10 @@ export function EstudiantesList() {
 
 				<select
 					value={estadoAcademicoId}
-					onChange={(e) =>
-						handleFilterChange(setEstadoAcademicoId)(e.target.value)
-					}
+					onChange={(e) => {
+						setEstadoAcademicoId(e.target.value);
+						setSkip(0);
+					}}
 					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
 				>
 					<option value="">Todos los estados</option>
@@ -85,10 +85,10 @@ export function EstudiantesList() {
 			<Table>
 				<thead className="bg-zinc-50">
 					<tr>
+						<Th>Legajo</Th>
+						<Th>DNI</Th>
 						<Th>Apellido</Th>
 						<Th>Nombre</Th>
-						<Th>DNI</Th>
-						<Th>Legajo</Th>
 						<Th>Carreras</Th>
 						<Th>Estado</Th>
 					</tr>
@@ -96,10 +96,10 @@ export function EstudiantesList() {
 				<Tbody>
 					{items.map((item) => (
 						<tr key={item.id} className="bg-white">
+							<td className="px-4 py-3 text-zinc-600">{item.legajo ?? "—"}</td>
+							<td className="px-4 py-3 text-zinc-600">{item.dni}</td>
 							<td className="px-4 py-3 text-zinc-800">{item.apellido}</td>
 							<td className="px-4 py-3 text-zinc-800">{item.nombre}</td>
-							<td className="px-4 py-3 text-zinc-600">{item.dni}</td>
-							<td className="px-4 py-3 text-zinc-600">{item.legajo ?? "—"}</td>
 							<td className="px-4 py-3 text-zinc-600">
 								{item.carreras.map((c) => c.carrera_nombre).join(", ")}
 							</td>
