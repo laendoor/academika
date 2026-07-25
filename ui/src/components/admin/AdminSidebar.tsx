@@ -41,8 +41,8 @@ function LinkItem({ label, href }: { label: string; href: string }) {
 			href={href}
 			className={`block rounded-md px-3 py-1.5 text-sm transition-colors ${
 				isActive
-					? "bg-zinc-100 font-medium text-zinc-1000"
-					: "text-zinc-800 hover:bg-zinc-50 hover:text-zinc-1000"
+					? "bg-zinc-100 font-medium text-zinc-900"
+					: "text-zinc-800 hover:bg-zinc-50 hover:text-zinc-900"
 			}`}
 		>
 			{label}

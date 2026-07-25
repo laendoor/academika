@@ -1,27 +1,12 @@
 "use client";
-import {
-	BookOpen,
-	GraduationCap,
-	LayoutList,
-	type LucideIcon,
-} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { BookOpen, GraduationCap, LayoutList } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import * as workspace from "@/lib/api/workspace";
+import { useAdminStats } from "@/hooks/admin";
 
 export function AdminDashboard() {
-	const [estudiantes, setEstudiantes] = useState<number | null>(null);
-	const [materias, setMaterias] = useState<number | null>(null);
-
-	useEffect(() => {
-		workspace.getEstudiantes(0, 1).then((r) => {
-			if (r.ok) setEstudiantes(r.data.total);
-		});
-		workspace.getMaterias(0, 1).then((r) => {
-			if (r.ok) setMaterias(r.data.total);
-		});
-	}, []);
+	const { estudiantes, materias, status } = useAdminStats();
 
 	return (
 		<div className="p-8">
@@ -29,6 +14,9 @@ export function AdminDashboard() {
 				<LayoutList className="h-5 w-5 text-zinc-500" />
 				<h1 className="text-lg font-medium text-zinc-800">Datos Académicos</h1>
 			</div>
+			{status === "error" && (
+				<p className="mb-4 text-sm text-red-600">Error al cargar datos.</p>
+			)}
 			<div className="flex flex-col gap-4">
 				<StatCard
 					label="Estudiantes"
