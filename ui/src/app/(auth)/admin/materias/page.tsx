@@ -1,5 +1,5 @@
 import { MateriasList } from "@/components/workspace/MateriasList";
 
-export default function MateriasPage() {
+export default function AdminMateriasPage() {
 	return <MateriasList />;
 }
