@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    env_file: .env.prod
+    volumes:
+      - pg_data_prod:/var/lib/postgresql/data
+
+  api:
+    image: leandrojdl/academika-api:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env.prod
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - postgres
+
+  ui:
+    image: leandrojdl/academika-ui:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env.prod
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pg_data_prod:

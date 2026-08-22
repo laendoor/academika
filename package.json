@@ -1,0 +1,11 @@
+{
+	"name": "academika",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"release": "release-it"
+	},
+	"devDependencies": {
+		"release-it": "^21.0.0"
+	}
+}

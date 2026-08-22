@@ -6,18 +6,20 @@ __pycache__/
 
 # temp
 .tmp/
+tmp/
 
 # uv
 .uv/
 
 # Env files
 .env
+.env.prod
 
 # Dev logs
 dev-api.log
 
 # Node
-ui/node_modules/
+node_modules/
 ui/.next/
 
 # Claude
