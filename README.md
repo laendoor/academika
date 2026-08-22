@@ -25,8 +25,10 @@ make dev-ui           # servidor Next.js en :3000
 | Comando           | Cuándo usarlo                                        |
 | ----------------- | ---------------------------------------------------- |
 | `make seed`       | Siempre — LKPs de referencia, prod-safe, idempotente |
-| `make seed-admin` | Primera vez en dev y en prod — crea el admin inicial |
+| `make seed-admin` | Primera vez en dev (local) — crea el admin inicial   |
 | `make seed-dev`   | Solo local — datos de muestra para desarrollo        |
+
+En producción el admin se crea por el droplet (ver `docs/DEPLOY.md`).
 
 ## Más comandos
 
