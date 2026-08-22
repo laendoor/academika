@@ -12,6 +12,7 @@ RUN uv sync --frozen --no-dev
 COPY . .
 
 RUN chown -R appuser:appuser /app
+ENV UV_CACHE_DIR=/app/.cache/uv
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
