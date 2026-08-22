@@ -13,6 +13,7 @@ tmp/
 
 # Env files
 .env
+.env.prod
 
 # Dev logs
 dev-api.log
