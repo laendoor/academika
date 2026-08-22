@@ -1,102 +1,86 @@
-.PHONY: help install docker-dev db-start db-stop dev-api dev-ui check format test test-integration clean \
-        alembic-current alembic-upgrade alembic-downgrade alembic-check alembic-revision \
-        seed seed-dev seed-admin release
+.DEFAULT_GOAL := help
 
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
-help:
-	@echo "Académika — Comandos de desarrollo"
-	@echo ""
-	@echo "  make install                        - Instalar dependencias (api + ui)"
-	@echo "  make docker-dev                     - Levantar stack completo con Docker (api + ui + postgres)"
-	@echo "  make db-start                       - Levantar base de datos en background"
-	@echo "  make db-stop                        - Detener base de datos"
-	@echo "  make dev-api                        - Servidor FastAPI con hot-reload"
-	@echo "  make dev-ui                         - Servidor Next.js con hot-reload"
-	@echo "  make check                          - Linter y verificación de formato (api + ui)"
-	@echo "  make format                         - Formatear código automáticamente (api + ui)"
-	@echo "  make test                           - Tests (api + ui)"
-	@echo "  make test-integration               - Tests de integración con base de datos real"
-	@echo "  make clean                          - Limpiar archivos de caché (api + ui)"
-	@echo ""
-	@echo "  make alembic-current                - Revisión actual de la DB"
-	@echo "  make alembic-upgrade                - Aplicar migraciones pendientes"
-	@echo "  make alembic-downgrade REV=<rev>    - Bajar a revisión (ej: REV=-1 o REV=abc123)"
-	@echo "  make alembic-check                  - Verificar que no hay migraciones pendientes"
-	@echo "  make alembic-revision MSG=\"...\"     - Generar migración (NO aplica — revisar antes)
-	@echo ""
-	@echo "  make seed                           - Seeds de referencia (LKPs) — prod-safe, idempotente"
-	@echo "  make seed-admin                     - Crear primer usuario admin (interactivo, dev y prod)"
-	@echo "  make seed-dev                       - Seeds de desarrollo (datos de muestra) — solo local"
-	@echo "  make release                        - Crear release (bump version + git tag + push)"
+.PHONY: help install clean docker-dev db-start db-stop dev-api dev-ui check format \
+        test test-integration alembic-current alembic-upgrade alembic-downgrade \
+        alembic-check alembic-revision seed seed-dev seed-admin release
 
-install:
+help: ## Muestra esta ayuda
+	@grep -E '^## |^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
+		awk -F ':.*?## ' '/^## / {sub(/^## /, ""); printf "\n\033[1m%s\033[0m\n", $$0; next} {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
+
+## Setup
+install: ## Instala dependencias (api + ui)
 	cd api && uv sync
 	cd ui && npm install
 
-docker-dev:
-	docker compose -f compose.yaml up
-
-db-start:
-	docker compose -f compose.yaml up postgres -d
-
-db-stop:
-	docker compose -f compose.yaml stop postgres
-
-dev-api:
-	cd api && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-dev-ui:
-	cd ui && npm run dev
-
-check:
-	cd api && uv run ruff check . && uv run ruff format --check .
-	cd ui && npm run lint
-
-format:
-	cd api && uv run ruff check --fix . && uv run ruff format .
-	cd ui && npm run format
-
-test:
-	cd api && uv run pytest tests/unit/
-	@# cd ui && npm test  (UI tests pendientes)
-
-# Los tests de integración usan testcontainers — levantan postgres automáticamente.
-# tests/unit/    → sin infraestructura, corren offline
-# tests/integration/ → requieren DB (testcontainers postgres)
-test-integration:
-	cd api && uv run pytest tests/integration/ -v
-
-clean:
+clean: ## Limpia cachés y artefactos (api + ui)
 	cd api && find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	cd api && find . -type f -name "*.pyc" -delete
 	cd api && rm -rf .pytest_cache htmlcov .coverage .ruff_cache
 	cd ui && rm -rf .next node_modules/.cache
 
-alembic-current:
+## Docker
+docker-dev: ## Levanta stack completo (api + ui + postgres)
+	docker compose -f compose.yaml up
+
+db-start: ## Levanta solo postgres en background
+	docker compose -f compose.yaml up postgres -d
+
+db-stop: ## Detiene postgres
+	docker compose -f compose.yaml stop postgres
+
+## Dev local
+dev-api: ## Servidor FastAPI con hot-reload
+	cd api && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+dev-ui: ## Servidor Next.js con hot-reload
+	cd ui && npm run dev
+
+## Calidad
+check: ## Linter y verificación de formato (api + ui)
+	cd api && uv run ruff check . && uv run ruff format --check .
+	cd ui && npm run lint
+
+format: ## Formatea automáticamente (api + ui)
+	cd api && uv run ruff check --fix . && uv run ruff format .
+	cd ui && npm run format
+
+## Tests
+test: ## Tests unitarios (api)
+	cd api && uv run pytest tests/unit/
+
+test-integration: ## Tests de integración con DB real (testcontainers)
+	cd api && uv run pytest tests/integration/ -v
+
+## Migraciones
+alembic-current: ## Revisión actual de la DB
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic current
 
-alembic-upgrade:
+alembic-upgrade: ## Aplica migraciones pendientes
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic upgrade head
 
-alembic-downgrade:
+alembic-downgrade: ## Baja a revisión (uso: make alembic-downgrade REV=-1)
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic downgrade $(REV)
 
-alembic-check:
+alembic-check: ## Verifica que no hay migraciones pendientes
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic check
 
-alembic-revision:
+alembic-revision: ## Genera migración (uso: make alembic-revision MSG="descripcion")
 	cd api && DATABASE_URL=$(DB_URL) uv run alembic revision --autogenerate -m "$(MSG)"
 
-seed:
+## Seeds
+seed: ## Seeds de referencia (LKPs) — prod-safe, idempotente
 	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference
 
-seed-dev:
+seed-dev: ## Seeds de desarrollo (datos de muestra) — solo local
 	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference && \
 	          DATABASE_URL=$(DB_URL) uv run python -m seeds.runner dev
 
-seed-admin:
+seed-admin: ## Crea primer usuario admin (interactivo)
 	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.create_admin
 
-release:
+## Release
+release: ## Crea release (bump version + git tag + push)
 	npm run release
