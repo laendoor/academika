@@ -34,13 +34,13 @@ install:
 	cd ui && npm install
 
 docker-dev:
-	docker compose -f docker-compose.dev.yml up
+	docker compose -f compose.yaml up
 
 db-start:
-	docker compose -f docker-compose.dev.yml up postgres -d
+	docker compose -f compose.yaml up postgres -d
 
 db-stop:
-	docker compose -f docker-compose.dev.yml stop postgres
+	docker compose -f compose.yaml stop postgres
 
 dev-api:
 	cd api && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
