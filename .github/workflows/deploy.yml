@@ -69,7 +69,11 @@ jobs:
         run: |
           scp -i ~/.ssh/id_deploy compose.prod.yaml "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/academika/"
 
-      - name: Pull and up
+      # View docs/DEPLOY.md for details
+      - name: Deploy (pull → migrate → up)
         run: |
           ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "cd /opt/academika && IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml pull && IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml up -d"
+            "cd /opt/academika && \
+             IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml pull && \
+             IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml run --rm api uv run alembic upgrade head && \
+             IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml up -d"
