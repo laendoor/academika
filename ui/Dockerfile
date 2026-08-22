@@ -12,6 +12,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=appuser:appuser /app/.next/standalone ./
