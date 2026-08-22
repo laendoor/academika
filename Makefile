@@ -1,6 +1,6 @@
 .PHONY: help install docker-dev db-start db-stop dev-api dev-ui check format test test-integration clean \
         alembic-current alembic-upgrade alembic-downgrade alembic-check alembic-revision \
-        seed seed-dev seed-admin
+        seed seed-dev seed-admin release
 
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
@@ -28,6 +28,7 @@ help:
 	@echo "  make seed                           - Seeds de referencia (LKPs) — prod-safe, idempotente"
 	@echo "  make seed-admin                     - Crear primer usuario admin (interactivo, dev y prod)"
 	@echo "  make seed-dev                       - Seeds de desarrollo (datos de muestra) — solo local"
+	@echo "  make release                        - Crear release (bump version + git tag + push)"
 
 install:
 	cd api && uv sync
@@ -96,3 +97,6 @@ seed-dev:
 
 seed-admin:
 	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.create_admin
+
+release:
+	npm run release

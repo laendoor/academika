@@ -19,7 +19,7 @@ tmp/
 dev-api.log
 
 # Node
-ui/node_modules/
+node_modules/
 ui/.next/
 
 # Claude

@@ -1,0 +1,75 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-push:
+    name: Build & push images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push api
+        uses: docker/build-push-action@v6
+        with:
+          context: ./api
+          push: true
+          tags: |
+            leandrojdl/academika-api:${{ steps.version.outputs.version }}
+            leandrojdl/academika-api:latest
+
+      - name: Build and push ui
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ui
+          push: true
+          tags: |
+            leandrojdl/academika-ui:${{ steps.version.outputs.version }}
+            leandrojdl/academika-ui:latest
+
+  deploy:
+    name: Deploy to droplet
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Ensure deploy directory
+        run: |
+          ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "mkdir -p /opt/academika"
+
+      - name: Sync compose file
+        run: |
+          scp -i ~/.ssh/id_deploy compose.prod.yaml "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/academika/"
+
+      - name: Pull and up
+        run: |
+          ssh -i ~/.ssh/id_deploy "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "cd /opt/academika && IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml pull && IMAGE_TAG=${{ steps.version.outputs.version }} docker compose -f compose.prod.yaml up -d"
