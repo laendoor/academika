@@ -109,6 +109,29 @@ Dos opciones para exponer una var al cliente:
 
 ## Testing
 
+### Testing frontend (Vitest + RTL)
+
+Tests en `ui/` con Vitest + React Testing Library + jest-dom, environment `jsdom`. Van junto al fuente con
+extensión `.test.ts(x)` — no hay directorio `__tests__`.
+
+Sin `globals: true`: importar explícitamente de `vitest` (`describe`, `it`, `expect`, `vi`).
+
+El setup (`ui/vitest.setup.ts`) registra los matchers de jest-dom y `afterEach(cleanup)`. Sin `globals`,
+RTL no auto-limpia el DOM entre tests — los renders se acumulan y `screen.getBy*` falla con
+"Found multiple elements".
+
+**Mocking:** `vi.mock` de los módulos `@/lib/api/*` y de los hooks (`@/hooks/*`) que usa el código bajo test.
+`vi.hoisted` para capturar callbacks pasados a un mock (ej. `onMessage` de `useWebSocket`). `next/navigation`
+se mockea para `usePathname`/`useRouter`; `next/link` no necesita mock (renderiza `<a>`).
+
+**Server components async** (ej. `SiteHeader`) no se testean con Vitest — ir por E2E.
+
+```bash
+npm run test     # vitest run (no-watch)
+make test-ui
+make test        # api unit + ui
+```
+
 ### Unit vs Integration
 
 | Carpeta              | Regla                                                                 |
