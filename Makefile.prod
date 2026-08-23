@@ -1,0 +1,27 @@
+.DEFAULT_GOAL := help
+
+COMPOSE := docker compose -f compose.prod.yaml
+
+.PHONY: help logs logs-api logs-ui logs-db ps restart
+
+help: ## Muestra esta ayuda
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk -F ':.*?## ' '{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+logs: ## Ver logs de todos los servicios (follow)
+	$(COMPOSE) logs -f
+
+logs-api: ## Ver logs de la API (follow)
+	$(COMPOSE) logs -f api
+
+logs-ui: ## Ver logs de la UI (follow)
+	$(COMPOSE) logs -f ui
+
+logs-db: ## Ver logs de postgres (follow)
+	$(COMPOSE) logs -f postgres
+
+ps: ## Estado de los containers
+	$(COMPOSE) ps
+
+restart: ## Reiniciar todos los servicios
+	$(COMPOSE) restart
