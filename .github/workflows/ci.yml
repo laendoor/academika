@@ -80,7 +80,7 @@ jobs:
           DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
 
   frontend:
-    name: Frontend — biome + build
+    name: Frontend — biome + test + build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,5 +93,7 @@ jobs:
         run: cd ui && npm ci
       - name: Lint (biome)
         run: cd ui && npm run lint
+      - name: Test (Vitest)
+        run: cd ui && npm run test
       - name: Build
         run: cd ui && npm run build
