@@ -1,12 +1,19 @@
 {
 	"git": {
-		"commitMessage": "chore: release v${version}",
+		"commitMessage": "chore: bump v${version}",
 		"tagName": "v${version}"
 	},
 	"npm": {
 		"publish": false
 	},
 	"github": {
-		"release": true
+		"release": true,
+		"releaseName": "v${version}"
+	},
+	"plugins": {
+		"@release-it/conventional-changelog": {
+			"infile": "CHANGELOG.md",
+			"preset": "conventionalcommits"
+		}
 	}
 }
