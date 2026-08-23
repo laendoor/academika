@@ -4,7 +4,11 @@ import { NextResponse } from "next/server";
 import { clearAuthCookies } from "@/lib/cookies";
 
 export function GET(request: NextRequest) {
-	const response = NextResponse.redirect(new URL("/login", request.url));
+	const host = request.headers.get("host") ?? "localhost:3000";
+	const proto = request.headers.get("x-forwarded-proto") ?? "http";
+	const response = NextResponse.redirect(
+		new URL("/login", `${proto}://${host}`),
+	);
 	clearAuthCookies(response);
 	return response;
 }
