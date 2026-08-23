@@ -94,6 +94,17 @@ import { API_URL, IS_PRODUCTION } from "@/lib/constants";
 
 Ventaja: un solo lugar para auditar qué env vars usa la app, y fácil de mockear en tests.
 
+### Prefijo `NEXT_PUBLIC_` para env leídas en el cliente
+
+Next.js solo inyecta en el bundle del navegador las env vars con prefijo `NEXT_PUBLIC_`. Una var sin ese prefijo leída en un hook `"use client"` o componente con estado llega como `undefined` y cae al fallback — el cliente conecta a `localhost` en vez del host real (bug del WS en #42).
+
+Dos opciones para exponer una var al cliente:
+
+- Usar `NEXT_PUBLIC_*` cuando el valor es conocido en build (ej. `NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws` para dev cross-origin).
+- Derivarla en runtime desde `window.location` cuando debe ser same-origin (ej. `WS_URL`: `wss://<host>/ws` con el protocolo según `https`/`http`).
+
+`API_URL` se mantiene sin prefijo porque se consume solo server-side (route handlers / BFF), donde `process.env.*` sí está disponible.
+
 ---
 
 ## Testing
