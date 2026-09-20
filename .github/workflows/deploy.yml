@@ -34,14 +34,14 @@ jobs:
             leandrojdl/academika-api:${{ steps.version.outputs.version }}
             leandrojdl/academika-api:latest
 
-      - name: Build and push ui
+      - name: Build and push web
         uses: docker/build-push-action@v6
         with:
-          context: ./ui
+          context: ./web
           push: true
           tags: |
-            leandrojdl/academika-ui:${{ steps.version.outputs.version }}
-            leandrojdl/academika-ui:latest
+            leandrojdl/academika-web:${{ steps.version.outputs.version }}
+            leandrojdl/academika-web:latest
 
   deploy:
     name: Deploy to droplet

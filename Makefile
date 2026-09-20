@@ -2,8 +2,8 @@
 
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
-.PHONY: help install clean docker-dev db-start db-stop dev-api dev-ui check format \
-        test test-api test-ui test-integration alembic-current alembic-upgrade alembic-downgrade \
+.PHONY: help install clean docker-dev db-start db-stop dev-api dev-web check format \
+        test test-api test-web test-integration alembic-current alembic-upgrade alembic-downgrade \
         alembic-check alembic-revision seed seed-dev seed-admin release
 
 help: ## Muestra esta ayuda
@@ -11,18 +11,18 @@ help: ## Muestra esta ayuda
 		awk -F ':.*?## ' '/^## / {sub(/^## /, ""); printf "\n\033[1m%s\033[0m\n", $$0; next} {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
 ## Setup
-install: ## Instala dependencias (api + ui)
+install: ## Instala dependencias (api + web)
 	cd api && uv sync
-	cd ui && npm install
+	cd web && npm install
 
-clean: ## Limpia cachés y artefactos (api + ui)
+clean: ## Limpia cachés y artefactos (api + web)
 	cd api && find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	cd api && find . -type f -name "*.pyc" -delete
 	cd api && rm -rf .pytest_cache htmlcov .coverage .ruff_cache
-	cd ui && rm -rf .next node_modules/.cache
+	cd web && rm -rf .next node_modules/.cache
 
 ## Docker
-docker-dev: ## Levanta stack completo (api + ui + postgres)
+docker-dev: ## Levanta stack completo (api + web + postgres)
 	docker compose -f compose.yaml up
 
 db-start: ## Levanta solo postgres en background
@@ -35,28 +35,28 @@ db-stop: ## Detiene postgres
 dev-api: ## Servidor FastAPI con hot-reload
 	cd api && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-dev-ui: ## Servidor Next.js con hot-reload
-	cd ui && npm run dev
+dev-web: ## Servidor Next.js con hot-reload
+	cd web && npm run dev
 
 ## Calidad
-check: ## Linter y verificación de formato (api + ui)
+check: ## Linter y verificación de formato (api + web)
 	cd api && uv run ruff check . && uv run ruff format --check .
-	cd ui && npm run lint
+	cd web && npm run lint
 
-format: ## Formatea automáticamente (api + ui)
+format: ## Formatea automáticamente (api + web)
 	cd api && uv run ruff check --fix . && uv run ruff format .
-	cd ui && npm run format
+	cd web && npm run format
 
 ## Tests
-test: ## Tests unitarios (api + ui)
+test: ## Tests unitarios (api + web)
 	cd api && uv run pytest tests/unit/
-	cd ui && npm run test
+	cd web && npm run test
 
 test-api: ## Tests unitarios de la API
 	cd api && uv run pytest tests/unit/
 
-test-ui: ## Tests unitarios de la UI (Vitest)
-	cd ui && npm run test
+test-web: ## Tests unitarios del frontend (Vitest)
+	cd web && npm run test
 
 test-integration: ## Tests de integración con DB real (testcontainers)
 	cd api && uv run pytest tests/integration/ -v
