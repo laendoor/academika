@@ -1,6 +1,6 @@
 # Académika
 
-Stack: FastAPI (`api/`) + Next.js (`ui/`). Ver ADR-003 para decisiones de stack.
+Stack: FastAPI (`api/`) + Next.js (`web/`). Ver ADR-003 para decisiones de stack.
 
 ## Convenciones de código
 
