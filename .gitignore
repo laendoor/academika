@@ -20,7 +20,7 @@ dev-api.log
 
 # Node
 node_modules/
-ui/.next/
+web/.next/
 
 # Claude
 .claude/

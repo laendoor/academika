@@ -11,14 +11,14 @@ services:
     depends_on:
       - postgres
 
-  ui:
+  web:
     build:
-      context: ./ui
+      context: ./web
     command: ["npm", "run", "dev"]
     ports:
       - "3000:3000"
     volumes:
-      - ./ui:/app
+      - ./web:/app
       - /app/node_modules
     env_file: .env
 

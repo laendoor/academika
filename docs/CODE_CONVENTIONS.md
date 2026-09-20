@@ -14,7 +14,7 @@ La repetición es la señal práctica más confiable. Los programadores la usan 
 ### Ubicación
 
 ```txt
-ui/src/components/
+web/src/components/
   auth/      ← componentes de dominio (auth, recovery)
   ui/        ← primitivos sin dominio (PageState, ...)
 ```
@@ -49,7 +49,7 @@ Sin `"use client"` por defecto. Agregar solo cuando el componente necesita hooks
 Los custom hooks encapsulan estado, efectos y llamadas a la API. Los componentes son presentación pura.
 
 ```txt
-ui/src/hooks/
+web/src/hooks/
   auth/      ← hooks de dominio auth (useLoginForm, useForgotPasswordForm, ...)
   admin/     ← hooks de dominio admin (useAdminUsers, ...)
 ```
@@ -80,7 +80,7 @@ Cada carpeta de dominio tiene un `index.ts` con barrel exports.
 
 Nunca acceder a `process.env.*` (frontend) ni a `os.environ` (backend) directamente en código de negocio. Toda lectura de env vars va en un módulo central:
 
-- **Frontend:** `ui/src/lib/constants.ts`
+- **Frontend:** `web/src/lib/constants.ts`
 - **Backend:** `api/app/config.py` (pydantic-settings)
 
 ```typescript
@@ -111,12 +111,12 @@ Dos opciones para exponer una var al cliente:
 
 ### Testing frontend (Vitest + RTL)
 
-Tests en `ui/` con Vitest + React Testing Library + jest-dom, environment `jsdom`. Van junto al fuente con
+Tests en `web/` con Vitest + React Testing Library + jest-dom, environment `jsdom`. Van junto al fuente con
 extensión `.test.ts(x)` — no hay directorio `__tests__`.
 
 Sin `globals: true`: importar explícitamente de `vitest` (`describe`, `it`, `expect`, `vi`).
 
-El setup (`ui/vitest.setup.ts`) registra los matchers de jest-dom y `afterEach(cleanup)`. Sin `globals`,
+El setup (`web/vitest.setup.ts`) registra los matchers de jest-dom y `afterEach(cleanup)`. Sin `globals`,
 RTL no auto-limpia el DOM entre tests — los renders se acumulan y `screen.getBy*` falla con
 "Found multiple elements".
 
@@ -128,8 +128,8 @@ se mockea para `usePathname`/`useRouter`; `next/link` no necesita mock (renderiz
 
 ```bash
 npm run test     # vitest run (no-watch)
-make test-ui
-make test        # api unit + ui
+make test-web
+make test        # api unit + web
 ```
 
 ### Unit vs Integration

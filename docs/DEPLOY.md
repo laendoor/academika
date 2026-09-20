@@ -4,7 +4,7 @@
 
 1. `make release` crea un tag `vX.Y.Z` y lo pushea
 2. El workflow `.github/workflows/deploy.yml` se dispara con el tag
-3. Build + push de imágenes (`leandrojdl/academika-api` + `academika-ui`) a Docker Hub
+3. Build + push de imágenes (`leandrojdl/academika-api` + `academika-web`) a Docker Hub
 4. Deploy al droplet: `pull` → `migrate` → `seed` → `up`
 
 ## Migraciones

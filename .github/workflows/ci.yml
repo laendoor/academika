@@ -88,12 +88,12 @@ jobs:
         with:
           node-version: "24"
           cache: npm
-          cache-dependency-path: ui/package-lock.json
+          cache-dependency-path: web/package-lock.json
       - name: Install dependencies
-        run: cd ui && npm ci
+        run: cd web && npm ci
       - name: Lint (biome)
-        run: cd ui && npm run lint
+        run: cd web && npm run lint
       - name: Test (Vitest)
-        run: cd ui && npm run test
+        run: cd web && npm run test
       - name: Build
-        run: cd ui && npm run build
+        run: cd web && npm run build
