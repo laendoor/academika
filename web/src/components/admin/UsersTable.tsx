@@ -1,18 +1,15 @@
 import { Table, Tbody, Th } from "@/components/ui/Table";
 import type { UserItem, UserRole, UserUpdate } from "@/lib/api/admin";
-
-const ROLE_LABELS: Record<UserRole, string> = {
-	admin: "Admin",
-	director: "Director",
-	docente: "Docente",
-};
+import type { LookupOption } from "@/lib/api/lookups";
 
 function RoleSelect({
 	role,
+	roles,
 	disabled,
 	onChange,
 }: {
 	role: UserRole;
+	roles: LookupOption[];
 	disabled: boolean;
 	onChange: (role: UserRole) => void;
 }) {
@@ -23,9 +20,9 @@ function RoleSelect({
 			onChange={(e) => onChange(e.target.value as UserRole)}
 			className="rounded border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-700 disabled:opacity-50"
 		>
-			{(Object.keys(ROLE_LABELS) as UserRole[]).map((r) => (
-				<option key={r} value={r}>
-					{ROLE_LABELS[r]}
+			{roles.map((r) => (
+				<option key={r.key} value={r.key}>
+					{r.label}
 				</option>
 			))}
 		</select>
@@ -59,10 +56,12 @@ function StatusToggle({
 
 function UserRow({
 	user,
+	roles,
 	isUpdating,
 	onUpdate,
 }: {
 	user: UserItem;
+	roles: LookupOption[];
 	isUpdating: boolean;
 	onUpdate: (id: string, data: UserUpdate) => void;
 }) {
@@ -72,6 +71,7 @@ function UserRow({
 			<td className="px-4 py-3">
 				<RoleSelect
 					role={user.role}
+					roles={roles}
 					disabled={isUpdating}
 					onChange={(role) => onUpdate(user.id, { role })}
 				/>
@@ -89,10 +89,12 @@ function UserRow({
 
 export function UsersTable({
 	users,
+	roles,
 	updating,
 	onUpdate,
 }: {
 	users: UserItem[];
+	roles: LookupOption[];
 	updating: string | null;
 	onUpdate: (id: string, data: UserUpdate) => void;
 }) {
@@ -110,6 +112,7 @@ export function UsersTable({
 					<UserRow
 						key={user.id}
 						user={user}
+						roles={roles}
 						isUpdating={updating === user.id}
 						onUpdate={onUpdate}
 					/>
