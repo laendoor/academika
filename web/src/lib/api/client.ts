@@ -2,6 +2,8 @@ const UNEXPECTED_ERROR = "Error inesperado. Intentá de nuevo más tarde.";
 
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
+export type OkResponse = { ok: true };
+
 async function parseResult<T>(res: Response): Promise<ApiResult<T>> {
 	if (res.ok) {
 		return { ok: true, data: (await res.json()) as T };

@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 
 import { Table, Tbody, Th } from "@/components/ui/Table";
 import { useEstudiantes } from "@/hooks/workspace";
-import type { CarreraOption, EstadoOption } from "@/lib/api/workspace";
+import type { LookupOption } from "@/lib/api/lookups";
+import * as lookups from "@/lib/api/lookups";
+import type { CarreraOption } from "@/lib/api/workspace";
 import * as workspace from "@/lib/api/workspace";
 
 const PAGE_SIZE = 20;
@@ -13,7 +15,7 @@ export function EstudiantesList() {
 	const [carreraId, setCarreraId] = useState("");
 	const [estadoAcademicoId, setEstadoAcademicoId] = useState("");
 	const [carreras, setCarreras] = useState<CarreraOption[]>([]);
-	const [estadosAcademicos, setEstadosAcademicos] = useState<EstadoOption[]>(
+	const [estadosAcademicos, setEstadosAcademicos] = useState<LookupOption[]>(
 		[],
 	);
 
@@ -29,7 +31,7 @@ export function EstudiantesList() {
 			if (r.ok) setCarreras(r.data.items);
 			else console.warn("Error fetching carreras:", r.error);
 		});
-		workspace.getEstadosAcademicos().then((r) => {
+		lookups.getEstadosAcademicos().then((r) => {
 			if (r.ok) setEstadosAcademicos(r.data);
 			else console.warn("Error fetching estados:", r.error);
 		});
@@ -70,7 +72,7 @@ export function EstudiantesList() {
 					<option value="">Todos los estados</option>
 					{estadosAcademicos.map((e) => (
 						<option key={e.key} value={e.key}>
-							{e.nombre}
+							{e.label}
 						</option>
 					))}
 				</select>

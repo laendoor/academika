@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import { UsersTable } from "@/components/admin/UsersTable";
 import type { UserItem } from "@/lib/api/admin";
+import type { LookupOption } from "@/lib/api/lookups";
+
+const ROLES: LookupOption[] = [
+	{ key: "admin", label: "Administrador" },
+	{ key: "director", label: "Director de Carrera" },
+	{ key: "docente", label: "Docente" },
+];
 
 function makeUser(overrides: Partial<UserItem> = {}): UserItem {
 	return {
@@ -19,18 +26,28 @@ function makeUser(overrides: Partial<UserItem> = {}): UserItem {
 describe("UsersTable", () => {
 	it("renderiza email, rol y estado", () => {
 		render(
-			<UsersTable users={[makeUser()]} updating={null} onUpdate={vi.fn()} />,
+			<UsersTable
+				users={[makeUser()]}
+				roles={ROLES}
+				updating={null}
+				onUpdate={vi.fn()}
+			/>,
 		);
 
 		expect(screen.getByText("a@unq.edu.ar")).toBeInTheDocument();
-		expect(screen.getByText("Director")).toBeInTheDocument();
+		expect(screen.getByText("Director de Carrera")).toBeInTheDocument();
 		expect(screen.getByText("Activo")).toBeInTheDocument();
 	});
 
 	it("llama onUpdate al cambiar el rol", () => {
 		const onUpdate = vi.fn();
 		render(
-			<UsersTable users={[makeUser()]} updating={null} onUpdate={onUpdate} />,
+			<UsersTable
+				users={[makeUser()]}
+				roles={ROLES}
+				updating={null}
+				onUpdate={onUpdate}
+			/>,
 		);
 
 		fireEvent.change(screen.getByRole("combobox"), {
@@ -43,7 +60,12 @@ describe("UsersTable", () => {
 	it("llama onUpdate al alternar el estado", () => {
 		const onUpdate = vi.fn();
 		render(
-			<UsersTable users={[makeUser()]} updating={null} onUpdate={onUpdate} />,
+			<UsersTable
+				users={[makeUser()]}
+				roles={ROLES}
+				updating={null}
+				onUpdate={onUpdate}
+			/>,
 		);
 
 		fireEvent.click(screen.getByRole("button", { name: "Activo" }));
@@ -53,7 +75,12 @@ describe("UsersTable", () => {
 
 	it("deshabilita controles mientras actualiza ese usuario", () => {
 		render(
-			<UsersTable users={[makeUser()]} updating="u1" onUpdate={vi.fn()} />,
+			<UsersTable
+				users={[makeUser()]}
+				roles={ROLES}
+				updating="u1"
+				onUpdate={vi.fn()}
+			/>,
 		);
 
 		expect(screen.getByRole("combobox")).toBeDisabled();

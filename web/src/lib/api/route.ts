@@ -53,7 +53,9 @@ export async function fetchWithToken(
 		...init,
 		headers: { ...init?.headers, Authorization: `Bearer ${token}` },
 	});
-	if (res.status === 401 || res.status === 403)
-		throw new RouteError("No autorizado", res.status);
+	if (res.status === 401 || res.status === 403) {
+		const json = (await res.json().catch(() => ({}))) as { detail?: string };
+		throw new RouteError(json.detail ?? "No autorizado", res.status);
+	}
 	return res;
 }

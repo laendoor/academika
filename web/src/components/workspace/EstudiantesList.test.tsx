@@ -3,17 +3,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EstudiantesList } from "@/components/workspace/EstudiantesList";
 import { useEstudiantes } from "@/hooks/workspace";
+import * as lookups from "@/lib/api/lookups";
 import * as workspace from "@/lib/api/workspace";
 
 vi.mock("@/hooks/workspace", () => ({ useEstudiantes: vi.fn() }));
 vi.mock("@/lib/api/workspace", () => ({
 	getCarreras: vi.fn(),
+}));
+vi.mock("@/lib/api/lookups", () => ({
 	getEstadosAcademicos: vi.fn(),
 }));
 
 const useEstudiantesMock = vi.mocked(useEstudiantes);
 const getCarreras = vi.mocked(workspace.getCarreras);
-const getEstadosAcademicos = vi.mocked(workspace.getEstadosAcademicos);
+const getEstadosAcademicos = vi.mocked(lookups.getEstadosAcademicos);
 
 function makeEstudiante(id: string) {
 	return {
