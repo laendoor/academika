@@ -5,16 +5,22 @@
 		"description": "Endpoints de Académika. Fiel al código actual: los CRUD de dominio (carreras, materias, planes, alumnos, cursadas) aún no requieren auth — se protegerán en #65, donde se actualizará esta collection. El WebSocket `/ws` no se incluye (Postman v2.1 no lo soporta)."
 	},
 	"variable": [
-		{ "key": "base_url", "value": "http://localhost:8000", "type": "string" },
-		{ "key": "access_token", "value": "", "type": "string" },
-		{ "key": "refresh_token", "value": "", "type": "string" },
+		{
+			"key": "AIKA_BASE_URL",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{ "key": "AIKA_ADMIN_EMAIL", "value": "", "type": "string" },
+		{ "key": "AIKA_ADMIN_PASSWORD", "value": "", "type": "string" },
+		{ "key": "AIKA_ACCESS_TOKEN", "value": "", "type": "string" },
+		{ "key": "AIKA_REFRESH_TOKEN", "value": "", "type": "string" },
 		{ "key": "carrera_id", "value": "", "type": "string" },
 		{ "key": "materia_id", "value": "", "type": "string" },
 		{ "key": "plan_id", "value": "", "type": "string" },
 		{ "key": "alumno_id", "value": "", "type": "string" },
 		{ "key": "cursada_id", "value": "", "type": "string" },
-		{ "key": "user_id", "value": "", "type": "string" },
-		{ "key": "invite_token", "value": "", "type": "string" }
+		{ "key": "AIKA_USER_ID", "value": "", "type": "string" },
+		{ "key": "AIKA_INVITE_TOKEN", "value": "", "type": "string" }
 	],
 	"item": [
 		{
@@ -24,7 +30,7 @@
 					"name": "GET /health",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/health"
+						"url": "{{AIKA_BASE_URL}}/health"
 					}
 				}
 			]
@@ -42,8 +48,8 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"  const json = pm.response.json();",
-									"  pm.collectionVariables.set('access_token', json.access_token);",
-									"  pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"  pm.collectionVariables.set('AIKA_ACCESS_TOKEN', json.access_token);",
+									"  pm.collectionVariables.set('AIKA_REFRESH_TOKEN', json.refresh_token);",
 									"}"
 								]
 							}
@@ -51,11 +57,11 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/auth/login",
+						"url": "{{AIKA_BASE_URL}}/api/v1/auth/login",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"lean@unq.edu.ar\",\n  \"password\": \"Test1234!\"\n}"
+							"raw": "{\n  \"email\": \"{{AIKA_ADMIN_EMAIL}}\",\n  \"password\": \"{{AIKA_ADMIN_PASSWORD}}\"\n}"
 						}
 					}
 				},
@@ -69,7 +75,7 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"  const json = pm.response.json();",
-									"  pm.collectionVariables.set('access_token', json.access_token);",
+									"  pm.collectionVariables.set('AIKA_ACCESS_TOKEN', json.access_token);",
 									"}"
 								]
 							}
@@ -77,11 +83,11 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/auth/refresh",
+						"url": "{{AIKA_BASE_URL}}/api/v1/auth/refresh",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+							"raw": "{\n  \"refresh_token\": \"{{AIKA_REFRESH_TOKEN}}\"\n}"
 						}
 					}
 				},
@@ -89,10 +95,13 @@
 					"name": "POST /auth/invite (admin)",
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/auth/invite",
+						"url": "{{AIKA_BASE_URL}}/api/v1/auth/invite",
 						"header": [
 							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
@@ -110,8 +119,8 @@
 								"exec": [
 									"if (pm.response.code === 201) {",
 									"  const json = pm.response.json();",
-									"  pm.collectionVariables.set('access_token', json.access_token);",
-									"  pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"  pm.collectionVariables.set('AIKA_ACCESS_TOKEN', json.access_token);",
+									"  pm.collectionVariables.set('AIKA_REFRESH_TOKEN', json.refresh_token);",
 									"}"
 								]
 							}
@@ -119,11 +128,11 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/auth/register",
+						"url": "{{AIKA_BASE_URL}}/api/v1/auth/register",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"token\": \"{{invite_token}}\",\n  \"password\": \"Test1234!\"\n}"
+							"raw": "{\n  \"token\": \"{{AIKA_INVITE_TOKEN}}\",\n  \"password\": \"Test1234!\"\n}"
 						}
 					}
 				},
@@ -131,7 +140,7 @@
 					"name": "POST /auth/forgot-password",
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/auth/forgot-password",
+						"url": "{{AIKA_BASE_URL}}/api/v1/auth/forgot-password",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -143,7 +152,7 @@
 					"name": "POST /auth/reset-password",
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/auth/reset-password",
+						"url": "{{AIKA_BASE_URL}}/api/v1/auth/reset-password",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -161,11 +170,14 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/admin/users?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/admin/users?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "admin", "users"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -180,9 +192,12 @@
 						"method": "PUT",
 						"header": [
 							{ "key": "Content-Type", "value": "application/json" },
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
-						"url": "{{base_url}}/api/v1/admin/users/{{user_id}}",
+						"url": "{{AIKA_BASE_URL}}/api/v1/admin/users/{{AIKA_USER_ID}}",
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"role\": \"docente\"\n}"
@@ -199,13 +214,16 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [{ "key": "files", "type": "file", "src": [] }]
 						},
-						"url": "{{base_url}}/api/v1/admin/import-guarani"
+						"url": "{{AIKA_BASE_URL}}/api/v1/admin/import-guarani"
 					}
 				}
 			]
@@ -218,8 +236,8 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{base_url}}/api/v1/carreras?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/carreras?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "carreras"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -245,7 +263,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/carreras",
+						"url": "{{AIKA_BASE_URL}}/api/v1/carreras",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -257,14 +275,14 @@
 					"name": "GET /carreras/:id",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/api/v1/carreras/{{carrera_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/carreras/{{carrera_id}}"
 					}
 				},
 				{
 					"name": "PUT /carreras/:id",
 					"request": {
 						"method": "PUT",
-						"url": "{{base_url}}/api/v1/carreras/{{carrera_id}}",
+						"url": "{{AIKA_BASE_URL}}/api/v1/carreras/{{carrera_id}}",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -276,7 +294,7 @@
 					"name": "DELETE /carreras/:id",
 					"request": {
 						"method": "DELETE",
-						"url": "{{base_url}}/api/v1/carreras/{{carrera_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/carreras/{{carrera_id}}"
 					}
 				}
 			]
@@ -289,8 +307,8 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{base_url}}/api/v1/materias?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/materias?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "materias"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -316,7 +334,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/materias",
+						"url": "{{AIKA_BASE_URL}}/api/v1/materias",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -328,14 +346,14 @@
 					"name": "GET /materias/:id",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/api/v1/materias/{{materia_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/materias/{{materia_id}}"
 					}
 				},
 				{
 					"name": "PUT /materias/:id",
 					"request": {
 						"method": "PUT",
-						"url": "{{base_url}}/api/v1/materias/{{materia_id}}",
+						"url": "{{AIKA_BASE_URL}}/api/v1/materias/{{materia_id}}",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -347,7 +365,7 @@
 					"name": "DELETE /materias/:id",
 					"request": {
 						"method": "DELETE",
-						"url": "{{base_url}}/api/v1/materias/{{materia_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/materias/{{materia_id}}"
 					}
 				}
 			]
@@ -360,8 +378,8 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{base_url}}/api/v1/planes?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/planes?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "planes"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -387,7 +405,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/planes",
+						"url": "{{AIKA_BASE_URL}}/api/v1/planes",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -399,14 +417,14 @@
 					"name": "GET /planes/:id",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/api/v1/planes/{{plan_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/planes/{{plan_id}}"
 					}
 				},
 				{
 					"name": "PUT /planes/:id",
 					"request": {
 						"method": "PUT",
-						"url": "{{base_url}}/api/v1/planes/{{plan_id}}",
+						"url": "{{AIKA_BASE_URL}}/api/v1/planes/{{plan_id}}",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -418,7 +436,7 @@
 					"name": "DELETE /planes/:id",
 					"request": {
 						"method": "DELETE",
-						"url": "{{base_url}}/api/v1/planes/{{plan_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/planes/{{plan_id}}"
 					}
 				}
 			]
@@ -431,8 +449,8 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{base_url}}/api/v1/alumnos?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/alumnos?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "alumnos"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -458,7 +476,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/alumnos",
+						"url": "{{AIKA_BASE_URL}}/api/v1/alumnos",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -470,14 +488,14 @@
 					"name": "GET /alumnos/:id",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/alumnos/{{alumno_id}}"
 					}
 				},
 				{
 					"name": "PUT /alumnos/:id",
 					"request": {
 						"method": "PUT",
-						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}",
+						"url": "{{AIKA_BASE_URL}}/api/v1/alumnos/{{alumno_id}}",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -489,21 +507,21 @@
 					"name": "DELETE /alumnos/:id",
 					"request": {
 						"method": "DELETE",
-						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/alumnos/{{alumno_id}}"
 					}
 				},
 				{
 					"name": "GET /alumnos/:id/carreras",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}/carreras"
+						"url": "{{AIKA_BASE_URL}}/api/v1/alumnos/{{alumno_id}}/carreras"
 					}
 				},
 				{
 					"name": "POST /alumnos/:id/carreras",
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}/carreras",
+						"url": "{{AIKA_BASE_URL}}/api/v1/alumnos/{{alumno_id}}/carreras",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -521,8 +539,8 @@
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{base_url}}/api/v1/cursadas?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/cursadas?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "cursadas"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -548,7 +566,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"url": "{{base_url}}/api/v1/cursadas",
+						"url": "{{AIKA_BASE_URL}}/api/v1/cursadas",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -560,14 +578,14 @@
 					"name": "GET /cursadas/:id",
 					"request": {
 						"method": "GET",
-						"url": "{{base_url}}/api/v1/cursadas/{{cursada_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/cursadas/{{cursada_id}}"
 					}
 				},
 				{
 					"name": "PUT /cursadas/:id",
 					"request": {
 						"method": "PUT",
-						"url": "{{base_url}}/api/v1/cursadas/{{cursada_id}}",
+						"url": "{{AIKA_BASE_URL}}/api/v1/cursadas/{{cursada_id}}",
 						"header": [{ "key": "Content-Type", "value": "application/json" }],
 						"body": {
 							"mode": "raw",
@@ -579,7 +597,7 @@
 					"name": "DELETE /cursadas/:id",
 					"request": {
 						"method": "DELETE",
-						"url": "{{base_url}}/api/v1/cursadas/{{cursada_id}}"
+						"url": "{{AIKA_BASE_URL}}/api/v1/cursadas/{{cursada_id}}"
 					}
 				}
 			]
@@ -592,9 +610,12 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
-						"url": "{{base_url}}/api/v1/lookups/estado-academico"
+						"url": "{{AIKA_BASE_URL}}/api/v1/lookups/estado-academico"
 					}
 				},
 				{
@@ -602,9 +623,12 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
-						"url": "{{base_url}}/api/v1/lookups/estado-cursada"
+						"url": "{{AIKA_BASE_URL}}/api/v1/lookups/estado-cursada"
 					}
 				},
 				{
@@ -612,9 +636,12 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
-						"url": "{{base_url}}/api/v1/lookups/tipo-cursada"
+						"url": "{{AIKA_BASE_URL}}/api/v1/lookups/tipo-cursada"
 					}
 				},
 				{
@@ -622,9 +649,12 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
-						"url": "{{base_url}}/api/v1/lookups/user-roles"
+						"url": "{{AIKA_BASE_URL}}/api/v1/lookups/user-roles"
 					}
 				}
 			]
@@ -637,11 +667,14 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/sources?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/sources?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "sources"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -660,11 +693,14 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/workspace/estudiantes?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/workspace/estudiantes?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "workspace", "estudiantes"],
 							"query": [
 								{ "key": "skip", "value": "0" },
@@ -678,11 +714,14 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/workspace/materias?skip=0&limit=20",
-							"host": ["{{base_url}}"],
+							"raw": "{{AIKA_BASE_URL}}/api/v1/workspace/materias?skip=0&limit=20",
+							"host": ["{{AIKA_BASE_URL}}"],
 							"path": ["api", "v1", "workspace", "materias"],
 							"query": [
 								{ "key": "skip", "value": "0" },
