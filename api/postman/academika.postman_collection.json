@@ -1,498 +1,697 @@
 {
-  "info": {
-    "name": "Académika API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Endpoints base de Académika — Fase 2 (tickets #3, #6)"
-  },
-  "variable": [
-    { "key": "base_url", "value": "http://localhost:8000", "type": "string" },
-    { "key": "access_token", "value": "", "type": "string" },
-    { "key": "refresh_token", "value": "", "type": "string" },
-    { "key": "degree_id", "value": "", "type": "string" },
-    { "key": "course_id", "value": "", "type": "string" },
-    { "key": "plan_id", "value": "", "type": "string" },
-    { "key": "student_id", "value": "", "type": "string" },
-    { "key": "enrollment_id", "value": "", "type": "string" },
-    { "key": "invite_token", "value": "", "type": "string" }
-  ],
-  "item": [
-    {
-      "name": "Health",
-      "item": [
-        {
-          "name": "GET /health",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/health"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Auth",
-      "item": [
-        {
-          "name": "POST /auth/login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  const json = pm.response.json();",
-                  "  pm.collectionVariables.set('access_token', json.access_token);",
-                  "  pm.collectionVariables.set('refresh_token', json.refresh_token);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/auth/login",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"lean@unq.edu.ar\",\n  \"password\": \"Test1234!\"\n}"
-            }
-          }
-        },
-        {
-          "name": "POST /auth/refresh",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "  const json = pm.response.json();",
-                  "  pm.collectionVariables.set('access_token', json.access_token);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/auth/refresh",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
-            }
-          }
-        },
-        {
-          "name": "POST /auth/invite",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/auth/invite",
-            "header": [
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Authorization", "value": "Bearer {{access_token}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"nuevo@unq.edu.ar\",\n  \"role\": \"docente\"\n}"
-            }
-          }
-        },
-        {
-          "name": "POST /auth/register",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code === 201) {",
-                  "  const json = pm.response.json();",
-                  "  pm.collectionVariables.set('access_token', json.access_token);",
-                  "  pm.collectionVariables.set('refresh_token', json.refresh_token);",
-                  "}"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/auth/register",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"token\": \"{{invite_token}}\",\n  \"password\": \"Test1234!\"\n}"
-            }
-          }
-        },
-        {
-          "name": "POST /auth/forgot-password",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/auth/forgot-password",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"lean@unq.edu.ar\"\n}"
-            }
-          }
-        },
-        {
-          "name": "POST /auth/reset-password",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/auth/reset-password",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"token\": \"\",\n  \"new_password\": \"NewPassword1!\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Carreras",
-      "item": [
-        {
-          "name": "GET /api/v1/carreras",
-          "request": {
-            "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
-            "url": {
-              "raw": "{{base_url}}/api/v1/carreras?skip=0&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "carreras"],
-              "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "20" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "POST /api/v1/carreras",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/carreras",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Tecnicatura en Programación Informática\",\n  \"code\": \"TPI\"\n}"
-            }
-          }
-        },
-        {
-          "name": "GET /api/v1/carreras/:id",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/carreras/{{degree_id}}"
-          }
-        },
-        {
-          "name": "PUT /api/v1/carreras/:id",
-          "request": {
-            "method": "PUT",
-            "url": "{{base_url}}/api/v1/carreras/{{degree_id}}",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Tecnicatura en Programación Informática (actualizada)\"\n}"
-            }
-          }
-        },
-        {
-          "name": "DELETE /api/v1/carreras/:id",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/v1/carreras/{{degree_id}}"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Materias",
-      "item": [
-        {
-          "name": "GET /api/v1/materias",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/v1/materias?skip=0&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "materias"],
-              "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "20" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "POST /api/v1/materias",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/materias",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Introducción a la Programación\",\n  \"code\": \"IP\",\n  \"abbreviation\": \"IntProg\"\n}"
-            }
-          }
-        },
-        {
-          "name": "GET /api/v1/materias/:id",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/materias/{{course_id}}"
-          }
-        },
-        {
-          "name": "PUT /api/v1/materias/:id",
-          "request": {
-            "method": "PUT",
-            "url": "{{base_url}}/api/v1/materias/{{course_id}}",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Introducción a la Programación (actualizada)\"\n}"
-            }
-          }
-        },
-        {
-          "name": "DELETE /api/v1/materias/:id",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/v1/materias/{{course_id}}"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Planes",
-      "item": [
-        {
-          "name": "GET /api/v1/planes",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/v1/planes?skip=0&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "planes"],
-              "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "20" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "POST /api/v1/planes",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/planes",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"degree_id\": \"{{degree_id}}\",\n  \"name\": \"Plan 2018\",\n  \"year\": 2018,\n  \"is_active\": true,\n  \"course_ids\": []\n}"
-            }
-          }
-        },
-        {
-          "name": "GET /api/v1/planes/:id",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/planes/{{plan_id}}"
-          }
-        },
-        {
-          "name": "PUT /api/v1/planes/:id",
-          "request": {
-            "method": "PUT",
-            "url": "{{base_url}}/api/v1/planes/{{plan_id}}",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"is_active\": false,\n  \"course_ids\": [\"{{course_id}}\"]\n}"
-            }
-          }
-        },
-        {
-          "name": "DELETE /api/v1/planes/:id",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/v1/planes/{{plan_id}}"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Alumnos",
-      "item": [
-        {
-          "name": "GET /api/v1/alumnos",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/v1/alumnos?skip=0&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "alumnos"],
-              "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "20" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "POST /api/v1/alumnos",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/alumnos",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"first_name\": \"Ana\",\n  \"last_name\": \"García\",\n  \"doc_id\": \"12345678\",\n  \"email\": \"ana.garcia@unq.edu.ar\",\n  \"degree_id\": \"{{degree_id}}\",\n  \"plan_id\": null,\n  \"academic_status\": \"alumno_regular\"\n}"
-            }
-          }
-        },
-        {
-          "name": "GET /api/v1/alumnos/:id",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/alumnos/{{student_id}}"
-          }
-        },
-        {
-          "name": "PUT /api/v1/alumnos/:id",
-          "request": {
-            "method": "PUT",
-            "url": "{{base_url}}/api/v1/alumnos/{{student_id}}",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"academic_status\": \"no_regular\"\n}"
-            }
-          }
-        },
-        {
-          "name": "DELETE /api/v1/alumnos/:id",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/v1/alumnos/{{student_id}}"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Inscripciones",
-      "item": [
-        {
-          "name": "GET /api/v1/inscripciones",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/v1/inscripciones?skip=0&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "inscripciones"],
-              "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "20" },
-                { "key": "student_id", "value": "", "disabled": true },
-                { "key": "course_id", "value": "", "disabled": true },
-                { "key": "year", "value": "", "disabled": true },
-                { "key": "term", "value": "", "disabled": true }
-              ]
-            }
-          }
-        },
-        {
-          "name": "POST /api/v1/inscripciones",
-          "request": {
-            "method": "POST",
-            "url": "{{base_url}}/api/v1/inscripciones",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"student_id\": \"{{student_id}}\",\n  \"course_id\": \"{{course_id}}\",\n  \"year\": 2024,\n  \"term\": \"1C\",\n  \"section\": null,\n  \"enrollment_type\": \"regular\",\n  \"enrollment_status\": \"inscripto\",\n  \"grade\": null,\n  \"enrolled_at\": null\n}"
-            }
-          }
-        },
-        {
-          "name": "GET /api/v1/inscripciones/:id",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/inscripciones/{{enrollment_id}}"
-          }
-        },
-        {
-          "name": "PUT /api/v1/inscripciones/:id",
-          "request": {
-            "method": "PUT",
-            "url": "{{base_url}}/api/v1/inscripciones/{{enrollment_id}}",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"enrollment_status\": \"regular\",\n  \"grade\": null\n}"
-            }
-          }
-        },
-        {
-          "name": "DELETE /api/v1/inscripciones/:id",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/v1/inscripciones/{{enrollment_id}}"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Lookups",
-      "item": [
-        {
-          "name": "GET /api/v1/lookups/academic-status",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/lookups/academic-status"
-          }
-        },
-        {
-          "name": "GET /api/v1/lookups/academic-status/:key",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/lookups/academic-status/alumno_regular"
-          }
-        },
-        {
-          "name": "GET /api/v1/lookups/enrollment-status",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/lookups/enrollment-status"
-          }
-        },
-        {
-          "name": "GET /api/v1/lookups/enrollment-status/:key",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/lookups/enrollment-status/inscripto"
-          }
-        },
-        {
-          "name": "GET /api/v1/lookups/enrollment-type",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/lookups/enrollment-type"
-          }
-        },
-        {
-          "name": "GET /api/v1/lookups/enrollment-type/:key",
-          "request": {
-            "method": "GET",
-            "url": "{{base_url}}/api/v1/lookups/enrollment-type/regular"
-          }
-        }
-      ]
-    }
-  ]
+	"info": {
+		"name": "Académika API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"description": "Endpoints de Académika. Fiel al código actual: los CRUD de dominio (carreras, materias, planes, alumnos, cursadas) aún no requieren auth — se protegerán en #65, donde se actualizará esta collection. El WebSocket `/ws` no se incluye (Postman v2.1 no lo soporta)."
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:8000", "type": "string" },
+		{ "key": "access_token", "value": "", "type": "string" },
+		{ "key": "refresh_token", "value": "", "type": "string" },
+		{ "key": "carrera_id", "value": "", "type": "string" },
+		{ "key": "materia_id", "value": "", "type": "string" },
+		{ "key": "plan_id", "value": "", "type": "string" },
+		{ "key": "alumno_id", "value": "", "type": "string" },
+		{ "key": "cursada_id", "value": "", "type": "string" },
+		{ "key": "user_id", "value": "", "type": "string" },
+		{ "key": "invite_token", "value": "", "type": "string" }
+	],
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "GET /health",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/health"
+					}
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "POST /auth/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const json = pm.response.json();",
+									"  pm.collectionVariables.set('access_token', json.access_token);",
+									"  pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/auth/login",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lean@unq.edu.ar\",\n  \"password\": \"Test1234!\"\n}"
+						}
+					}
+				},
+				{
+					"name": "POST /auth/refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const json = pm.response.json();",
+									"  pm.collectionVariables.set('access_token', json.access_token);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/auth/refresh",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						}
+					}
+				},
+				{
+					"name": "POST /auth/invite (admin)",
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/auth/invite",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"nuevo@unq.edu.ar\",\n  \"role\": \"docente\"\n}"
+						}
+					}
+				},
+				{
+					"name": "POST /auth/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  const json = pm.response.json();",
+									"  pm.collectionVariables.set('access_token', json.access_token);",
+									"  pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/auth/register",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{invite_token}}\",\n  \"password\": \"Test1234!\"\n}"
+						}
+					}
+				},
+				{
+					"name": "POST /auth/forgot-password",
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/auth/forgot-password",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"lean@unq.edu.ar\"\n}"
+						}
+					}
+				},
+				{
+					"name": "POST /auth/reset-password",
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/auth/reset-password",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"\",\n  \"new_password\": \"NewPassword1!\"\n}"
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Users",
+			"item": [
+				{
+					"name": "GET /admin/users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/admin/users?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "admin", "users"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "PUT /admin/users/:id",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": "{{base_url}}/api/v1/admin/users/{{user_id}}",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"docente\"\n}"
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Import",
+			"item": [
+				{
+					"name": "POST /admin/import-guarani",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [{ "key": "files", "type": "file", "src": [] }]
+						},
+						"url": "{{base_url}}/api/v1/admin/import-guarani"
+					}
+				}
+			]
+		},
+		{
+			"name": "Carreras",
+			"item": [
+				{
+					"name": "GET /carreras",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/carreras?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "carreras"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /carreras",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  pm.collectionVariables.set('carrera_id', pm.response.json().id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/carreras",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Tecnicatura en Programación Informática\",\n  \"codigo\": \"TPI\"\n}"
+						}
+					}
+				},
+				{
+					"name": "GET /carreras/:id",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/api/v1/carreras/{{carrera_id}}"
+					}
+				},
+				{
+					"name": "PUT /carreras/:id",
+					"request": {
+						"method": "PUT",
+						"url": "{{base_url}}/api/v1/carreras/{{carrera_id}}",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Tecnicatura en Programación Informática (actualizada)\"\n}"
+						}
+					}
+				},
+				{
+					"name": "DELETE /carreras/:id",
+					"request": {
+						"method": "DELETE",
+						"url": "{{base_url}}/api/v1/carreras/{{carrera_id}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Materias",
+			"item": [
+				{
+					"name": "GET /materias",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/materias?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "materias"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /materias",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  pm.collectionVariables.set('materia_id', pm.response.json().id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/materias",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Introducción a la Programación\",\n  \"codigo\": \"IP\",\n  \"sigla\": \"IP\",\n  \"creditos\": 4\n}"
+						}
+					}
+				},
+				{
+					"name": "GET /materias/:id",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/api/v1/materias/{{materia_id}}"
+					}
+				},
+				{
+					"name": "PUT /materias/:id",
+					"request": {
+						"method": "PUT",
+						"url": "{{base_url}}/api/v1/materias/{{materia_id}}",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"creditos\": 5\n}"
+						}
+					}
+				},
+				{
+					"name": "DELETE /materias/:id",
+					"request": {
+						"method": "DELETE",
+						"url": "{{base_url}}/api/v1/materias/{{materia_id}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Planes",
+			"item": [
+				{
+					"name": "GET /planes",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/planes?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "planes"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /planes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  pm.collectionVariables.set('plan_id', pm.response.json().id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/planes",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carrera_id\": \"{{carrera_id}}\",\n  \"nombre\": \"Plan 2026\",\n  \"anio\": 2026,\n  \"vigente\": true,\n  \"materia_ids\": []\n}"
+						}
+					}
+				},
+				{
+					"name": "GET /planes/:id",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/api/v1/planes/{{plan_id}}"
+					}
+				},
+				{
+					"name": "PUT /planes/:id",
+					"request": {
+						"method": "PUT",
+						"url": "{{base_url}}/api/v1/planes/{{plan_id}}",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vigente\": false\n}"
+						}
+					}
+				},
+				{
+					"name": "DELETE /planes/:id",
+					"request": {
+						"method": "DELETE",
+						"url": "{{base_url}}/api/v1/planes/{{plan_id}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Alumnos",
+			"item": [
+				{
+					"name": "GET /alumnos",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/alumnos?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "alumnos"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /alumnos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  pm.collectionVariables.set('alumno_id', pm.response.json().id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/alumnos",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"dni\": \"12345678\",\n  \"email\": \"juan@unq.edu.ar\"\n}"
+						}
+					}
+				},
+				{
+					"name": "GET /alumnos/:id",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}"
+					}
+				},
+				{
+					"name": "PUT /alumnos/:id",
+					"request": {
+						"method": "PUT",
+						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"juan.perez@unq.edu.ar\"\n}"
+						}
+					}
+				},
+				{
+					"name": "DELETE /alumnos/:id",
+					"request": {
+						"method": "DELETE",
+						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}"
+					}
+				},
+				{
+					"name": "GET /alumnos/:id/carreras",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}/carreras"
+					}
+				},
+				{
+					"name": "POST /alumnos/:id/carreras",
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/alumnos/{{alumno_id}}/carreras",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plan_id\": \"{{plan_id}}\",\n  \"fecha_ingreso\": \"2026-03-01\",\n  \"estado_academico\": \"alumno_regular\"\n}"
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cursadas",
+			"item": [
+				{
+					"name": "GET /cursadas",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/cursadas?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "cursadas"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "POST /cursadas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"  pm.collectionVariables.set('cursada_id', pm.response.json().id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/api/v1/cursadas",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"alumno_id\": \"{{alumno_id}}\",\n  \"materia_id\": \"{{materia_id}}\",\n  \"carrera_id\": \"{{carrera_id}}\",\n  \"anio\": 2026,\n  \"cuatrimestre\": \"1\",\n  \"comision\": \"A\",\n  \"tipo_cursada\": \"regular\",\n  \"estado_cursada\": \"inscripto\"\n}"
+						}
+					}
+				},
+				{
+					"name": "GET /cursadas/:id",
+					"request": {
+						"method": "GET",
+						"url": "{{base_url}}/api/v1/cursadas/{{cursada_id}}"
+					}
+				},
+				{
+					"name": "PUT /cursadas/:id",
+					"request": {
+						"method": "PUT",
+						"url": "{{base_url}}/api/v1/cursadas/{{cursada_id}}",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado_cursada\": \"aprobado\",\n  \"nota\": \"8\"\n}"
+						}
+					}
+				},
+				{
+					"name": "DELETE /cursadas/:id",
+					"request": {
+						"method": "DELETE",
+						"url": "{{base_url}}/api/v1/cursadas/{{cursada_id}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Lookups",
+			"item": [
+				{
+					"name": "GET /lookups/estado-academico",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": "{{base_url}}/api/v1/lookups/estado-academico"
+					}
+				},
+				{
+					"name": "GET /lookups/estado-cursada",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": "{{base_url}}/api/v1/lookups/estado-cursada"
+					}
+				},
+				{
+					"name": "GET /lookups/tipo-cursada",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": "{{base_url}}/api/v1/lookups/tipo-cursada"
+					}
+				},
+				{
+					"name": "GET /lookups/user-roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": "{{base_url}}/api/v1/lookups/user-roles"
+					}
+				}
+			]
+		},
+		{
+			"name": "Sources",
+			"item": [
+				{
+					"name": "GET /sources",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/sources?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "sources"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Workspace",
+			"item": [
+				{
+					"name": "GET /workspace/estudiantes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspace/estudiantes?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspace", "estudiantes"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /workspace/materias",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{access_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workspace/materias?skip=0&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "workspace", "materias"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				}
+			]
+		}
+	]
 }
