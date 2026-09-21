@@ -74,6 +74,52 @@ export default function AdminPage() {
 
 Cada carpeta de dominio tiene un `index.ts` con barrel exports.
 
+### Lookups
+
+Los lookups (`/api/v1/lookups/*`) se consumen por el módulo central `web/src/lib/api/lookups.ts`, con el
+tipo `{ key, label }` fiel al `LookupResponse` del API. Los hooks van en `web/src/hooks/lookups.ts`
+(ej. `useUserRoles`).
+
+Usar el lookup en vez de hardcodear labels en el frontend: los labels viven en las tablas `lkp_*`, y
+hardcodearlos desincroniza la UI del backend (ej. `UsersTable` mostraba "Director" mientras el lookup
+dice "Director de Carrera").
+
+Si dos componentes hermanos necesitan el mismo lookup, se fetchea **una sola vez en el padre** y se baja
+como prop — no un hook por componente (serían requests duplicados).
+
+---
+
+## BFF / route handlers (frontend)
+
+El navegador nunca habla directo con la API: toda llamada pasa por un route handler de Next en
+`web/src/app/api/**` (patrón BFF). El token de sesión vive en una cookie httpOnly, así que el JS del
+cliente no lo ve ni lo maneja.
+
+- Los handlers se envuelven con `apiHandler` (`web/src/lib/api/route.ts`): traduce `RouteError` a
+  `{ error, status }` y cualquier otra excepción a un 500 genérico.
+- Para endpoints autenticados se usa `fetchWithToken(req, url, init)`: lee la cookie `access_token`,
+  agrega `Authorization: Bearer` y, ante 401/403, lanza `RouteError` con el `detail` que devolvió la API
+  (así el usuario ve "El email debe pertenecer al dominio @unq.edu.ar" y no un "No autorizado" genérico).
+- Las funciones cliente viven en `web/src/lib/api/*` y devuelven `ApiResult<T>`
+  (`{ ok: true, data } | { ok: false, error }`). Para endpoints sin payload existe `OkResponse`.
+
+### Endpoints con 204 → el proxy responde `ok()`
+
+`parseResult` de `lib/api/client.ts` siempre hace `res.json()` en respuestas 2xx. Si el API devuelve 204
+sin body (invite, forgot-password, ...), el route handler responde `ok()` (`{ ok: true }`) para que el
+cliente no falle parseando un body vacío.
+
+### Mapear el error del API, no tragárselo
+
+Los handlers propagan el `detail` del API en los códigos que el usuario puede corregir (409, y 422 con
+el primer `msg` de la lista de Pydantic); el resto cae al genérico:
+
+```typescript
+if (res.ok) return ok();
+const { detail } = (await res.json().catch(() => ({}))) as { detail?: string };
+if (res.status === 409 && typeof detail === "string") throw new RouteError(detail, 409);
+```
+
 ---
 
 ## Variables de entorno
@@ -131,6 +177,22 @@ npm run test     # vitest run (no-watch)
 make test-web
 make test        # api unit + web
 ```
+
+### Testing de route handlers (BFF)
+
+Los route handlers también se testean con Vitest + jsdom: se construye un `NextRequest` y se stubea el
+`fetch` global (el handler llama a la API real vía `fetchWithToken`).
+
+```typescript
+vi.stubGlobal("fetch", vi.fn());
+vi.mocked(fetch).mockResolvedValue(new Response(null, { status: 204 }));
+
+const res = await POST(makeRequest("token-admin")); // NextRequest con cookie access_token
+expect(await res.json()).toEqual({ ok: true });
+```
+
+Casos que valen la pena: 204 del API → `ok()`, error del API con `detail` (409/401), 422 con lista de
+`msg`, y request sin cookie → 401 sin llamar a `fetch`. Ver `web/src/app/api/auth/invite/route.test.ts`.
 
 ### Unit vs Integration
 
