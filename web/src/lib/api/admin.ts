@@ -1,4 +1,11 @@
-import { type ApiResult, get, postFormData, put } from "./client";
+import {
+	type ApiResult,
+	get,
+	type OkResponse,
+	post,
+	postFormData,
+	put,
+} from "./client";
 
 export type UserRole = "admin" | "director" | "docente";
 
@@ -35,6 +42,13 @@ export function updateUser(
 	data: UserUpdate,
 ): Promise<ApiResult<UserItem>> {
 	return put<UserItem>(`/api/admin/users/${id}`, data);
+}
+
+export function inviteUser(
+	email: string,
+	role: UserRole,
+): Promise<ApiResult<OkResponse>> {
+	return post("/api/auth/invite", { email, role });
 }
 
 export function uploadGuaraniSheets(

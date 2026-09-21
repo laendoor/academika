@@ -30,19 +30,10 @@ export interface CarreraOption {
 	nombre: string;
 }
 
-export interface EstadoOption {
-	key: string;
-	nombre: string;
-}
-
 export function getCarreras(): Promise<
 	ApiResult<{ total: number; items: CarreraOption[] }>
 > {
 	return get("/api/carreras");
-}
-
-export function getEstadosAcademicos(): Promise<ApiResult<EstadoOption[]>> {
-	return get("/api/lookups/estado-academico");
 }
 
 export interface PlanInfo {

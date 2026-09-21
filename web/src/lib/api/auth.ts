@@ -1,9 +1,9 @@
-import { type ApiResult, post } from "./client";
+import { type ApiResult, type OkResponse, post } from "./client";
 
 export function login(
 	email: string,
 	password: string,
-): Promise<ApiResult<{ ok: true }>> {
+): Promise<ApiResult<OkResponse>> {
 	return post("/api/auth/login", { email, password });
 }
 
@@ -16,13 +16,13 @@ export function forgotPassword(
 export function resetPassword(
 	token: string,
 	newPassword: string,
-): Promise<ApiResult<{ ok: true }>> {
+): Promise<ApiResult<OkResponse>> {
 	return post("/api/auth/reset-password", { token, new_password: newPassword });
 }
 
 export function register(
 	token: string,
 	password: string,
-): Promise<ApiResult<{ ok: true }>> {
+): Promise<ApiResult<OkResponse>> {
 	return post("/api/auth/register", { token, password });
 }
