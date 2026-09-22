@@ -34,3 +34,7 @@ def require_role(*roles: str):
         return user
 
     return dependency
+
+
+AdminRole = Depends(require_role("admin"))
+DirectorOrAdminRole = Depends(require_role("director", "admin"))

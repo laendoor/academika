@@ -3,11 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.common import PaginatedResponse
 from app.schemas.planes_de_estudio import PlanDeEstudioCreate, PlanDeEstudioResponse, PlanDeEstudioUpdate
 from app.services.planes_de_estudio import PlanDeEstudioService
 
-router = APIRouter()
+router = APIRouter(dependencies=[DirectorOrAdminRole])
 
 ServiceDep = Annotated[PlanDeEstudioService, Depends(PlanDeEstudioService.dep)]
 

@@ -3,11 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.common import PaginatedResponse
 from app.schemas.materias import MateriaCreate, MateriaResponse, MateriaUpdate
 from app.services.materias import MateriaService
 
-router = APIRouter()
+router = APIRouter(dependencies=[DirectorOrAdminRole])
 
 ServiceDep = Annotated[MateriaService, Depends(MateriaService.dep)]
 

@@ -1,4 +1,4 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 
 import pytest
 import pytest_asyncio
@@ -140,8 +140,8 @@ async def clean_db(test_engine: AsyncEngine) -> AsyncGenerator[None]:
 
 
 @pytest_asyncio.fixture
-async def client(session_factory) -> AsyncGenerator[AsyncClient]:
-    """Cliente HTTP con sesión del mismo engine que el resto del test."""
+async def client_factory(session_factory) -> AsyncGenerator[Callable[..., AsyncClient]]:
+    """Crea clients HTTP con overrides de sesión; `headers` quedan como default del client."""
 
     async def override_get_session():
         async with session_factory() as session:
@@ -152,9 +152,31 @@ async def client(session_factory) -> AsyncGenerator[AsyncClient]:
 
     app.dependency_overrides[get_session] = override_get_session
     app.dependency_overrides[get_session_factory] = override_get_session_factory
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
-        yield c
+
+    clients: list[AsyncClient] = []
+
+    def make(headers: dict[str, str] | None = None) -> AsyncClient:
+        client = AsyncClient(transport=ASGITransport(app=app), base_url="http://test", headers=headers)
+        clients.append(client)
+        return client
+
+    yield make
+
+    for client in clients:
+        await client.aclose()
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def client(client_factory) -> AsyncGenerator[AsyncClient]:
+    """Cliente sin auth — para tests de 401/403."""
+    yield client_factory()
+
+
+@pytest_asyncio.fixture
+async def auth_client(client_factory, director_token: str) -> AsyncGenerator[AsyncClient]:
+    """Cliente con Authorization de director por default — cubre los endpoints dir+admin."""
+    yield client_factory(headers={"Authorization": f"Bearer {director_token}"})
 
 
 @pytest_asyncio.fixture
@@ -190,3 +212,8 @@ async def test_admin(db_session: AsyncSession) -> User:
 @pytest_asyncio.fixture
 async def admin_token(test_admin: User) -> str:
     return create_access_token(test_admin.id, test_admin.role, test_admin.email)
+
+
+@pytest_asyncio.fixture
+async def director_token(test_user: User) -> str:
+    return create_access_token(test_user.id, test_user.role, test_user.email)

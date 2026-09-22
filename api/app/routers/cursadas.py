@@ -3,11 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.common import PaginatedResponse
 from app.schemas.cursadas import CursadaCreate, CursadaResponse, CursadaUpdate
 from app.services.cursadas import CursadaService
 
-router = APIRouter()
+router = APIRouter(dependencies=[DirectorOrAdminRole])
 
 ServiceDep = Annotated[CursadaService, Depends(CursadaService.dep)]
 

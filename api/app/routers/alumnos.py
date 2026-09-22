@@ -3,11 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.alumnos import AlumnoCarreraCreate, AlumnoCarreraResponse, AlumnoCreate, AlumnoResponse, AlumnoUpdate
 from app.schemas.common import PaginatedResponse
 from app.services.alumnos import AlumnoService
 
-router = APIRouter()
+router = APIRouter(dependencies=[DirectorOrAdminRole])
 
 ServiceDep = Annotated[AlumnoService, Depends(AlumnoService.dep)]
 

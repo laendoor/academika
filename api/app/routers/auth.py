@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.auth.dependencies import require_role
+from app.auth.dependencies import AdminRole
 from app.schemas.auth import (
     ForgotPasswordRequest,
     InviteRequest,
@@ -19,7 +19,6 @@ from app.services.auth import AuthService
 router = APIRouter()
 
 ServiceDep = Annotated[AuthService, Depends(AuthService.dep)]
-AdminRole = Depends(require_role("admin"))
 
 
 @router.post("/login", response_model=LoginResponse)

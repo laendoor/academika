@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from app.auth.dependencies import require_role
+from app.auth.dependencies import DirectorOrAdminRole
 from app.models.plan_de_estudio import PlanDeEstudio
 from app.schemas.common import PaginatedResponse
 from app.schemas.workspace import AlumnoRowResponse, MateriaRowResponse, PlanInfo, _CarreraInfo
@@ -11,7 +11,6 @@ from app.services.workspace_studio import WorkspaceStudioService
 
 router = APIRouter()
 
-DirectorOrAdminRole = Depends(require_role("director", "admin"))
 ServiceDep = Annotated[WorkspaceStudioService, Depends(WorkspaceStudioService.dep)]
 
 
