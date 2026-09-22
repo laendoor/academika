@@ -210,6 +210,21 @@ async def test_admin(db_session: AsyncSession) -> User:
 
 
 @pytest_asyncio.fixture
+async def test_docente(db_session: AsyncSession) -> User:
+    user = User(
+        id=generate_uuid(),
+        email="docente@unq.edu.ar",
+        hashed_password=hash_password("docente123"),
+        role="docente",
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
 async def admin_token(test_admin: User) -> str:
     return create_access_token(test_admin.id, test_admin.role, test_admin.email)
 
@@ -217,3 +232,8 @@ async def admin_token(test_admin: User) -> str:
 @pytest_asyncio.fixture
 async def director_token(test_user: User) -> str:
     return create_access_token(test_user.id, test_user.role, test_user.email)
+
+
+@pytest_asyncio.fixture
+async def docente_token(test_docente: User) -> str:
+    return create_access_token(test_docente.id, test_docente.role, test_docente.email)
