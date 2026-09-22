@@ -2,14 +2,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from app.auth.dependencies import require_role
+from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.common import PaginatedResponse
 from app.schemas.log_events import SourceResponse
 from app.services.log_events import LogEventService
 
 router = APIRouter()
 
-DirectorOrAdminRole = Depends(require_role("director", "admin"))
 ServiceDep = Annotated[LogEventService, Depends(LogEventService.dep)]
 
 

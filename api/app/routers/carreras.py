@@ -3,11 +3,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.carreras import CarreraCreate, CarreraResponse, CarreraUpdate
 from app.schemas.common import PaginatedResponse
 from app.services.carreras import CarreraService
 
-router = APIRouter()
+router = APIRouter(dependencies=[DirectorOrAdminRole])
 
 ServiceDep = Annotated[CarreraService, Depends(CarreraService.dep)]
 
