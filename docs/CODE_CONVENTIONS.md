@@ -273,6 +273,42 @@ a un modelo completo con `mapped_column()`.
 
 ---
 
+## Auth y autorización de endpoints (backend)
+
+Todo endpoint nace **con auth**. Los únicos públicos son la whitelist explícita: `GET /health`,
+`POST /auth/login`, `POST /auth/register`, `POST /auth/refresh`, `POST /auth/forgot-password` y
+`POST /auth/reset-password`. Agregar un endpoint público es la excepción y queda acá.
+
+### Niveles de acceso
+
+Los aliases viven en `app/auth/dependencies.py` — los routers no definen los suyos:
+
+| Alias                 | Rol            | Endpoints                                                                              |
+| --------------------- | -------------- | -------------------------------------------------------------------------------------- |
+| `AdminRole`           | admin          | `auth/invite`, `admin/users`, `admin/import-guarani`                                   |
+| `DirectorOrAdminRole` | director+admin | CRUD (`carreras`, `materias`, `planes`, `alumnos`, `cursadas`), `sources`, `workspace` |
+| `CurrentUser`         | autenticado    | `lookups`                                                                              |
+
+El director es el gestor de los datos de su carrera: accede a lectura **y escritura** de los CRUD.
+`docente` no accede a ninguno de estos endpoints (todavía no tiene superficie en la app).
+
+### Cómo declarar la dependencia
+
+- Router uniforme (todos los métodos, mismo nivel): `APIRouter(dependencies=[DirectorOrAdminRole])`.
+- Nivel distinto por método: `dependencies=[...]` en el decorador de la ruta.
+- El handler necesita el usuario: agregar el parámetro (`user: CurrentUser`), no re-declarar la dep.
+  FastAPI cachea `get_current_user` por request, así que el parámetro no suma queries.
+
+### Tests de acceso (integración)
+
+- `client` — sin auth: para 401 (falta token) y 403 (token de rol sin permiso).
+- `auth_client` — token de director por default: para flujos funcionales de endpoints dir+admin.
+- `admin_token` / `docente_token` — para casos puntuales por rol.
+- La matriz 401/403 de los CRUD vive en `tests/integration/test_crud_auth.py`: al agregar un
+  endpoint CRUD, sumarlo a `CRUD_ENDPOINTS`.
+
+---
+
 ## Services
 
 Cada service es responsable de las queries sobre sus propios modelos.
