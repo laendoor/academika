@@ -30,3 +30,23 @@ export const PUT = route.apiHandler(async (req: NextRequest, ctx) => {
 
 	return NextResponse.json(await res.json());
 });
+
+export const DELETE = route.apiHandler(async (req: NextRequest, ctx) => {
+	if (!ctx) throw new route.RouteError("Falta contexto", 400);
+	const { id } = await ctx.params;
+
+	const res = await route.fetchWithToken(
+		req,
+		`${API_URL}/api/v1/admin/users/${id}`,
+		{ method: "DELETE" },
+	);
+
+	if (!res.ok) {
+		const json = (await res.json().catch(() => ({}))) as { detail?: string };
+		const message =
+			typeof json.detail === "string" ? json.detail : route.UNEXPECTED_ERROR;
+		throw new route.RouteError(message, res.status >= 500 ? 500 : res.status);
+	}
+
+	return route.ok();
+});

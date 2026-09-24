@@ -46,6 +46,10 @@ export function put<T>(path: string, body: unknown): Promise<ApiResult<T>> {
 	return request("PUT", path, body);
 }
 
+export function del<T>(path: string): Promise<ApiResult<T>> {
+	return request("DELETE", path);
+}
+
 export async function postFormData<T>(
 	path: string,
 	formData: FormData,

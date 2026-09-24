@@ -9,7 +9,15 @@ import { useAdminUsers } from "@/hooks/admin";
 import { useUserRoles } from "@/hooks/lookups";
 
 export function UsersPanel() {
-	const { users, loading, error, updating, handleUpdate } = useAdminUsers();
+	const {
+		users,
+		loading,
+		error,
+		updating,
+		deleting,
+		handleUpdate,
+		handleDelete,
+	} = useAdminUsers();
 	const { roles, loading: rolesLoading, error: rolesError } = useUserRoles();
 	const [showInvite, setShowInvite] = useState(false);
 
@@ -35,7 +43,9 @@ export function UsersPanel() {
 				users={users}
 				roles={roles}
 				updating={updating}
+				deleting={deleting}
 				onUpdate={handleUpdate}
+				onDelete={handleDelete}
 			/>
 		</div>
 	);

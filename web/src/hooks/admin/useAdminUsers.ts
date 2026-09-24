@@ -8,6 +8,7 @@ export function useAdminUsers() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | undefined>();
 	const [updating, setUpdating] = useState<string | null>(null);
+	const [deleting, setDeleting] = useState<string | null>(null);
 
 	useEffect(() => {
 		admin.getUsers().then((result) => {
@@ -30,5 +31,24 @@ export function useAdminUsers() {
 		}
 	}
 
-	return { users, loading, error, updating, handleUpdate };
+	async function handleDelete(id: string) {
+		setDeleting(id);
+		const result = await admin.deleteUser(id);
+		setDeleting(null);
+		if (result.ok) {
+			setUsers((prev) => prev.filter((u) => u.id !== id));
+		} else {
+			setError(result.error);
+		}
+	}
+
+	return {
+		users,
+		loading,
+		error,
+		updating,
+		deleting,
+		handleUpdate,
+		handleDelete,
+	};
 }

@@ -47,7 +47,9 @@ function mockPanel({
 		loading,
 		error,
 		updating: null,
+		deleting: null,
 		handleUpdate: vi.fn(),
+		handleDelete: vi.fn(),
 	});
 	useUserRolesMock.mockReturnValue({
 		roles: ROLES,

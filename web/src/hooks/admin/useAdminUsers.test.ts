@@ -7,10 +7,12 @@ import * as admin from "@/lib/api/admin";
 vi.mock("@/lib/api/admin", () => ({
 	getUsers: vi.fn(),
 	updateUser: vi.fn(),
+	deleteUser: vi.fn(),
 }));
 
 const getUsers = vi.mocked(admin.getUsers);
 const updateUser = vi.mocked(admin.updateUser);
+const deleteUser = vi.mocked(admin.deleteUser);
 
 function makeUser(id: string): admin.UserItem {
 	return {
@@ -67,5 +69,46 @@ describe("useAdminUsers", () => {
 
 		expect(updateUser).toHaveBeenCalledWith("u1", { role: "admin" });
 		expect(result.current.users[0].role).toBe("admin");
+	});
+
+	it("elimina el usuario de la lista al borrar", async () => {
+		getUsers.mockResolvedValue({
+			ok: true,
+			data: { total: 2, items: [makeUser("u1"), makeUser("u2")] },
+		});
+		deleteUser.mockResolvedValue({ ok: true, data: { ok: true } });
+
+		const { result } = renderHook(() => useAdminUsers());
+		await waitFor(() => expect(result.current.loading).toBe(false));
+
+		await act(async () => {
+			await result.current.handleDelete("u1");
+		});
+
+		expect(deleteUser).toHaveBeenCalledWith("u1");
+		expect(result.current.users.map((u) => u.id)).toEqual(["u2"]);
+	});
+
+	it("setea error cuando falla el delete", async () => {
+		getUsers.mockResolvedValue({
+			ok: true,
+			data: { total: 1, items: [makeUser("u1")] },
+		});
+		deleteUser.mockResolvedValue({
+			ok: false,
+			error: "El usuario tiene eventos de log asociados",
+		});
+
+		const { result } = renderHook(() => useAdminUsers());
+		await waitFor(() => expect(result.current.loading).toBe(false));
+
+		await act(async () => {
+			await result.current.handleDelete("u1");
+		});
+
+		expect(result.current.error).toBe(
+			"El usuario tiene eventos de log asociados",
+		);
+		expect(result.current.users).toHaveLength(1);
 	});
 });

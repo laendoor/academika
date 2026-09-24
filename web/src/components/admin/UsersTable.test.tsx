@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { UsersTable } from "@/components/admin/UsersTable";
-import type { UserItem } from "@/lib/api/admin";
+import type { UserItem, UserUpdate } from "@/lib/api/admin";
 import type { LookupOption } from "@/lib/api/lookups";
 
 const ROLES: LookupOption[] = [
@@ -23,16 +23,38 @@ function makeUser(overrides: Partial<UserItem> = {}): UserItem {
 	};
 }
 
+function renderTable({
+	users = [makeUser()],
+	updating = null,
+	deleting = null,
+	onUpdate = vi.fn(),
+	onDelete = vi.fn(),
+}: {
+	users?: UserItem[];
+	updating?: string | null;
+	deleting?: string | null;
+	onUpdate?: (id: string, data: UserUpdate) => void;
+	onDelete?: (id: string) => void;
+} = {}) {
+	render(
+		<UsersTable
+			users={users}
+			roles={ROLES}
+			updating={updating}
+			deleting={deleting}
+			onUpdate={onUpdate}
+			onDelete={onDelete}
+		/>,
+	);
+}
+
 describe("UsersTable", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it("renderiza email, rol y estado", () => {
-		render(
-			<UsersTable
-				users={[makeUser()]}
-				roles={ROLES}
-				updating={null}
-				onUpdate={vi.fn()}
-			/>,
-		);
+		renderTable();
 
 		expect(screen.getByText("a@unq.edu.ar")).toBeInTheDocument();
 		expect(screen.getByText("Director de Carrera")).toBeInTheDocument();
@@ -41,14 +63,7 @@ describe("UsersTable", () => {
 
 	it("llama onUpdate al cambiar el rol", () => {
 		const onUpdate = vi.fn();
-		render(
-			<UsersTable
-				users={[makeUser()]}
-				roles={ROLES}
-				updating={null}
-				onUpdate={onUpdate}
-			/>,
-		);
+		renderTable({ onUpdate });
 
 		fireEvent.change(screen.getByRole("combobox"), {
 			target: { value: "admin" },
@@ -59,14 +74,7 @@ describe("UsersTable", () => {
 
 	it("llama onUpdate al alternar el estado", () => {
 		const onUpdate = vi.fn();
-		render(
-			<UsersTable
-				users={[makeUser()]}
-				roles={ROLES}
-				updating={null}
-				onUpdate={onUpdate}
-			/>,
-		);
+		renderTable({ onUpdate });
 
 		fireEvent.click(screen.getByRole("button", { name: "Activo" }));
 
@@ -74,16 +82,37 @@ describe("UsersTable", () => {
 	});
 
 	it("deshabilita controles mientras actualiza ese usuario", () => {
-		render(
-			<UsersTable
-				users={[makeUser()]}
-				roles={ROLES}
-				updating="u1"
-				onUpdate={vi.fn()}
-			/>,
-		);
+		renderTable({ updating: "u1" });
 
 		expect(screen.getByRole("combobox")).toBeDisabled();
 		expect(screen.getByRole("button", { name: "Activo" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Eliminar" })).toBeDisabled();
+	});
+
+	it("llama onDelete al confirmar la eliminación", () => {
+		const onDelete = vi.fn();
+		const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+		renderTable({ onDelete });
+
+		fireEvent.click(screen.getByRole("button", { name: "Eliminar" }));
+
+		expect(confirmSpy).toHaveBeenCalled();
+		expect(onDelete).toHaveBeenCalledWith("u1");
+	});
+
+	it("no llama onDelete si se cancela la confirmación", () => {
+		const onDelete = vi.fn();
+		vi.spyOn(window, "confirm").mockReturnValue(false);
+		renderTable({ onDelete });
+
+		fireEvent.click(screen.getByRole("button", { name: "Eliminar" }));
+
+		expect(onDelete).not.toHaveBeenCalled();
+	});
+
+	it("deshabilita el botón de eliminar mientras borra ese usuario", () => {
+		renderTable({ deleting: "u1" });
+
+		expect(screen.getByRole("button", { name: "Eliminar" })).toBeDisabled();
 	});
 });
