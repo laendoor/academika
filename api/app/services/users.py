@@ -1,8 +1,9 @@
 import uuid
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
-from app.errors import BusinessError
+from app.errors import BusinessError, ConflictError
 from app.models.user import User
 from app.schemas.users import UserCreate, UserUpdate
 from app.services.base import BaseService
@@ -35,3 +36,16 @@ class UserService(BaseService[User, UserCreate, UserUpdate]):
         if new_role == "admin" and new_active:
             return
         raise BusinessError("Un admin no puede quitarse el rol admin ni desactivarse a sí mismo")
+
+    async def delete(self, id: uuid.UUID, requester_id: uuid.UUID) -> None:
+        instance = await self.get_by_id(id)
+        self._ensure_no_self_delete(instance, requester_id)
+        try:
+            await super().delete(id)
+        except IntegrityError as e:
+            await self.session.rollback()
+            raise ConflictError("El usuario tiene eventos de log asociados") from e
+
+    def _ensure_no_self_delete(self, instance: User, requester_id: uuid.UUID) -> None:
+        if requester_id == instance.id:
+            raise BusinessError("Un admin no puede eliminarse a sí mismo")

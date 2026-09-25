@@ -1,5 +1,6 @@
 import {
 	type ApiResult,
+	del,
 	get,
 	type OkResponse,
 	post,
@@ -42,6 +43,10 @@ export function updateUser(
 	data: UserUpdate,
 ): Promise<ApiResult<UserItem>> {
 	return put<UserItem>(`/api/admin/users/${id}`, data);
+}
+
+export function deleteUser(id: string): Promise<ApiResult<OkResponse>> {
+	return del<OkResponse>(`/api/admin/users/${id}`);
 }
 
 export function inviteUser(

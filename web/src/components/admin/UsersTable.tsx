@@ -1,3 +1,5 @@
+import { Trash2 } from "lucide-react";
+
 import { Table, Tbody, Th } from "@/components/ui/Table";
 import type { UserItem, UserRole, UserUpdate } from "@/lib/api/admin";
 import type { LookupOption } from "@/lib/api/lookups";
@@ -58,13 +60,27 @@ function UserRow({
 	user,
 	roles,
 	isUpdating,
+	isDeleting,
 	onUpdate,
+	onDelete,
 }: {
 	user: UserItem;
 	roles: LookupOption[];
 	isUpdating: boolean;
+	isDeleting: boolean;
 	onUpdate: (id: string, data: UserUpdate) => void;
+	onDelete: (id: string) => void;
 }) {
+	function handleDelete() {
+		if (
+			window.confirm(
+				`¿Eliminar a ${user.email}? Esta acción no se puede deshacer.`,
+			)
+		) {
+			onDelete(user.id);
+		}
+	}
+
 	return (
 		<tr className="bg-white">
 			<td className="px-4 py-3 text-zinc-800">{user.email}</td>
@@ -83,6 +99,17 @@ function UserRow({
 					onToggle={() => onUpdate(user.id, { is_active: !user.is_active })}
 				/>
 			</td>
+			<td className="px-4 py-3 text-right">
+				<button
+					type="button"
+					aria-label="Eliminar"
+					disabled={isUpdating || isDeleting}
+					onClick={handleDelete}
+					className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+				>
+					<Trash2 className="h-4 w-4" />
+				</button>
+			</td>
 		</tr>
 	);
 }
@@ -91,12 +118,16 @@ export function UsersTable({
 	users,
 	roles,
 	updating,
+	deleting,
 	onUpdate,
+	onDelete,
 }: {
 	users: UserItem[];
 	roles: LookupOption[];
 	updating: string | null;
+	deleting: string | null;
 	onUpdate: (id: string, data: UserUpdate) => void;
+	onDelete: (id: string) => void;
 }) {
 	return (
 		<Table>
@@ -105,6 +136,9 @@ export function UsersTable({
 					<Th>Email</Th>
 					<Th>Rol</Th>
 					<Th>Estado</Th>
+					<Th>
+						<span className="sr-only">Acciones</span>
+					</Th>
 				</tr>
 			</thead>
 			<Tbody>
@@ -114,7 +148,9 @@ export function UsersTable({
 						user={user}
 						roles={roles}
 						isUpdating={updating === user.id}
+						isDeleting={deleting === user.id}
 						onUpdate={onUpdate}
+						onDelete={onDelete}
 					/>
 				))}
 			</Tbody>

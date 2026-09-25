@@ -203,6 +203,19 @@
 							"raw": "{\n  \"role\": \"docente\"\n}"
 						}
 					}
+				},
+				{
+					"name": "DELETE /admin/users/:id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": "{{AIKA_BASE_URL}}/api/v1/admin/users/{{AIKA_USER_ID}}"
+					}
 				}
 			]
 		},
