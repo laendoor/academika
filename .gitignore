@@ -34,7 +34,6 @@ datos-prueba/*_anon.*
 # Coverage
 .coverage*
 coverage.xml
-htmlcov/
 coverage/
 
 # OS

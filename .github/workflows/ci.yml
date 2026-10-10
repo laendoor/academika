@@ -42,6 +42,7 @@ jobs:
         with:
           files: api/coverage.xml
           flags: backend
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
   alembic-check:
@@ -106,6 +107,7 @@ jobs:
         with:
           files: web/coverage/lcov.info
           flags: frontend
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Build
         run: cd web && npm run build
