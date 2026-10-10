@@ -20,6 +20,40 @@
 cd /opt/academika && docker compose -f compose.prod.yaml exec -it api uv run python -m seeds.create_admin
 ```
 
+## Log viewer (Dozzle)
+
+`compose.prod.yaml` incluye Dozzle (`amir20/dozzle:v11`), solo vía nginx en
+`https://academika.net.ar/logs/` con login propio. En local prende junto al
+resto (`http://localhost:8080/logs/`, sin auth).
+
+### Setup one-time en el droplet (manual, como `create_admin`)
+
+Dozzle lee usuarios de `/data/users.yml` (no hay env para passwords):
+
+```bash
+mkdir -p /opt/academika/dozzle-data
+docker run --rm amir20/dozzle:v11 generate admin --password '<PASSWORD>' \
+  --email admin@unq.edu.ar --name Admin > /opt/academika/dozzle-data/users.yml
+chmod 600 /opt/academika/dozzle-data/users.yml
+```
+
+`generate` deja `roles:` vacío (= todos los roles). Para view-only, setear
+`roles: none` al usuario en `users.yml` (los logs siguen visibles).
+
+Copiar el `location /logs/` de `infra/nginx.conf` al server block y recargar:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### Notas
+
+- El `compose.prod.yaml` se sincroniza solo en cada release: el servicio
+  levanta sin pasos extra. El `users.yml` vive fuera de git y sobrevive.
+- Dozzle corre con actions y shell apagados (defaults) y `roles: none`
+  (solo lectura de logs). El socket va en `:ro`.
+- Smoke post-release: `/logs/` sin login rechaza; con login muestra api/web.
+
 ## Rollback manual
 
 Si un deploy sale mal **después** de aplicar (la migración pasó pero hay un bug):

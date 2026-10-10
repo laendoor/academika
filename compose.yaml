@@ -33,5 +33,16 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  dozzle:
+    image: amir20/dozzle:v11
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - dozzle_data:/data
+    environment:
+      DOZZLE_BASE: /logs
+
 volumes:
   pg_data:
+  dozzle_data:
