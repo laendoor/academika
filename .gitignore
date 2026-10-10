@@ -31,6 +31,11 @@ web/.next/
 # Output files del anonimizador
 datos-prueba/*_anon.*
 
+# Coverage
+.coverage*
+coverage.xml
+coverage/
+
 # OS
 .DS_Store
 
