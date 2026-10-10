@@ -13,3 +13,4 @@ Alembic (naming, validación en CI).
 - Tests que requieren DB van en `tests/integration/`, nunca en `tests/unit/`
 - No usar lazy loading en async SQLAlchemy — siempre `selectinload()` o `joinedload()`
 - IDs: siempre via `generate_uuid()` de `app.db.base`, nunca `uuid_utils.uuid7()` directo
+- PRs siempre vía `/aika-create-pr` (preview + confirmación antes de crear) — nunca `gh pr create` directo
