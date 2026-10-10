@@ -24,5 +24,19 @@ services:
     depends_on:
       - api
 
+  dozzle:
+    image: amir20/dozzle:v11
+    restart: unless-stopped
+    environment:
+      DOZZLE_BASE: /logs
+      DOZZLE_AUTH_PROVIDER: simple
+      DOZZLE_ENABLE_ACTIONS: "false"
+      DOZZLE_ENABLE_SHELL: "false"
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/academika/dozzle-data:/data
+
 volumes:
   pg_data_prod:
