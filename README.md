@@ -1,6 +1,7 @@
 # Académika
 
-[![codecov](https://codecov.io/gh/laendoor/academika/graph/badge.svg)](https://codecov.io/gh/laendoor/academika)
+[![backend](https://codecov.io/gh/laendoor/academika/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/laendoor/academika)
+[![frontend](https://codecov.io/gh/laendoor/academika/branch/main/graph/badge.svg?flag=frontend)](https://codecov.io/gh/laendoor/academika)
 
 Plataforma AI-first para seguimiento académico en la UNQ. Stack: FastAPI + Next.js + PostgreSQL.
 

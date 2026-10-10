@@ -3,7 +3,7 @@
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
 .PHONY: help install clean docker-dev db-start db-stop dev-api dev-web check format \
-        test test-api test-web test-integration alembic-current alembic-upgrade alembic-downgrade \
+        test test-api test-web test-integration test-api-cov test-web-cov alembic-current alembic-upgrade alembic-downgrade \
         alembic-check alembic-revision seed seed-dev seed-admin release
 
 help: ## Muestra esta ayuda
@@ -60,6 +60,12 @@ test-web: ## Tests unitarios del frontend (Vitest)
 
 test-integration: ## Tests de integración con DB real (testcontainers)
 	cd api && uv run pytest tests/integration/ -v
+
+test-api-cov: ## Tests de la API (unit + integration) con coverage en consola
+	cd api && uv run pytest tests/unit/ tests/integration/ --cov=app --cov-report=term-missing -q
+
+test-web-cov: ## Tests del frontend con coverage en consola
+	cd web && npm run test -- --coverage
 
 ## Migraciones
 alembic-current: ## Revisión actual de la DB
