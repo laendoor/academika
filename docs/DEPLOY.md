@@ -28,19 +28,28 @@ resto (`http://localhost:8080/logs/`, sin auth).
 
 ### Setup one-time en el droplet (manual, como `create_admin`)
 
+Hacerlo ANTES del release: el release levanta Dozzle solo, y sin `users.yml`
+Dozzle no arranca (fail-closed), ni la ruta `/logs/` existe sin el location.
+
 Dozzle lee usuarios de `/data/users.yml` (no hay env para passwords):
 
 ```bash
 mkdir -p /opt/academika/dozzle-data
 docker run --rm amir20/dozzle:v11 generate admin --password '<PASSWORD>' \
-  --email admin@unq.edu.ar --name Admin > /opt/academika/dozzle-data/users.yml
+  --email admin@unq.edu.ar --name Admin --user-roles none > /opt/academika/dozzle-data/users.yml
 chmod 600 /opt/academika/dozzle-data/users.yml
 ```
 
-`generate` deja `roles:` vacío (= todos los roles). Para view-only, setear
-`roles: none` al usuario en `users.yml` (los logs siguen visibles).
+(`--user-roles none`: solo lectura de logs; sin roles el default es todos.)
 
-Copiar el `location /logs/` de `infra/nginx.conf` al server block y recargar:
+Copiar el `location /logs/` de `infra/nginx.conf` al server block, agregar en
+el bloque `http` del nginx principal:
+
+```nginx
+limit_req_zone $binary_remote_addr zone=logs:10m rate=5r/m;
+```
+
+y recargar:
 
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
