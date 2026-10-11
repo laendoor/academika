@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0](https://github.com/laendoor/academika/compare/v0.3.0...v0.4.0) (2026-10-11)
+
+### Features
+
+* **admin:** tabla de settings genérica + UI backoffice ([#49](https://github.com/laendoor/academika/issues/49)) ([113845a](https://github.com/laendoor/academika/commit/113845a281ee545cdcaf8e05e45a43cdc4d52d79))
+
+### Bug Fixes
+
+* **infra:** rate-limit de /logs/ apto para carga de pagina (10r/s, burst 30) ([27d99c1](https://github.com/laendoor/academika/commit/27d99c133b527df10949e551ebdc029340508a5c))
+* **review:** self-review [#49](https://github.com/laendoor/academika/issues/49) — draft persistente, rollback, encode key, validación ([#49](https://github.com/laendoor/academika/issues/49)) ([5b38ec4](https://github.com/laendoor/academika/commit/5b38ec4be20c5130937cf91b957a65cd872eab6b))
+
 ## [0.3.0](https://github.com/laendoor/academika/compare/v0.2.8...v0.3.0) (2026-10-11)
 
 ### Features
