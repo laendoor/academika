@@ -69,6 +69,34 @@ describe("useAdminSettings", () => {
 		expect(result.current.settings[0].value).toEqual([]);
 	});
 
+	it("actualiza solo el setting editado con varios en lista", async () => {
+		getSettings.mockResolvedValue({
+			ok: true,
+			data: [
+				makeSetting("auth.allowed_domains"),
+				makeSetting("other.key", "x"),
+			],
+		});
+		updateSetting.mockResolvedValue({
+			ok: true,
+			data: makeSetting("auth.allowed_domains", []),
+		});
+
+		const { result } = renderHook(() => useAdminSettings());
+		await waitFor(() => expect(result.current.loading).toBe(false));
+
+		let ok = false;
+		await act(async () => {
+			ok = await result.current.handleUpdate("auth.allowed_domains", []);
+		});
+
+		expect(ok).toBe(true);
+		expect(result.current.settings).toEqual([
+			makeSetting("auth.allowed_domains", []),
+			makeSetting("other.key", "x"),
+		]);
+	});
+
 	it("setea error cuando falla el guardado", async () => {
 		getSettings.mockResolvedValue({
 			ok: true,

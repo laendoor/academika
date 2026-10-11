@@ -23,7 +23,7 @@ describe("SettingsTable", () => {
 	});
 
 	it("llama onUpdate con el valor parseado al guardar", () => {
-		const onUpdate = vi.fn();
+		const onUpdate = vi.fn().mockResolvedValue(true);
 		render(
 			<SettingsTable settings={SETTINGS} updating={null} onUpdate={onUpdate} />,
 		);
@@ -37,7 +37,7 @@ describe("SettingsTable", () => {
 	});
 
 	it("muestra error y no llama onUpdate con JSON inválido", () => {
-		const onUpdate = vi.fn();
+		const onUpdate = vi.fn().mockResolvedValue(true);
 		render(
 			<SettingsTable settings={SETTINGS} updating={null} onUpdate={onUpdate} />,
 		);
@@ -58,6 +58,21 @@ describe("SettingsTable", () => {
 
 		expect(
 			screen.getByRole("button", { name: "Guardar" }) as HTMLButtonElement,
+		).toHaveProperty("disabled", true);
+	});
+
+	it("muestra guardando y deshabilita el input mientras actualiza", () => {
+		render(
+			<SettingsTable
+				settings={SETTINGS}
+				updating="auth.allowed_domains"
+				onUpdate={vi.fn()}
+			/>,
+		);
+
+		expect(screen.getByRole("button", { name: "Guardando…" })).toBeDefined();
+		expect(
+			screen.getByDisplayValue('["@unq.edu.ar"]') as HTMLInputElement,
 		).toHaveProperty("disabled", true);
 	});
 });

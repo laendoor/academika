@@ -49,6 +49,26 @@ describe("GET /api/admin/settings", () => {
 		);
 	});
 
+	it("propaga el detail del API cuando falla", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(500, { detail: "boom interno" }),
+		);
+
+		const res = await GET(makeRequest("token-admin"));
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: "boom interno" });
+	});
+
+	it("devuelve genérico sin detail y conserva 4xx", async () => {
+		vi.mocked(fetch).mockResolvedValue(jsonResponse(404, {}));
+
+		const res = await GET(makeRequest("token-admin"));
+
+		expect(res.status).toBe(404);
+		expect(await res.json()).toEqual({ error: expect.any(String) });
+	});
+
 	it("sin cookie no llama al API", async () => {
 		const res = await GET(makeRequest());
 

@@ -68,6 +68,24 @@ describe("PUT /api/admin/settings/[key]", () => {
 		});
 	});
 
+	it("traduce el 500 del API a genérico", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(500, { detail: "boom interno" }),
+		);
+
+		const res = await PUT(makeRequest("token-admin"), CTX);
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: expect.any(String) });
+	});
+
+	it("sin contexto devuelve 400", async () => {
+		const res = await PUT(makeRequest("token-admin"), undefined);
+
+		expect(res.status).toBe(400);
+		expect(fetch).not.toHaveBeenCalled();
+	});
+
 	it("sin cookie no llama al API", async () => {
 		const res = await PUT(makeRequest(), CTX);
 
