@@ -68,3 +68,20 @@ export function uploadGuaraniSheets(
 		formData,
 	);
 }
+
+export interface SettingItem {
+	key: string;
+	value: unknown;
+	description: string | null;
+}
+
+export function getSettings(): Promise<ApiResult<SettingItem[]>> {
+	return get<SettingItem[]>("/api/admin/settings");
+}
+
+export function updateSetting(
+	key: string,
+	value: unknown,
+): Promise<ApiResult<SettingItem>> {
+	return put<SettingItem>(`/api/admin/settings/${key}`, { value });
+}

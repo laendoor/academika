@@ -18,6 +18,7 @@ export function AdminSidebar() {
 			<div>
 				<SectionHeader label="Sistema" Icon={Settings} />
 				<LinkItem label="Usuarios" href="/admin/usuarios" />
+				<LinkItem label="Configuración" href="/admin/settings" />
 			</div>
 		</aside>
 	);
