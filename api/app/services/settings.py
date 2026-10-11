@@ -1,6 +1,7 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
-from app.errors import NotFoundError
+from app.errors import ConflictError, NotFoundError
 from app.models.setting import Setting
 from app.schemas.settings import SettingUpdate
 from app.services.base import BaseService
@@ -26,6 +27,10 @@ class SettingService(BaseService[Setting, SettingUpdate, SettingUpdate]):
     async def update_value(self, key: str, data: SettingUpdate) -> Setting:
         setting = await self.get_by_key(key)
         setting.value = data.value
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError as e:
+            await self.session.rollback()
+            raise ConflictError(str(e.orig)) from e
         await self.session.refresh(setting)
         return setting

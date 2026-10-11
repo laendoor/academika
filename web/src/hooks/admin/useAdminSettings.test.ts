@@ -59,10 +59,12 @@ describe("useAdminSettings", () => {
 		const { result } = renderHook(() => useAdminSettings());
 		await waitFor(() => expect(result.current.loading).toBe(false));
 
+		let ok = false;
 		await act(async () => {
-			await result.current.handleUpdate("auth.allowed_domains", []);
+			ok = await result.current.handleUpdate("auth.allowed_domains", []);
 		});
 
+		expect(ok).toBe(true);
 		expect(updateSetting).toHaveBeenCalledWith("auth.allowed_domains", []);
 		expect(result.current.settings[0].value).toEqual([]);
 	});
@@ -77,10 +79,12 @@ describe("useAdminSettings", () => {
 		const { result } = renderHook(() => useAdminSettings());
 		await waitFor(() => expect(result.current.loading).toBe(false));
 
+		let ok = true;
 		await act(async () => {
-			await result.current.handleUpdate("auth.allowed_domains", []);
+			ok = await result.current.handleUpdate("auth.allowed_domains", []);
 		});
 
+		expect(ok).toBe(false);
 		expect(result.current.error).toBe("no autorizado");
 		expect(result.current.settings[0].value).toEqual(["@unq.edu.ar"]);
 	});

@@ -10,7 +10,12 @@ export const GET = route.apiHandler(async (req: NextRequest) => {
 		`${API_URL}/api/v1/admin/settings`,
 	);
 
-	if (!res.ok) throw new Error();
+	if (!res.ok) {
+		const json = await res.json().catch(() => ({}));
+		const message =
+			(json as { detail?: string }).detail ?? route.UNEXPECTED_ERROR;
+		throw new route.RouteError(message, res.status >= 500 ? 500 : res.status);
+	}
 
 	return NextResponse.json(await res.json());
 });

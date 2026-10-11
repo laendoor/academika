@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 
 from app.auth.dependencies import AdminRole
 from app.schemas.settings import SettingResponse, SettingUpdate
@@ -17,5 +17,5 @@ async def list_settings(service: ServiceDep):
 
 
 @router.put("/{key}", response_model=SettingResponse, dependencies=[AdminRole])
-async def update_setting(key: str, body: SettingUpdate, service: ServiceDep):
+async def update_setting(key: Annotated[str, Path(max_length=100)], body: SettingUpdate, service: ServiceDep):
     return await service.update_value(key, body)

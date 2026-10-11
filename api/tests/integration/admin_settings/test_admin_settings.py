@@ -22,17 +22,13 @@ async def _seed_setting(db_session: AsyncSession, key: str = "auth.allowed_domai
     return setting
 
 
-def _admin_headers(admin_token: str) -> dict[str, str]:
-    return {"Authorization": f"Bearer {admin_token}"}
-
-
 # ── GET /admin/settings ───────────────────────────────────────────────────────
 
 
 @pytest.mark.asyncio
 async def test_list_settings_success(client: AsyncClient, test_admin: User, admin_token: str, db_session: AsyncSession):
     await _seed_setting(db_session)
-    response = await client.get("/api/v1/admin/settings", headers=_admin_headers(admin_token))
+    response = await client.get("/api/v1/admin/settings", headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == 200
     body = response.json()
     assert {item["key"] for item in body} == {"auth.allowed_domains"}
@@ -64,7 +60,7 @@ async def test_update_setting_success(
     response = await client.put(
         "/api/v1/admin/settings/auth.allowed_domains",
         json={"value": []},
-        headers=_admin_headers(admin_token),
+        headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 200
     assert response.json()["value"] == []
@@ -75,7 +71,7 @@ async def test_update_setting_not_found(client: AsyncClient, test_admin: User, a
     response = await client.put(
         "/api/v1/admin/settings/no.existe",
         json={"value": "x"},
-        headers=_admin_headers(admin_token),
+        headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 404
 

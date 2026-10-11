@@ -83,5 +83,7 @@ export function updateSetting(
 	key: string,
 	value: unknown,
 ): Promise<ApiResult<SettingItem>> {
-	return put<SettingItem>(`/api/admin/settings/${key}`, { value });
+	return put<SettingItem>(`/api/admin/settings/${encodeURIComponent(key)}`, {
+		value,
+	});
 }

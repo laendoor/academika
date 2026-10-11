@@ -17,17 +17,19 @@ export function useAdminSettings() {
 		});
 	}, []);
 
-	async function handleUpdate(key: string, value: unknown) {
+	async function handleUpdate(key: string, value: unknown): Promise<boolean> {
 		setUpdating(key);
+		setError(undefined);
 		const result = await admin.updateSetting(key, value);
 		setUpdating(null);
 		if (result.ok) {
 			setSettings((prev) =>
 				prev.map((s) => (s.key === result.data.key ? result.data : s)),
 			);
-		} else {
-			setError(result.error);
+			return true;
 		}
+		setError(result.error);
+		return false;
 	}
 
 	return { settings, loading, error, updating, handleUpdate };

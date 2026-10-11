@@ -11,14 +11,14 @@ function SettingRow({
 }: {
 	setting: SettingItem;
 	isUpdating: boolean;
-	onUpdate: (key: string, value: unknown) => void;
+	onUpdate: (key: string, value: unknown) => Promise<boolean>;
 }) {
 	const [draft, setDraft] = useState<string | null>(null);
 	const [invalidJson, setInvalidJson] = useState(false);
 	const text = draft ?? JSON.stringify(setting.value);
 	const dirty = draft !== null && draft !== JSON.stringify(setting.value);
 
-	function handleSave() {
+	async function handleSave() {
 		let parsed: unknown;
 		try {
 			parsed = JSON.parse(text);
@@ -26,9 +26,10 @@ function SettingRow({
 			setInvalidJson(true);
 			return;
 		}
-		setInvalidJson(false);
-		setDraft(null);
-		onUpdate(setting.key, parsed);
+		if (await onUpdate(setting.key, parsed)) {
+			setInvalidJson(false);
+			setDraft(null);
+		}
 	}
 
 	return (
@@ -69,7 +70,7 @@ export function SettingsTable({
 }: {
 	settings: SettingItem[];
 	updating: string | null;
-	onUpdate: (key: string, value: unknown) => void;
+	onUpdate: (key: string, value: unknown) => Promise<boolean>;
 }) {
 	return (
 		<Table>

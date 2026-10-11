@@ -17,4 +17,4 @@ class Setting(AuditMixin, Base):
     id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)
     key: Mapped[str] = mapped_column(String(100), unique=True)
     value: Mapped[Any] = mapped_column(JSONB)
-    description: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)

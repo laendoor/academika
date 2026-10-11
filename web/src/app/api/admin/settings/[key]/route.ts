@@ -11,7 +11,7 @@ export const PUT = route.apiHandler(async (req: NextRequest, ctx) => {
 	const body = await req.json();
 	const res = await route.fetchWithToken(
 		req,
-		`${API_URL}/api/v1/admin/settings/${key}`,
+		`${API_URL}/api/v1/admin/settings/${encodeURIComponent(key)}`,
 		{
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
