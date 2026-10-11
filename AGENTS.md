@@ -14,3 +14,4 @@ Alembic (naming, validación en CI).
 - No usar lazy loading en async SQLAlchemy — siempre `selectinload()` o `joinedload()`
 - IDs: siempre via `generate_uuid()` de `app.db.base`, nunca `uuid_utils.uuid7()` directo
 - PRs siempre vía `/aika-create-pr` (preview + confirmación antes de crear) — nunca `gh pr create` directo
+- Releases solo los hace Lean (`make release`, `npx release-it`, tags, version bumps): prohibido ejecutarlos — ni con OK general, solo con confirmación explícita e independiente para el release
