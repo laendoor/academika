@@ -17,7 +17,7 @@ def session() -> AsyncMock:
 
 @pytest.fixture
 def service(session: AsyncMock) -> SettingService:
-    return SettingService(session)
+    return SettingService.dep(session)
 
 
 def _mock_execute(session: AsyncMock, scalars: list | None = None, scalar: Any = "unset") -> None:
