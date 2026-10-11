@@ -23,7 +23,7 @@ def mail() -> MagicMock:
 
 @pytest.fixture
 def service(session: AsyncMock, mail: MagicMock) -> AuthService:
-    return AuthService(session, UserService(session), mail)
+    return AuthService(session, UserService(session), mail, AsyncMock())
 
 
 @pytest.fixture
@@ -224,3 +224,48 @@ async def test_reset_password_user_not_found(service: AuthService, mock_user: Ma
     session.get.return_value = None
     with pytest.raises(InvalidTokenError):
         await service.reset_password(token, "nueva_pass")
+
+
+# ── dominios configurables ────────────────────────────────────────────────────
+
+
+def _service_with_domains(session: AsyncMock, mail: MagicMock, value) -> AuthService:
+    users = AsyncMock()
+    users.find_active_by_email.return_value = None
+    domain_settings = AsyncMock()
+    setting = MagicMock()
+    setting.value = value
+    domain_settings.find_by_key.return_value = setting
+    return AuthService(session, users, mail, domain_settings)
+
+
+@pytest.mark.asyncio
+async def test_invite_custom_domain_allowed(session: AsyncMock, mail: MagicMock):
+    service = _service_with_domains(session, mail, ["@gmail.com"])
+    await service.invite("nuevo@gmail.com", "docente")
+    mail.send.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_invite_wildcard_allows_any(session: AsyncMock, mail: MagicMock):
+    service = _service_with_domains(session, mail, ["*"])
+    await service.invite("nuevo@yahoo.com", "docente")
+    mail.send.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_invite_denied_lists_configured_domains(session: AsyncMock, mail: MagicMock):
+    service = _service_with_domains(session, mail, ["@a.edu", "@b.edu"])
+    with pytest.raises(UnauthorizedDomainError, match="uno de los dominios"):
+        await service.invite("nuevo@gmail.com", "docente")
+    mail.send.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_login_missing_key_falls_back_to_default(session: AsyncMock, mail: MagicMock):
+    users = AsyncMock()
+    domain_settings = AsyncMock()
+    domain_settings.find_by_key.return_value = None
+    service = AuthService(session, users, mail, domain_settings)
+    with pytest.raises(UnauthorizedDomainError, match="@unq.edu.ar"):
+        await service.login("steve@gmail.com", "secreto123")

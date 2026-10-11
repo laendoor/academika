@@ -5,6 +5,7 @@ from httpx import AsyncClient
 
 from app.auth.tokens import create_access_token, create_invite_token, create_refresh_token, create_reset_token
 from app.db.base import generate_uuid
+from app.models.setting import Setting
 from app.models.user import User
 
 # ── POST /login ───────────────────────────────────────────────────────────────
@@ -255,3 +256,55 @@ async def test_invite_then_register_flow(client: AsyncClient, test_admin: User, 
     assert login_response.status_code == 200
     body = login_response.json()
     assert "access_token" in body
+
+
+# ── dominios configurables ────────────────────────────────────────────────────
+
+
+async def _seed_domains(db_session, value) -> None:
+    db_session.add(Setting(id=generate_uuid(), key="auth.allowed_domains", value=value, description="test"))
+    await db_session.commit()
+
+
+@pytest.mark.asyncio
+async def test_login_custom_domain_denies_unlisted(client: AsyncClient, db_session, test_user: User):
+    await _seed_domains(db_session, ["@gmail.com"])
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": "hari@unq.edu.ar", "password": "seldon123"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_login_wildcard_allows(client: AsyncClient, db_session, test_user: User):
+    await _seed_domains(db_session, ["*"])
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": "hari@unq.edu.ar", "password": "seldon123"},
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_invite_custom_domain_allowed(client: AsyncClient, test_admin: User, admin_token: str, db_session):
+    await _seed_domains(db_session, ["@gmail.com"])
+    with patch("app.services.mail.ConsoleMailService.send") as mock_send:
+        response = await client.post(
+            "/api/v1/auth/invite",
+            json={"email": "nuevo@gmail.com", "role": "docente"},
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+    assert response.status_code == 204
+    mock_send.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_invite_empty_list_denies_all(client: AsyncClient, test_admin: User, admin_token: str, db_session):
+    await _seed_domains(db_session, [])
+    response = await client.post(
+        "/api/v1/auth/invite",
+        json={"email": "nuevo@unq.edu.ar", "role": "docente"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 401

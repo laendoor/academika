@@ -5,6 +5,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.assertions import ensure_authorized_domain, ensure_token_decoded
+from app.auth.domains import ALLOWED_DOMAINS_KEY, DEFAULT_ALLOWED_DOMAINS
 from app.auth.errors import InvalidCredentialsError, InvalidTokenError
 from app.auth.password import hash_password, verify_password
 from app.auth.tokens import create_access_token, create_invite_token, create_refresh_token, create_reset_token
@@ -13,14 +14,18 @@ from app.db.session import SessionDep
 from app.errors import ConflictError
 from app.schemas.users import UserCreate
 from app.services.mail import MailService, get_mail_service
+from app.services.settings import SettingService
 from app.services.users import UserService
 
 
 class AuthService:
-    def __init__(self, session: AsyncSession, users: UserService, mail: MailService) -> None:
+    def __init__(
+        self, session: AsyncSession, users: UserService, mail: MailService, domain_settings: SettingService
+    ) -> None:
         self.session = session
         self.users = users
         self.mail = mail
+        self.domain_settings = domain_settings
 
     @classmethod
     def dep(
@@ -28,11 +33,18 @@ class AuthService:
         session: SessionDep,
         users: Annotated[UserService, Depends(UserService.dep)],
         mail: Annotated[MailService, Depends(get_mail_service)],
+        domain_settings: Annotated[SettingService, Depends(SettingService.dep)],
     ) -> "AuthService":
-        return cls(session, users, mail)
+        return cls(session, users, mail, domain_settings)
+
+    async def _allowed_domains(self) -> list[str]:
+        setting = await self.domain_settings.find_by_key(ALLOWED_DOMAINS_KEY)
+        if setting is None or not isinstance(setting.value, list):
+            return list(DEFAULT_ALLOWED_DOMAINS)
+        return [str(domain).strip().lower() for domain in setting.value]
 
     async def login(self, email: str, password: str) -> dict:
-        ensure_authorized_domain(email)
+        ensure_authorized_domain(email, await self._allowed_domains())
 
         user = await self.users.find_active_by_email(email)
 
@@ -54,7 +66,7 @@ class AuthService:
         raise InvalidTokenError()
 
     async def invite(self, email: str, role: str) -> None:
-        ensure_authorized_domain(email)
+        ensure_authorized_domain(email, await self._allowed_domains())
 
         if await self.users.find_active_by_email(email) is not None:
             raise ConflictError(f"Ya existe un usuario activo con email '{email}'")
