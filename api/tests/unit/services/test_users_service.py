@@ -5,6 +5,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.errors import BusinessError, ConflictError, NotFoundError
+from app.schemas.users import UserUpdate
 from app.services.users import UserService
 
 
@@ -15,7 +16,7 @@ def session() -> AsyncMock:
 
 @pytest.fixture
 def service(session: AsyncMock) -> UserService:
-    return UserService(session)
+    return UserService.dep(session)
 
 
 @pytest.fixture
@@ -58,3 +59,39 @@ async def test_delete_user_with_log_events_conflict(service: UserService, sessio
     with pytest.raises(ConflictError):
         await service.delete(mock_user.id, requester_id=uuid.uuid4())
     session.rollback.assert_awaited_once()
+
+
+# ── update ────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_update_role_success(service: UserService, session: AsyncMock, mock_user: MagicMock):
+    session.get.return_value = mock_user
+    updated = await service.update(mock_user.id, UserUpdate(role="docente"), requester_id=uuid.uuid4())
+    assert updated.role == "docente"
+    session.commit.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_update_self_lockout_forbidden(service: UserService, session: AsyncMock, mock_user: MagicMock):
+    mock_user.role = "admin"
+    session.get.return_value = mock_user
+    with pytest.raises(BusinessError):
+        await service.update(mock_user.id, UserUpdate(role="docente"), requester_id=mock_user.id)
+    session.commit.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_update_not_found(service: UserService, session: AsyncMock):
+    session.get.return_value = None
+    with pytest.raises(NotFoundError):
+        await service.update(uuid.uuid4(), UserUpdate(role="docente"), requester_id=uuid.uuid4())
+
+
+@pytest.mark.asyncio
+async def test_update_self_keeping_admin_ok(service: UserService, session: AsyncMock, mock_user: MagicMock):
+    mock_user.role = "admin"
+    session.get.return_value = mock_user
+    updated = await service.update(mock_user.id, UserUpdate(role="admin"), requester_id=mock_user.id)
+    assert updated.role == "admin"
+    session.commit.assert_awaited_once()

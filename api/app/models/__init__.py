@@ -15,6 +15,7 @@ from app.models.log_event import LogEvent
 from app.models.materia import Materia
 from app.models.plan_de_estudio import PlanDeEstudio
 from app.models.planes_materias import planes_materias
+from app.models.setting import Setting
 from app.models.user import User
 
 __all__ = [
@@ -34,6 +35,7 @@ __all__ = [
     "LkpUserRole",
     "Materia",
     "PlanDeEstudio",
+    "Setting",
     "User",
     "planes_materias",
 ]

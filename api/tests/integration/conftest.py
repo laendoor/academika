@@ -132,7 +132,7 @@ async def clean_db(test_engine: AsyncEngine) -> AsyncGenerator[None]:
         await session.execute(
             text(
                 "TRUNCATE log_events, users, cursadas, planes_materias, alumno_carrera, alumnos,"
-                " planes_de_estudio, correlativas, materias, carreras"
+                " planes_de_estudio, correlativas, materias, carreras, settings"
                 " RESTART IDENTITY CASCADE"
             )
         )

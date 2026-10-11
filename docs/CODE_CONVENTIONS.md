@@ -285,7 +285,7 @@ Los aliases viven en `app/auth/dependencies.py` — los routers no definen los s
 
 | Alias                 | Rol            | Endpoints                                                                              |
 | --------------------- | -------------- | -------------------------------------------------------------------------------------- |
-| `AdminRole`           | admin          | `auth/invite`, `admin/users`, `admin/import-guarani`                                   |
+| `AdminRole`           | admin          | `auth/invite`, `admin/users`, `admin/import-guarani`, `admin/settings`                 |
 | `DirectorOrAdminRole` | director+admin | CRUD (`carreras`, `materias`, `planes`, `alumnos`, `cursadas`), `sources`, `workspace` |
 | `CurrentUser`         | autenticado    | `lookups`                                                                              |
 
