@@ -14,6 +14,7 @@ tmp/
 # Env files
 .env
 .env.prod
+.envrc.local
 
 # Dev logs
 dev-api.log
