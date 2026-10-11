@@ -46,8 +46,11 @@ Copiar el `location /logs/` de `infra/nginx.conf` al server block, agregar en
 el bloque `http` del nginx principal:
 
 ```nginx
-limit_req_zone $binary_remote_addr zone=logs:10m rate=5r/m;
+limit_req_zone $binary_remote_addr zone=logs:10m rate=10r/s;
 ```
+
+(10r/s con burst 30: la página de login carga ~15 assets juntos; contra un
+password fuerte ese rate no le sirve a un brute-force.)
 
 y recargar:
 
