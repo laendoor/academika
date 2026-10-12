@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from sqlalchemy import Update
 
 from app.services.guarani_importer import GuaraniImporterService
 from tests.unit.factories import (
@@ -179,6 +180,20 @@ class TestUpsertHistorialCursadas:
         call_args = session.execute.call_args[0][0]
         assert call_args.compile().params.get("estado_cursada") == "__unknown__"
 
+    async def test_credits_persisted(self):
+        session = AsyncMock()
+        service = GuaraniImporterService(session)
+        alumno = make_student("12345678")
+        materia = make_course("ALGO1")
+        carrera = make_degree("P")
+
+        p1, p2, p3 = self._patch_all(service, student=alumno, course=materia, degree=carrera)
+        with p1, p2, p3:
+            await service._upsert_historial_cursadas([make_enrollment_history_row()])
+
+        call_args = session.execute.call_args[0][0]
+        assert call_args.compile().params.get("creditos") == 6
+
 
 @pytest.mark.asyncio
 class TestUpsertCursadas:
@@ -340,6 +355,39 @@ class TestUpsertPlanes:
                     await service._upsert_planes([make_study_plan_course_row()])
 
         session.commit.assert_called_once()
+
+    async def test_updates_materia_nucleo_and_creditos(self):
+        session = AsyncMock()
+        service = GuaraniImporterService(session)
+        carrera = make_degree("TPI")
+        materia = make_course("101")
+        plan = make_study_plan(carrera.id, 2015)
+
+        with patch.object(service, "_fetch_carreras", return_value={"TPI": carrera}):
+            with patch.object(service, "_fetch_materias", return_value={"101": materia}):
+                with patch.object(service, "_fetch_planes", return_value={(carrera.id, 2015): plan}):
+                    await service._upsert_planes([make_study_plan_course_row(nucleo="basico", creditos=8)])
+
+        updates = [c[0][0] for c in session.execute.call_args_list if isinstance(c[0][0], Update)]
+        assert len(updates) == 1
+        params = updates[0].compile().params
+        assert params.get("nucleo") == "basico"
+        assert params.get("creditos") == 8
+
+    async def test_skips_materia_update_when_no_data(self):
+        session = AsyncMock()
+        service = GuaraniImporterService(session)
+        carrera = make_degree("TPI")
+        materia = make_course("101")
+        plan = make_study_plan(carrera.id, 2015)
+
+        with patch.object(service, "_fetch_carreras", return_value={"TPI": carrera}):
+            with patch.object(service, "_fetch_materias", return_value={"101": materia}):
+                with patch.object(service, "_fetch_planes", return_value={(carrera.id, 2015): plan}):
+                    await service._upsert_planes([make_study_plan_course_row()])
+
+        updates = [c[0][0] for c in session.execute.call_args_list if isinstance(c[0][0], Update)]
+        assert updates == []
 
 
 @pytest.mark.asyncio

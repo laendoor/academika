@@ -2,7 +2,7 @@ import logging
 import uuid
 from typing import Self
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -235,6 +235,7 @@ class GuaraniImporterService:
                     es_regular=row.is_regular,
                     tipo_aprobacion=row.approval_type,
                     anio_plan=row.plan_year,
+                    creditos=row.credits,
                 )
                 .on_conflict_do_update(
                     constraint="uq_cursada_alumno_materia_carrera_cuatrimestre",
@@ -245,6 +246,7 @@ class GuaraniImporterService:
                         "es_regular": row.is_regular,
                         "tipo_aprobacion": row.approval_type,
                         "anio_plan": row.plan_year,
+                        "creditos": row.credits,
                         "updated_at": func.now(),
                     },
                 )
@@ -392,10 +394,21 @@ class GuaraniImporterService:
                 continue
             link_stmt = insert(planes_materias).values(plan_id=plan.id, materia_id=materia.id).on_conflict_do_nothing()
             await self.session.execute(link_stmt)
+            await self._update_materia_from_plan(materia.id, row)
             upserted += 1
 
         await self.session.commit()
         return upserted, skipped
+
+    async def _update_materia_from_plan(self, materia_id: uuid.UUID, row: StudyPlanCourseRow) -> None:
+        fields: dict[str, object] = {}
+        if row.nucleo is not None:
+            fields["nucleo"] = row.nucleo
+        if row.creditos is not None:
+            fields["creditos"] = row.creditos
+        if fields:
+            fields["updated_at"] = func.now()
+            await self.session.execute(update(Materia).where(Materia.id == materia_id).values(**fields))
 
     async def _upsert_correlativas(self, rows: list[PrerequisiteRow]) -> tuple[int, int]:
         materias = await self._fetch_materias()

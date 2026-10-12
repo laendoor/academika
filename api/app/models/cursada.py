@@ -50,6 +50,7 @@ class Cursada(AuditMixin, Base):
     es_regular: Mapped[str | None] = mapped_column(String(5), nullable=True)
     tipo_aprobacion: Mapped[str | None] = mapped_column(String(50), nullable=True)
     anio_plan: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    creditos: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     alumno: Mapped[Alumno] = relationship("Alumno", back_populates="cursadas")
     materia: Mapped[Materia] = relationship("Materia", back_populates="cursadas")
