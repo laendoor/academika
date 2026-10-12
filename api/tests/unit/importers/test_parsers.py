@@ -132,13 +132,21 @@ class TestParseMaterias:
 class TestParsePlanes:
     def test_parses_valid_rows(self) -> None:
         rows = parse_study_plan_courses(_read("planes.csv"))
-        assert len(rows) == 3
+        assert len(rows) == 4
 
     def test_fields(self) -> None:
         row = parse_study_plan_courses(_read("planes.csv"))[0]
         assert row.degree_code == "TPI"
         assert row.plan_year == 2015
         assert row.course_code == "101"
+        assert row.nucleo == "basico"
+        assert row.creditos == 8
+
+    def test_unknown_nucleo_and_empty_creditos_are_none(self) -> None:
+        row = parse_study_plan_courses(_read("planes.csv"))[3]
+        assert row.course_code == "104"
+        assert row.nucleo is None
+        assert row.creditos is None
 
     def test_multiple_degrees(self) -> None:
         rows = parse_study_plan_courses(_read("planes.csv"))

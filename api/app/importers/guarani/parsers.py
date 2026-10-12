@@ -1,4 +1,5 @@
 import logging
+import unicodedata
 
 from app.utils.csv import parse_csv
 from app.utils.dates import parse_date
@@ -39,14 +40,29 @@ def parse_courses(content: str) -> list[CourseRow]:
 
 def parse_study_plan_courses(content: str) -> list[StudyPlanCourseRow]:
     def _row(row: list[str]) -> StudyPlanCourseRow:
-        degree_code, plan_year_str, _cuatrimestre, _nucleo, _area, course_code, _creditos, _nombre = row[:8]
+        degree_code, plan_year_str, _cuatrimestre, nucleo_str, _area, course_code, creditos_str, _nombre = row[:8]
         return StudyPlanCourseRow(
             degree_code=degree_code.strip(),
             plan_year=int(plan_year_str.strip()),
             course_code=course_code.strip(),
+            nucleo=_normalize_nucleo(or_none(nucleo_str)),
+            creditos=int(creditos_str.strip()) if creditos_str.strip() else None,
         )
 
     return parse_csv(content, _row)
+
+
+_NUCLEO_KEYS = {"basico", "avanzado", "orientacion"}
+
+
+def _normalize_nucleo(value: str | None) -> str | None:
+    if value is None:
+        return None
+    key = unicodedata.normalize("NFKD", value.lower()).encode("ascii", "ignore").decode()
+    if key in _NUCLEO_KEYS:
+        return key
+    logger.warning("núcleo desconocido '%s' — se ignora", value)
+    return None
 
 
 def parse_prerequisites(content: str) -> list[PrerequisiteRow]:

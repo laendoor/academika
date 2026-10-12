@@ -20,6 +20,8 @@ class StudyPlanCourseRow:
     degree_code: str
     plan_year: int
     course_code: str
+    nucleo: str | None
+    creditos: int | None
 
 
 @dataclass
