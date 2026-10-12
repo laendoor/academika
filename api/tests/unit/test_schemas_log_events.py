@@ -34,4 +34,3 @@ def test_import_guarani_details_defaults() -> None:
     assert details.preview_truncated is False
     assert details.uploader_email is None
     assert details.skipped_sample is None
-    assert details.skipped_sample_truncated is False

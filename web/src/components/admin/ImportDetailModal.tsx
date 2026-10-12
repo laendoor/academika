@@ -18,8 +18,7 @@ export function ImportDetailModal({
 	const { details } = item;
 	const ok = item.status !== "error";
 	const skipSample = details.skipped_sample ?? [];
-	const sampleTruncated =
-		details.skipped_sample_truncated ?? details.skipped > skipSample.length;
+	const sampleTruncated = details.skipped > skipSample.length;
 	const panelRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {

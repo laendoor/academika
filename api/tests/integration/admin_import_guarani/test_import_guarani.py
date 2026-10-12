@@ -98,7 +98,6 @@ async def test_import_guarani_logs_ok_row_per_file(
     assert e.details["preview_truncated"] is True
     assert e.details["uploader_email"] == test_admin.email
     assert e.details["skipped_sample"] == []
-    assert e.details["skipped_sample_truncated"] is False
 
 
 @pytest.mark.asyncio

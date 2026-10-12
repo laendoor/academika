@@ -32,7 +32,6 @@ class FileOutcome:
     preview_truncated: bool = False
     uploader_email: str | None = None
     skipped_sample: list[str] | None = None
-    skipped_sample_truncated: bool = False
 
 
 def _file_hash(raw: bytes) -> str:
@@ -65,7 +64,6 @@ def _import_details(outcome: FileOutcome) -> dict[str, Any]:
         "preview_truncated": outcome.preview_truncated,
         "uploader_email": outcome.uploader_email,
         "skipped_sample": outcome.skipped_sample,
-        "skipped_sample_truncated": outcome.skipped_sample_truncated,
     }
 
 
@@ -134,10 +132,9 @@ class GuaraniUploadService:
         preview, preview_truncated = _preview_lines(content)
 
         sheet_type: GuaraniSheetType | None = None
-        importer: GuaraniImporterService | None = None
+        importer = GuaraniImporterService(self._session_factory())
         try:
             sheet_type = detect_type(content)
-            importer = GuaraniImporterService(self._session_factory())
             processed, skipped = await importer.importar(sheet_type, [content])
             await importer.session.commit()
         except DetectorError as e:
@@ -150,8 +147,7 @@ class GuaraniUploadService:
                 error=str(e),
             )
         except (ValueError, OSError) as e:
-            if importer is not None:
-                await importer.session.rollback()
+            await importer.session.rollback()
             return FileOutcome(
                 name=name,
                 sheet_type=sheet_type.value if sheet_type is not None else None,
@@ -163,8 +159,7 @@ class GuaraniUploadService:
             )
         except Exception as e:
             logger.exception("error inesperado procesando %s", name)
-            if importer is not None:
-                await importer.session.rollback()
+            await importer.session.rollback()
             return FileOutcome(
                 name=name,
                 sheet_type=sheet_type.value if sheet_type is not None else None,
@@ -174,6 +169,8 @@ class GuaraniUploadService:
                 uploader_email=uploader_email,
                 error=f"error inesperado: {e}",
             )
+        finally:
+            await importer.session.close()
         return FileOutcome(
             name=name,
             sheet_type=sheet_type.value,
@@ -184,5 +181,4 @@ class GuaraniUploadService:
             preview_truncated=preview_truncated,
             uploader_email=uploader_email,
             skipped_sample=importer.skip_sample,
-            skipped_sample_truncated=skipped > len(importer.skip_sample),
         )

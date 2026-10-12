@@ -18,7 +18,6 @@ function makeItem(overrides: Partial<SourceItem> = {}): SourceItem {
 			preview: ["h1;h2", "1;x"],
 			preview_truncated: false,
 			skipped_sample: ["import_x: missing refs — skipping doc_id=1"],
-			skipped_sample_truncated: true,
 		},
 		...overrides,
 	};
@@ -77,7 +76,6 @@ describe("ImportDetailModal", () => {
 					...makeItem().details,
 					skipped: 16,
 					skipped_sample: ["a", "b", "c", "d", "e"],
-					skipped_sample_truncated: undefined,
 				},
 			}),
 		);

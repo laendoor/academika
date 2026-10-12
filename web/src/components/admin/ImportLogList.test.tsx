@@ -43,6 +43,12 @@ describe("formatIsoLocal", () => {
 		expect(parseDate("no-es-fecha")).toBeNull();
 		expect(formatIsoLocal("no-es-fecha")).toBe("no-es-fecha");
 	});
+
+	it("recorta microsegundos a millis (Safari)", () => {
+		expect(
+			parseDate("2026-10-12T18:05:00.123456+00:00")?.getMilliseconds(),
+		).toBe(123);
+	});
 });
 
 describe("resubmittedIds", () => {

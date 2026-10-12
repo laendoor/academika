@@ -5,10 +5,10 @@ import { ImportDetailModal } from "@/components/admin/ImportDetailModal";
 import type { SourceItem } from "@/lib/api/sources";
 import { SHEET_TYPE_LABELS } from "@/lib/constants";
 
-/** Fecha que nunca revienta el render: normaliza el str() de Python y cae al crudo. */
+/** Fecha que nunca revienta el render: ISO real, con tolerancia al str() viejo de Python. */
 export function parseDate(iso: string): Date | null {
-	let date = new Date(iso);
-	if (Number.isNaN(date.getTime())) date = new Date(iso.replace(" ", "T"));
+	const normalized = iso.replace(/(\.\d{3})\d+/, "$1").replace(" ", "T");
+	const date = new Date(normalized);
 	return Number.isNaN(date.getTime()) ? null : date;
 }
 

@@ -119,7 +119,6 @@ async def test_sources_returns_import_details_shape(client: AsyncClient, test_us
         "preview_truncated",
         "uploader_email",
         "skipped_sample",
-        "skipped_sample_truncated",
     }
     assert item["details"]["sheet_type"] is None
 
