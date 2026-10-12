@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -123,5 +123,80 @@ describe("ImportLogList", () => {
 		);
 		expect(groups).toHaveLength(1);
 		expect(groups[0].items.map((i) => i.id)).toEqual(["1", "2"]);
+	});
+});
+
+describe("ImportLogList expand", () => {
+	function openRow(id = "1") {
+		render(<ImportLogList items={[makeSource({ id })]} />);
+		fireEvent.click(screen.getByRole("button", { expanded: false }));
+	}
+
+	it("L1 muestra evento en texto plano con email completo", () => {
+		openRow();
+		expect(screen.getByText("por: lean@unq.edu.ar")).toBeInTheDocument();
+		expect(screen.getByText(/procesadas:/)).toBeInTheDocument();
+	});
+
+	it("L1 se colapsa al segundo click", () => {
+		openRow();
+		fireEvent.click(screen.getByRole("button", { expanded: true }));
+		expect(screen.queryByText("por: lean@unq.edu.ar")).not.toBeInTheDocument();
+	});
+
+	it("L2 muestra la muestra del archivo y avisa truncado", () => {
+		render(
+			<ImportLogList
+				items={[
+					makeSource({
+						id: "1",
+						details: {
+							...makeSource().details,
+							preview: ["h1;h2", "1;x"],
+							preview_truncated: true,
+						},
+					}),
+				]}
+			/>,
+		);
+		fireEvent.click(screen.getByRole("button", { expanded: false }));
+		fireEvent.click(
+			screen.getByRole("button", { name: /muestra del archivo/ }),
+		);
+		expect(screen.getByText(/h1;h2/)).toBeInTheDocument();
+		expect(screen.getByText(/muestra truncada/)).toBeInTheDocument();
+	});
+
+	it("sin preview muestra fallback de importación anterior", () => {
+		openRow();
+		expect(
+			screen.getByText("sin muestra (importación anterior)"),
+		).toBeInTheDocument();
+	});
+
+	it("error se muestra en bloque monoespaciado", () => {
+		render(
+			<ImportLogList
+				items={[
+					makeSource({
+						id: "1",
+						status: "error",
+						details: {
+							sheet_type: null,
+							files: ["raro.csv"],
+							processed: 0,
+							skipped: 0,
+							error: "tipo desconocido",
+							file_hash: "abc",
+							uploader_email: null,
+						},
+					}),
+				]}
+			/>,
+		);
+		fireEvent.click(screen.getByRole("button", { expanded: false }));
+		const blocks = screen.getAllByText("tipo desconocido");
+		expect(blocks.length).toBeGreaterThanOrEqual(1);
+		expect(blocks[blocks.length - 1].tagName).toBe("PRE");
 	});
 });
