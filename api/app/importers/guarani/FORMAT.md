@@ -73,7 +73,7 @@ Historial de cursadas y exámenes. Una fila por evento.
 | Result           | `string` | `CourseEnrollment.enrollment_status`       | `P`→`promocionado`, `A`→`aprobado`, `R`→`regular`, otro→`inscripto` |
 | Nota             | `string` | `CourseEnrollment.grade`                   | Puede estar vacío, contener letras (A, D, PA, ?) o números (1-10)   |
 | Forma Aprobación | `string` | `CourseEnrollment.approval_type`           | Ej: "Examen", "Promoción", "Equivalencia"                           |
-| Créditos         | `int`    | `CourseEnrollment.credits`                 | Puede variar por plan; se preserva por cursada                      |
+| Créditos         | `int`    | `Cursada.creditos`                     | Puede variar por plan; se preserva por cursada                      |
 | Acta Promo       | `string` | —                                          | Ignorado (referencia administrativa)                                |
 | Acta Ex          | `string` | —                                          | Ignorado (referencia administrativa)                                |
 | Plan             | `int`    | `CourseEnrollment.plan_year`               | Año del plan bajo el que se cursó la materia                        |
@@ -202,18 +202,20 @@ Materias de un plan de estudios. Una fila por materia-plan. Archivos separados p
 
 > **Nota:** las exportaciones de Guaraní suelen incluir columnas trailing vacías (ej: `;;;;` al final de cada fila). El parser trabaja por índice y las ignora.
 
-| Columna        | Tipo     | Mapea a                       | Notas                                |
-| -------------- | -------- | ----------------------------- | ------------------------------------ |
-| Codigo Carrera | `string` | `StudyPlan.degree_code`       | Debe existir en `degree.code`        |
-| Plan           | `int`    | `StudyPlan.year`              | Año del plan; ej: 2015, 2018         |
-| Cuatrimestre   | `string` | —                             | Ignorado                             |
-| Nucleo         | `string` | —                             | Ignorado                             |
-| Area           | `string` | —                             | Ignorado                             |
-| Codigo         | `string` | `study_plan_course.course_id` | Debe existir en `course.code`        |
-| Creditos       | `int`    | —                             | Ignorado (no modelado aún)           |
-| Nombre         | `string` | —                             | Ignorado (nombre canónico en Course) |
+| Columna        | Tipo     | Mapea a                       | Notas                                                              |
+| -------------- | -------- | ----------------------------- | ------------------------------------------------------------------ |
+| Codigo Carrera | `string` | `StudyPlan.degree_code`       | Debe existir en `degree.code`                                      |
+| Plan           | `int`    | `StudyPlan.year`              | Año del plan; ej: 2015, 2018                                       |
+| Cuatrimestre   | `string` | —                             | Ignorado (posición en el plan, sin columna; ver #68)               |
+| Nucleo         | `string` | `Course.nucleo` (normalizado) | Label ("Básico") → key lkp (`basico`); desconocido → warn + null   |
+| Area           | `string` | —                             | Ignorado (sin columna; ver #68)                                    |
+| Codigo         | `string` | `study_plan_course.course_id` | Debe existir en `course.code`                                      |
+| Creditos       | `int`    | `Course.creditos`             | Actualiza la materia vinculada; vacío → no toca                    |
+| Nombre         | `string` | —                             | Ignorado (nombre canónico en Course)                               |
 
-El upsert crea/actualiza el `StudyPlan` con `name = "Plan {year}"` y luego vincula las materias en `study_plan_course` (ON CONFLICT DO NOTHING).
+El upsert crea/actualiza el `StudyPlan` con `name = "Plan {year}"`, vincula las materias en `study_plan_course` (ON CONFLICT DO NOTHING) y actualiza `Course.nucleo`/`Course.creditos` con los valores de la fila (solo los no-vacíos).
+
+> **Orden de importación:** importar `materias` antes que `planes` — los créditos y el núcleo de la materia viven en planes.csv. Si se invierte el orden, las filas de planes se skipean (warn) y hay que re-importar planes (el upsert es idempotente).
 
 ### Ejemplo de parseo
 
@@ -226,7 +228,7 @@ TPI;2015;1;Básico;Programación;101;8;Algoritmos
 **Produce:**
 
 ```python
-StudyPlanCourseRow(degree_code="TPI", plan_year=2015, course_code="101")
+StudyPlanCourseRow(degree_code="TPI", plan_year=2015, course_code="101", nucleo="basico", creditos=8)
 ```
 
 ## requisitos\_\*.csv
