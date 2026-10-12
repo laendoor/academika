@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
+import { Pagination } from "@/components/ui/Pagination";
 import { Table, Tbody, Th } from "@/components/ui/Table";
 import { useEstudiantes } from "@/hooks/workspace";
 import type { LookupOption } from "@/lib/api/lookups";
@@ -36,9 +37,6 @@ export function EstudiantesList() {
 			else console.warn("Error fetching estados:", r.error);
 		});
 	}, []);
-
-	const hasNext = skip + PAGE_SIZE < total;
-	const hasPrev = skip > 0;
 
 	return (
 		<div className="p-8">
@@ -117,29 +115,13 @@ export function EstudiantesList() {
 				<p className="mt-4 text-sm text-zinc-500">Sin estudiantes.</p>
 			)}
 
-			{(hasPrev || hasNext) && (
-				<div className="mt-4 flex justify-between">
-					<button
-						type="button"
-						onClick={() => setSkip((s) => Math.max(0, s - PAGE_SIZE))}
-						disabled={!hasPrev || loading}
-						className="rounded border border-zinc-200 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
-					>
-						Anterior
-					</button>
-					<span className="text-sm text-zinc-500">
-						{skip + 1}-{Math.min(skip + PAGE_SIZE, total)} de {total}
-					</span>
-					<button
-						type="button"
-						onClick={() => setSkip((s) => s + PAGE_SIZE)}
-						disabled={!hasNext || loading}
-						className="rounded border border-zinc-200 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
-					>
-						Siguiente
-					</button>
-				</div>
-			)}
+			<Pagination
+				skip={skip}
+				total={total}
+				pageSize={PAGE_SIZE}
+				loading={loading}
+				onChange={setSkip}
+			/>
 		</div>
 	);
 }
