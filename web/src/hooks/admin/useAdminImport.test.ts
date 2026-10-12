@@ -2,7 +2,6 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAdminImport } from "@/hooks/admin/useAdminImport";
-import { useSources } from "@/hooks/workspace";
 import * as admin from "@/lib/api/admin";
 
 const { state, useSourcesMock } = vi.hoisted(() => {

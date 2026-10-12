@@ -1,6 +1,7 @@
 import { Check, History, X } from "lucide-react";
 import { useState } from "react";
 
+import { ImportDetailModal } from "@/components/admin/ImportDetailModal";
 import type { SourceItem } from "@/lib/api/sources";
 import { SHEET_TYPE_LABELS } from "@/lib/constants";
 
@@ -41,102 +42,83 @@ function typeLabel(sheetType: string | null): string {
 	return SHEET_TYPE_LABELS[sheetType] ?? sheetType;
 }
 
+function statusIcon(item: SourceItem, isResubmission: boolean) {
+	if (item.status === "error")
+		return (
+			<span title={item.details.error ?? "error"}>
+				<X aria-hidden className="h-4 w-4 text-red-600" />
+			</span>
+		);
+	if (isResubmission)
+		return (
+			<span title="Re-subida: este archivo ya se había importado antes">
+				<History aria-hidden className="h-4 w-4 text-amber-600" />
+			</span>
+		);
+	return (
+		<span title="ok">
+			<Check aria-hidden className="h-4 w-4 text-green-600" />
+		</span>
+	);
+}
+
 export function ImportLogList({ items }: { items: SourceItem[] }) {
 	const resubmitted = resubmittedIds(items);
-	const [open, setOpen] = useState<Set<string>>(new Set());
-
-	function toggle(id: string) {
-		const next = new Set(open);
-		if (next.has(id)) next.delete(id);
-		else next.add(id);
-		setOpen(next);
-	}
+	const [selected, setSelected] = useState<SourceItem | null>(null);
 
 	return (
 		<div>
 			{items.map((item) => {
 				const { details } = item;
 				const ok = item.status !== "error";
-				const skipSample = details.skipped_sample ?? [];
 				return (
-					<div key={item.id}>
-						<button
-							type="button"
-							aria-expanded={open.has(item.id)}
-							onClick={() => toggle(item.id)}
-							className="flex w-full flex-wrap items-baseline gap-x-2 px-2 py-1 text-left hover:bg-zinc-50"
+					<button
+						key={item.id}
+						type="button"
+						aria-haspopup="dialog"
+						onClick={() => setSelected(item)}
+						className="grid w-full grid-cols-[150px_20px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.5fr)_auto] items-center gap-x-2 px-2 py-1 text-left hover:bg-zinc-50"
+					>
+						<span className="font-mono text-xs text-zinc-500">
+							{formatIsoLocal(item.created_at)}
+						</span>
+						{statusIcon(item, resubmitted.has(item.id))}
+						<span
+							className="truncate text-sm text-zinc-800"
+							title={details.files[0] ?? "—"}
 						>
-							<span className="font-mono text-xs text-zinc-500">
-								{formatIsoLocal(item.created_at)}
-							</span>
-							{ok ? (
-								<Check
-									aria-hidden
-									className="h-4 w-4 self-center text-green-600"
-								/>
-							) : (
-								<X aria-hidden className="h-4 w-4 self-center text-red-600" />
-							)}
-							<span className="text-sm text-zinc-800">
-								{details.files[0] ?? "—"}
-							</span>
-							<span aria-hidden className="text-sm text-zinc-400">
-								→
-							</span>
+							{details.files[0] ?? "—"}
+						</span>
+						<span className="truncate text-sm text-zinc-600">
+							{typeLabel(details.sheet_type)}
+						</span>
+						{ok ? (
 							<span className="text-sm text-zinc-600">
-								{typeLabel(details.sheet_type)}
+								· {details.processed.toLocaleString("es-AR")} ok
+								{details.skipped > 0 &&
+									` · ${details.skipped.toLocaleString("es-AR")} omitidas`}
 							</span>
-							{ok ? (
-								<span className="text-sm text-zinc-600">
-									· {details.processed.toLocaleString("es-AR")} ok
-									{details.skipped > 0 &&
-										` · ${details.skipped.toLocaleString("es-AR")} omitidas`}
-								</span>
-							) : (
-								<span className="text-sm text-red-700">
-									· error: {details.error}
-								</span>
-							)}
-							<span className="text-xs text-zinc-500">
-								por {emailLocal(details.uploader_email)}
+						) : (
+							<span className="truncate text-sm text-red-700">
+								· error: {details.error}
 							</span>
-							{resubmitted.has(item.id) && (
-								<span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">
-									<History aria-hidden className="h-3 w-3" />
-									re-subida
-								</span>
-							)}
-						</button>
-						{open.has(item.id) && (
-							<div className="ml-6 border-l-2 border-zinc-200 pl-3 pb-2">
-								{!ok && (
-									<pre className="overflow-x-auto rounded bg-red-50 p-2 font-mono text-xs text-red-800">
-										{details.error}
-									</pre>
-								)}
-								{skipSample.length > 0 && (
-									<div className="mt-1">
-										<p className="text-sm text-zinc-600">omitidas (muestra):</p>
-										<pre className="mt-1 overflow-x-auto rounded bg-amber-50 p-2 font-mono text-xs text-amber-900">
-											{skipSample.join("\n")}
-										</pre>
-									</div>
-								)}
-								{details.preview ? (
-									<pre className="mt-1 overflow-x-auto rounded bg-zinc-100 p-2 font-mono text-xs text-zinc-800">
-										{details.preview.join("\n")}
-										{details.preview_truncated && "\n… (muestra truncada)"}
-									</pre>
-								) : (
-									<p className="mt-1 text-sm text-zinc-500">
-										sin muestra (importación anterior)
-									</p>
-								)}
-							</div>
 						)}
-					</div>
+						<span
+							className="text-xs text-zinc-500"
+							title={details.uploader_email ?? "—"}
+						>
+							por {emailLocal(details.uploader_email)}
+						</span>
+					</button>
 				);
 			})}
+			{selected && (
+				<ImportDetailModal
+					item={selected}
+					subtitle={`${selected.details.files[0] ?? "—"} — ${formatIsoLocal(selected.created_at)} — ${typeLabel(selected.details.sheet_type)}`}
+					onClose={() => setSelected(null)}
+				/>
+			)}
 		</div>
 	);
 }

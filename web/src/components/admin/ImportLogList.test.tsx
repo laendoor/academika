@@ -84,7 +84,7 @@ describe("ImportLogList", () => {
 		expect(screen.getAllByText("por lean", { exact: false })).toHaveLength(2);
 	});
 
-	it("muestra el error en vez de conteos y marca re-subidas", () => {
+	it("muestra el error en vez de conteos y unifica el icono de re-subida", () => {
 		render(
 			<ImportLogList
 				items={[
@@ -108,7 +108,8 @@ describe("ImportLogList", () => {
 		);
 
 		expect(screen.getByText("· error: tipo desconocido")).toBeInTheDocument();
-		expect(screen.getByText("re-subida")).toBeInTheDocument();
+		expect(screen.getByTitle(/re-subida/i)).toBeInTheDocument();
+		expect(screen.getByTitle("tipo desconocido")).toBeInTheDocument();
 		expect(screen.getByText("por —", { exact: false })).toBeInTheDocument();
 	});
 
@@ -129,13 +130,13 @@ describe("ImportLogList", () => {
 	});
 });
 
-describe("ImportLogList expand", () => {
+describe("ImportLogList modal", () => {
 	function openRow(item: SourceItem) {
 		render(<ImportLogList items={[item]} />);
-		fireEvent.click(screen.getByRole("button", { expanded: false }));
+		fireEvent.click(screen.getByRole("button", { name: /alumnos.csv/ }));
 	}
 
-	it("muestra directo el contenido del archivo", () => {
+	it("abre el modal con el contenido directo", () => {
 		openRow(
 			makeSource({
 				id: "1",
@@ -146,40 +147,19 @@ describe("ImportLogList expand", () => {
 				},
 			}),
 		);
+		expect(screen.getByRole("dialog")).toBeInTheDocument();
 		expect(screen.getByText(/h1;h2/)).toBeInTheDocument();
 		expect(screen.getByText(/muestra truncada/)).toBeInTheDocument();
-		expect(screen.queryByText(/procesadas:/)).not.toBeInTheDocument();
 	});
 
-	it("sin preview muestra fallback de importación anterior", () => {
+	it("cierra con Escape y con el botón", () => {
 		openRow(makeSource({ id: "1" }));
-		expect(
-			screen.getByText("sin muestra (importación anterior)"),
-		).toBeInTheDocument();
-	});
+		expect(screen.getByRole("dialog")).toBeInTheDocument();
+		fireEvent.keyDown(document, { key: "Escape" });
+		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
-	it("error y muestra de omitidas explican qué pasó", () => {
-		openRow(
-			makeSource({
-				id: "1",
-				status: "error",
-				details: {
-					sheet_type: null,
-					files: ["raro.csv"],
-					processed: 0,
-					skipped: 2,
-					error: "tipo desconocido",
-					file_hash: "abc",
-					uploader_email: null,
-					skipped_sample: ["import_x: missing refs — skipping doc_id=1"],
-				},
-			}),
-		);
-		const blocks = screen.getAllByText("tipo desconocido");
-		expect(blocks[blocks.length - 1].tagName).toBe("PRE");
-		expect(screen.getByText("omitidas (muestra):")).toBeInTheDocument();
-		expect(
-			screen.getByText(/missing refs — skipping doc_id=1/),
-		).toBeInTheDocument();
+		fireEvent.click(screen.getByRole("button", { name: /alumnos.csv/ }));
+		fireEvent.click(screen.getByRole("button", { name: "Cerrar detalle" }));
+		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	});
 });

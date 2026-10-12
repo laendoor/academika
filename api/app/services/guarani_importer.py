@@ -39,7 +39,7 @@ from app.utils.dates import date_to_year_term
 
 logger = logging.getLogger(__name__)
 
-_SKIP_SAMPLE_MAX = 5
+_SKIP_SAMPLE_MAX = 50
 
 _RESULT_TO_STATUS: dict[str, str] = {
     "I": "inscripto",
