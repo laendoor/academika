@@ -1,4 +1,6 @@
 export const API_URL = process.env.API_URL ?? "http://localhost:8000";
+export const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "dev";
+export const APP_SHA = process.env.NEXT_PUBLIC_APP_SHA ?? "dev";
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 export const ADMIN_ROLE = "admin";
 

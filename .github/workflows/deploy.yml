@@ -25,6 +25,10 @@ jobs:
         id: version
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
+      - name: Extract short sha
+        id: sha
+        run: echo "sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - name: Build and push api
         uses: docker/build-push-action@v6
         with:
@@ -39,6 +43,9 @@ jobs:
         with:
           context: ./web
           push: true
+          build-args: |
+            APP_VERSION=${{ steps.version.outputs.version }}
+            APP_SHA=${{ steps.sha.outputs.sha }}
           tags: |
             leandrojdl/academika-web:${{ steps.version.outputs.version }}
             leandrojdl/academika-web:latest

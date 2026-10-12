@@ -35,4 +35,10 @@ describe("AdminSidebar", () => {
 		const inactive = screen.getByRole("link", { name: "Materias" });
 		expect(inactive.className).not.toContain("bg-zinc-100");
 	});
+
+	it("muestra la versión y el sha (dev en local)", () => {
+		render(<AdminSidebar />);
+
+		expect(screen.getByText("vdev · dev")).toBeInTheDocument();
+	});
 });

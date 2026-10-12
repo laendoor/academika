@@ -3,6 +3,8 @@ import { LayoutList, type LucideIcon, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { APP_SHA, APP_VERSION } from "@/lib/constants";
+
 export function AdminSidebar() {
 	return (
 		<aside className="flex w-56 flex-col gap-4 border-r border-zinc-200 px-4 py-6">
@@ -19,6 +21,10 @@ export function AdminSidebar() {
 				<SectionHeader label="Sistema" Icon={Settings} />
 				<LinkItem label="Usuarios" href="/admin/usuarios" />
 				<LinkItem label="Configuración" href="/admin/settings" />
+			</div>
+
+			<div className="mt-auto border-t border-zinc-200 px-3 pt-2 text-xs text-zinc-500">
+				v{APP_VERSION} · {APP_SHA}
 			</div>
 		</aside>
 	);
