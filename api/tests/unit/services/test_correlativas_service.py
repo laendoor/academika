@@ -32,14 +32,15 @@ async def test_list_filtered_no_filters(service: CorrelativaService, session: As
     assert await service.list_filtered() == (3, ["c1"])
     session.scalar.assert_awaited_once()
     session.execute.assert_awaited_once()
-    assert "WHERE" not in str(session.execute.await_args.args[0])
+    assert session.execute.await_args.args[0].whereclause is None
 
 
 @pytest.mark.asyncio
 async def test_list_filtered_by_materia(service: CorrelativaService, session: AsyncMock):
     _mock_list(session, 1, ["c1"])
     assert await service.list_filtered(materia_id=uuid.uuid4()) == (1, ["c1"])
-    assert "WHERE" in str(session.execute.await_args.args[0])
+    whereclause = session.execute.await_args.args[0].whereclause
+    assert whereclause is not None and "materia_id" in str(whereclause)
 
 
 @pytest.mark.asyncio

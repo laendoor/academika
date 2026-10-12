@@ -1,27 +1,22 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Table, Tbody, Th } from "@/components/ui/Table";
 import { useCorrelativas, useMaterias } from "@/hooks/workspace";
-import type { MateriaRow } from "@/lib/api/workspace";
 
 const PAGE_SIZE = 20;
 
 export function CorrelativasList() {
 	const [skip, setSkip] = useState(0);
 	const [materiaId, setMateriaId] = useState("");
-	const [materias, setMaterias] = useState<MateriaRow[]>([]);
 
 	const { items, total, loading, error } = useCorrelativas({
 		skip,
 		limit: PAGE_SIZE,
 		materia_id: materiaId || undefined,
 	});
+	// shortcut: select capado a 100 materias, agregar búsqueda por texto cuando haya más de 100
 	const { items: materiasItems } = useMaterias({ skip: 0, limit: 100 });
-
-	useEffect(() => {
-		setMaterias(materiasItems);
-	}, [materiasItems]);
 
 	const hasNext = skip + PAGE_SIZE < total;
 	const hasPrev = skip > 0;
@@ -32,6 +27,7 @@ export function CorrelativasList() {
 
 			<div className="mb-4 flex gap-4">
 				<select
+					aria-label="Filtrar por materia"
 					value={materiaId}
 					onChange={(e) => {
 						setMateriaId(e.target.value);
@@ -40,7 +36,7 @@ export function CorrelativasList() {
 					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
 				>
 					<option value="">Todas las materias</option>
-					{materias.map((m) => (
+					{materiasItems.map((m) => (
 						<option key={m.id} value={m.id}>
 							{m.codigo} — {m.nombre}
 						</option>
@@ -82,7 +78,7 @@ export function CorrelativasList() {
 				</Tbody>
 			</Table>
 
-			{total === 0 && !loading && (
+			{total === 0 && !loading && !error && (
 				<p className="mt-4 text-sm text-zinc-500">Sin correlativas.</p>
 			)}
 

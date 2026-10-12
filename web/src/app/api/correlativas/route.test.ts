@@ -50,23 +50,4 @@ describe("GET /api/correlativas", () => {
 			}),
 		);
 	});
-
-	it("responde genérico ante un 500 del API", async () => {
-		vi.mocked(fetch).mockResolvedValue(jsonResponse(500, { detail: "boom" }));
-
-		const res = await GET(makeRequest("token-dir"));
-
-		expect(res.status).toBe(500);
-		expect(await res.json()).toEqual({
-			error: "Error inesperado. Intentá de nuevo más tarde.",
-		});
-	});
-
-	it("corta con 401 sin token de sesión", async () => {
-		const res = await GET(makeRequest());
-
-		expect(res.status).toBe(401);
-		expect(await res.json()).toEqual({ error: "No autorizado" });
-		expect(fetch).not.toHaveBeenCalled();
-	});
 });

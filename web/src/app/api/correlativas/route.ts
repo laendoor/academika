@@ -10,6 +10,9 @@ export const GET = route.apiHandler(async (req: NextRequest) => {
 		req,
 		`${API_URL}/api/v1/correlativas${qs ? `?${qs}` : ""}`,
 	);
-	if (!res.ok) throw new Error();
+	if (!res.ok)
+		return NextResponse.json(await res.json().catch(() => ({})), {
+			status: res.status,
+		});
 	return NextResponse.json(await res.json());
 });

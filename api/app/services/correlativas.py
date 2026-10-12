@@ -2,6 +2,7 @@ import uuid
 from typing import Self
 
 from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db.session import SessionDep
@@ -11,7 +12,7 @@ from app.models.correlativa import Correlativa
 class CorrelativaService:
     """Lectura de correlativas (la escritura la gobierna el importador Guaraní)."""
 
-    def __init__(self, session) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     @classmethod

@@ -3,7 +3,7 @@ import uuid
 from pydantic import BaseModel
 
 
-class MateriaRef(BaseModel):
+class CorrelativaMateriaRef(BaseModel):
     id: uuid.UUID
     codigo: str
     nombre: str
@@ -12,8 +12,8 @@ class MateriaRef(BaseModel):
 
 
 class CorrelativaResponse(BaseModel):
-    materia: MateriaRef
-    requisito: MateriaRef
+    materia: CorrelativaMateriaRef
+    requisito: CorrelativaMateriaRef
     es_obligatoria: bool
 
     model_config = {"from_attributes": True}
