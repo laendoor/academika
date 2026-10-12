@@ -42,6 +42,7 @@ jobs:
         with:
           files: api/coverage.xml
           flags: backend
+          after_n_builds: 2
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -107,6 +108,7 @@ jobs:
         with:
           files: web/coverage/lcov.info
           flags: frontend
+          after_n_builds: 2
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Build
