@@ -1,9 +1,5 @@
-import { SourcesList } from "@/components/workspace/SourcesList";
+import { redirect } from "next/navigation";
 
-export default function AdminFuentesPage() {
-	return (
-		<div className="p-8">
-			<SourcesList />
-		</div>
-	);
+export default function AdminDatosPage() {
+	redirect("/admin/importar");
 }

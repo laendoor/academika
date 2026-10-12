@@ -1,12 +1,14 @@
 "use client";
 import { useRef, useState } from "react";
 
+import { Pagination } from "@/components/ui/Pagination";
 import { SourcesTable } from "@/components/workspace/SourcesTable";
-import { useAdminImport } from "@/hooks/admin";
+import { IMPORT_PAGE_SIZE, useAdminImport } from "@/hooks/admin";
 
 export function ImportPlanillas() {
+	const [skip, setSkip] = useState(0);
 	const { uploading, items, total, loading, error, handleUpload, refresh } =
-		useAdminImport();
+		useAdminImport(skip);
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,6 +68,14 @@ export function ImportPlanillas() {
 					Sin importaciones registradas todavía.
 				</p>
 			)}
+
+			<Pagination
+				skip={skip}
+				total={total}
+				pageSize={IMPORT_PAGE_SIZE}
+				loading={loading}
+				onChange={setSkip}
+			/>
 		</div>
 	);
 }

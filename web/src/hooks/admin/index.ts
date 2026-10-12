@@ -1,4 +1,4 @@
-export { useAdminImport } from "./useAdminImport";
+export { IMPORT_PAGE_SIZE, useAdminImport } from "./useAdminImport";
 export { useAdminSettings } from "./useAdminSettings";
 export { useAdminStats } from "./useAdminStats";
 export { useAdminUsers } from "./useAdminUsers";

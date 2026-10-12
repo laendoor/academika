@@ -2,19 +2,28 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAdminImport } from "@/hooks/admin/useAdminImport";
+import { useSources } from "@/hooks/workspace";
 import * as admin from "@/lib/api/admin";
 
-const { state } = vi.hoisted(() => ({ state: { wsEventCount: 0 } }));
+const { state, useSourcesMock } = vi.hoisted(() => {
+	const state = { wsEventCount: 0 };
+	return {
+		state,
+		useSourcesMock: vi.fn(() => ({
+			items: [],
+			total: 0,
+			loading: false,
+			error: undefined,
+			refresh: vi.fn(),
+			get wsEventCount() {
+				return state.wsEventCount;
+			},
+		})),
+	};
+});
 
 vi.mock("@/hooks/workspace", () => ({
-	useSources: () => ({
-		items: [],
-		total: 0,
-		loading: false,
-		error: undefined,
-		refresh: vi.fn(),
-		wsEventCount: state.wsEventCount,
-	}),
+	useSources: useSourcesMock,
 }));
 vi.mock("@/lib/api/admin", () => ({ uploadGuaraniSheets: vi.fn() }));
 
@@ -63,6 +72,11 @@ describe("useAdminImport", () => {
 		});
 
 		expect(result.current.uploading).toBe(false);
+	});
+
+	it("pide la página indicada con tamaño 20", () => {
+		renderHook(() => useAdminImport(40));
+		expect(useSourcesMock).toHaveBeenCalledWith({ skip: 40, limit: 20 });
 	});
 
 	it("frena el uploading cuando llegan los eventos WS esperados", async () => {
