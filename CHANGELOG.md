@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/laendoor/academika/compare/v0.4.0...v0.5.0) (2026-10-12)
+
+### Features
+
+* **auth:** dominios permitidos configurables vía settings ([#71](https://github.com/laendoor/academika/issues/71)) ([77531dd](https://github.com/laendoor/academika/commit/77531ddfee76fc698fcf1a534572481245619a7d))
+* **backoffice:** versión + sha en sidebar vía build-args ([#81](https://github.com/laendoor/academika/issues/81)) ([121d1fe](https://github.com/laendoor/academika/commit/121d1fe5c4402caeb2218bbeb96d613097a5b80e))
+
 ## [0.4.0](https://github.com/laendoor/academika/compare/v0.3.0...v0.4.0) (2026-10-11)
 
 ### Features
