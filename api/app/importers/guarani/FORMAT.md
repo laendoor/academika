@@ -202,18 +202,18 @@ Materias de un plan de estudios. Una fila por materia-plan. Archivos separados p
 
 > **Nota:** las exportaciones de Guaraní suelen incluir columnas trailing vacías (ej: `;;;;` al final de cada fila). El parser trabaja por índice y las ignora.
 
-| Columna        | Tipo     | Mapea a                       | Notas                                                              |
-| -------------- | -------- | ----------------------------- | ------------------------------------------------------------------ |
-| Codigo Carrera | `string` | `StudyPlan.degree_code`       | Debe existir en `degree.code`                                      |
-| Plan           | `int`    | `StudyPlan.year`              | Año del plan; ej: 2015, 2018                                       |
-| Cuatrimestre   | `string` | —                             | Ignorado (posición en el plan, sin columna; ver #68)               |
-| Nucleo         | `string` | `Course.nucleo` (normalizado) | Label ("Básico") → key lkp (`basico`); desconocido → warn + null   |
-| Area           | `string` | —                             | Ignorado (sin columna; ver #68)                                    |
-| Codigo         | `string` | `study_plan_course.course_id` | Debe existir en `course.code`                                      |
-| Creditos       | `int`    | `Course.creditos`             | Actualiza la materia vinculada; vacío → no toca                    |
-| Nombre         | `string` | —                             | Ignorado (nombre canónico en Course)                               |
+| Columna        | Tipo     | Mapea a                          | Notas                                                              |
+| -------------- | -------- | -------------------------------- | ------------------------------------------------------------------ |
+| Codigo Carrera | `string` | `PlanDeEstudio` (vía carrera)    | Debe existir en `degree.code`                                      |
+| Plan           | `int`    | `PlanDeEstudio.anio`             | Año del plan; ej: 2015, 2018                                       |
+| Cuatrimestre   | `string` | —                                | Ignorado (posición en el plan, sin columna; ver #68)               |
+| Nucleo         | `string` | `Materia.nucleo` (normalizado)   | Label ("Básico") → key lkp (`basico`); desconocido → warn + null   |
+| Area           | `string` | —                                | Ignorado (sin columna; ver #68)                                    |
+| Codigo         | `string` | `planes_materias` (vía `Materia`) | Debe existir en `course.code`                                     |
+| Creditos       | `int`    | `Materia.creditos`               | Actualiza la materia vinculada; vacío → no toca                    |
+| Nombre         | `string` | —                                | Ignorado (nombre canónico en Course)                               |
 
-El upsert crea/actualiza el `StudyPlan` con `name = "Plan {year}"`, vincula las materias en `study_plan_course` (ON CONFLICT DO NOTHING) y actualiza `Course.nucleo`/`Course.creditos` con los valores de la fila (solo los no-vacíos).
+El upsert crea/actualiza el `PlanDeEstudio` con `name = "Plan {year}"`, vincula las materias en `planes_materias` (ON CONFLICT DO NOTHING) y actualiza `Materia.nucleo`/`Materia.creditos` con los valores de la fila (solo los no-vacíos).
 
 > **Orden de importación:** importar `materias` antes que `planes` — los créditos y el núcleo de la materia viven en planes.csv. Si se invierte el orden, las filas de planes se skipean (warn) y hay que re-importar planes (el upsert es idempotente).
 
