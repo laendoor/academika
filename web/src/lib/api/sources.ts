@@ -6,6 +6,10 @@ export interface ImportGuaraniDetails {
 	processed: number;
 	skipped: number;
 	error: string | null;
+	file_hash?: string | null;
+	preview?: string[] | null;
+	preview_truncated?: boolean;
+	uploader_email?: string | null;
 }
 
 export interface SourceItem {

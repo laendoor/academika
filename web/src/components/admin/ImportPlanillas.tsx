@@ -1,8 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
 
+import { ImportLogList } from "@/components/admin/ImportLogList";
 import { Pagination } from "@/components/ui/Pagination";
-import { SourcesTable } from "@/components/workspace/SourcesTable";
 import { IMPORT_PAGE_SIZE, useAdminImport } from "@/hooks/admin";
 
 export function ImportPlanillas() {
@@ -61,7 +61,7 @@ export function ImportPlanillas() {
 				</div>
 			)}
 
-			<SourcesTable items={items} />
+			<ImportLogList items={items} />
 
 			{total === 0 && !loading && (
 				<p className="mt-4 text-sm text-zinc-500">
