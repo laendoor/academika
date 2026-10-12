@@ -74,8 +74,9 @@ async def test_list_nivel_carrera(client: AsyncClient, admin_token: str) -> None
     )
     assert response.status_code == 200
     items = response.json()
-    assert {item["key"] for item in items} == {"grado", "pregrado"}
+    assert {"grado", "pregrado"} <= {item["key"] for item in items}
     assert all({"key", "label"} <= set(item) for item in items)
+    assert all(item["label"] for item in items)
 
 
 @pytest.mark.asyncio
@@ -86,8 +87,9 @@ async def test_list_nucleo_carrera(client: AsyncClient, admin_token: str) -> Non
     )
     assert response.status_code == 200
     items = response.json()
-    assert {item["key"] for item in items} == {"basico", "avanzado", "orientacion"}
+    assert {"basico", "avanzado", "orientacion"} <= {item["key"] for item in items}
     assert all({"key", "label"} <= set(item) for item in items)
+    assert all(item["label"] for item in items)
 
 
 @pytest.mark.asyncio

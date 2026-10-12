@@ -1,53 +1,40 @@
 "use client";
 import { useEffect, useState } from "react";
 
+import type { ApiResult } from "@/lib/api/client";
 import type { LookupOption } from "@/lib/api/lookups";
 import * as lookups from "@/lib/api/lookups";
 
 export function useUserRoles() {
-	const [roles, setRoles] = useState<LookupOption[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | undefined>();
+	const { data, loading, error } = useLookup(lookups.getUserRoles);
 
-	useEffect(() => {
-		lookups.getUserRoles().then((result) => {
-			setLoading(false);
-			if (result.ok) setRoles(result.data);
-			else setError(result.error);
-		});
-	}, []);
-
-	return { roles, loading, error };
+	return { roles: data, loading, error };
 }
 
 export function useNivelesCarrera() {
-	const [niveles, setNiveles] = useState<LookupOption[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | undefined>();
+	const { data, loading, error } = useLookup(lookups.getNivelesCarrera);
 
-	useEffect(() => {
-		lookups.getNivelesCarrera().then((result) => {
-			setLoading(false);
-			if (result.ok) setNiveles(result.data);
-			else setError(result.error);
-		});
-	}, []);
-
-	return { niveles, loading, error };
+	return { niveles: data, loading, error };
 }
 
 export function useNucleosCarrera() {
-	const [nucleos, setNucleos] = useState<LookupOption[]>([]);
+	const { data, loading, error } = useLookup(lookups.getNucleosCarrera);
+
+	return { nucleos: data, loading, error };
+}
+
+function useLookup(fetch: () => Promise<ApiResult<LookupOption[]>>) {
+	const [data, setData] = useState<LookupOption[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | undefined>();
 
 	useEffect(() => {
-		lookups.getNucleosCarrera().then((result) => {
+		fetch().then((result) => {
 			setLoading(false);
-			if (result.ok) setNucleos(result.data);
+			if (result.ok) setData(result.data);
 			else setError(result.error);
 		});
-	}, []);
+	}, [fetch]);
 
-	return { nucleos, loading, error };
+	return { data, loading, error };
 }
