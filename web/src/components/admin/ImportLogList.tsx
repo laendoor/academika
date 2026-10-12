@@ -42,22 +42,34 @@ function typeLabel(sheetType: string | null): string {
 	return SHEET_TYPE_LABELS[sheetType] ?? sheetType;
 }
 
-function statusIcon(item: SourceItem, isResubmission: boolean) {
+function statusTooltip(item: SourceItem, isResubmission: boolean): string {
+	const { details } = item;
 	if (item.status === "error")
-		return (
-			<span title={item.details.error ?? "error"}>
-				<X aria-hidden className="h-4 w-4 text-red-600" />
-			</span>
-		);
+		return `Error: ${details.error ?? "desconocido"}`;
+	const base = `OK — ${details.processed.toLocaleString("es-AR")} procesadas, ${details.skipped.toLocaleString("es-AR")} omitidas`;
 	if (isResubmission)
-		return (
-			<span title="Re-subida: este archivo ya se había importado antes">
-				<History aria-hidden className="h-4 w-4 text-amber-600" />
-			</span>
+		return `Re-subida — este archivo ya se había importado antes. ${base}.`;
+	return `${base}.`;
+}
+
+function statusIcon(item: SourceItem, isResubmission: boolean) {
+	const icon =
+		item.status === "error" ? (
+			<X aria-hidden className="h-4 w-4 text-red-600" />
+		) : isResubmission ? (
+			<History aria-hidden className="h-4 w-4 text-amber-600" />
+		) : (
+			<Check aria-hidden className="h-4 w-4 text-green-600" />
 		);
 	return (
-		<span title="ok">
-			<Check aria-hidden className="h-4 w-4 text-green-600" />
+		<span className="group relative inline-flex">
+			{icon}
+			<span
+				role="tooltip"
+				className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden w-max max-w-64 -translate-x-1/2 rounded bg-zinc-900 px-2 py-1 text-xs font-normal whitespace-normal text-white group-hover:block group-focus-within:block"
+			>
+				{statusTooltip(item, isResubmission)}
+			</span>
 		</span>
 	);
 }

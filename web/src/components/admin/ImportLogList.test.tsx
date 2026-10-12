@@ -85,7 +85,7 @@ describe("ImportLogList", () => {
 	});
 
 	it("muestra el error en vez de conteos y unifica el icono de re-subida", () => {
-		render(
+		const { container } = render(
 			<ImportLogList
 				items={[
 					makeSource({ id: "nueva", created_at: "2026-10-12T14:32:08" }),
@@ -108,9 +108,21 @@ describe("ImportLogList", () => {
 		);
 
 		expect(screen.getByText("· error: tipo desconocido")).toBeInTheDocument();
-		expect(screen.getByTitle(/re-subida/i)).toBeInTheDocument();
-		expect(screen.getByTitle("tipo desconocido")).toBeInTheDocument();
+		const tips = [...container.querySelectorAll('[role="tooltip"]')].map(
+			(el) => el.textContent,
+		);
+		expect(tips.some((t) => t?.includes("Re-subida"))).toBe(true);
+		expect(tips.some((t) => t?.includes("tipo desconocido"))).toBe(true);
 		expect(screen.getByText("por —", { exact: false })).toBeInTheDocument();
+	});
+
+	it("tooltip de ok explica conteos", () => {
+		const { container } = render(
+			<ImportLogList items={[makeSource({ id: "1" })]} />,
+		);
+		const tip = container.querySelector('[role="tooltip"]')?.textContent;
+		expect(tip).toContain("OK");
+		expect(tip).toContain("omitidas");
 	});
 
 	it("fila con fecha del WS (formato Python) se renderiza sin reventar", () => {
