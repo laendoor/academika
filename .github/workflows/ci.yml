@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  backend:
-    name: Backend — ruff + pytest
+  gates:
+    name: CI Gates
     runs-on: ubuntu-24.04
     services:
       postgres:
@@ -29,85 +29,57 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.13"
-      - name: Install dependencies
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install backend dependencies
         run: cd api && uv sync --frozen
-      - name: Lint (ruff)
-        run: cd api && uv run ruff check .
-      - name: Test unit (pytest)
-        run: cd api && uv run pytest tests/unit/ --cov=app --cov-report=term
-      - name: Test integration (pytest)
-        run: cd api && uv run pytest tests/integration/ -v --cov=app --cov-append --cov-report=xml --cov-report=term
-      - name: Upload coverage to Codecov
+      - name: Install frontend dependencies
+        run: cd web && npm ci
+      - parallel:
+          - name: Lint backend (ruff)
+            run: cd api && uv run ruff check .
+          - name: Test backend (pytest)
+            # Ambas suites corren aunque la primera falle, para que el
+            # coverage.xml exista siempre y Codecov notifique (after_n_builds).
+            run: |
+              cd api
+              STATUS=0
+              uv run pytest tests/unit/ --cov=app --cov-report=term || STATUS=1
+              uv run pytest tests/integration/ -v --cov=app --cov-append --cov-report=xml --cov-report=term || STATUS=1
+              exit $STATUS
+          - name: Check migrations (alembic)
+            run: |
+              cd api
+              uv run alembic upgrade head
+              uv run alembic check
+              uv run alembic downgrade base
+              uv run alembic upgrade head
+            env:
+              DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
+          - name: Lint frontend (biome)
+            run: cd web && npm run lint
+          - name: Test frontend (vitest)
+            run: cd web && npm run test -- --coverage
+          - name: Build frontend
+            run: cd web && npm run build
+      # Siempre suben aunque los tests fallen: sin esto Codecov espera
+      # after_n_builds eternamente y el status queda en pending.
+      - name: Upload backend coverage to Codecov
+        if: always()
         uses: codecov/codecov-action@v5
         with:
           files: api/coverage.xml
           flags: backend
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-
-  alembic-check:
-    name: Alembic — migrations check
-    runs-on: ubuntu-24.04
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: academika
-          POSTGRES_USER: academika
-          POSTGRES_PASSWORD: academika
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    steps:
-      - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v7
-        with:
-          python-version: "3.13"
-      - name: Install dependencies
-        run: cd api && uv sync --frozen
-      - name: upgrade head
-        run: cd api && uv run alembic upgrade head
-        env:
-          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
-      - name: check (no pending migrations)
-        run: cd api && uv run alembic check
-        env:
-          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
-      - name: downgrade base
-        run: cd api && uv run alembic downgrade base
-        env:
-          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
-      - name: upgrade head (desde cero — valida flujo completo)
-        run: cd api && uv run alembic upgrade head
-        env:
-          DATABASE_URL: postgresql+asyncpg://academika:academika@localhost:5432/academika
-
-  frontend:
-    name: Frontend — biome + test + build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: "24"
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Install dependencies
-        run: cd web && npm ci
-      - name: Lint (biome)
-        run: cd web && npm run lint
-      - name: Test (Vitest)
-        run: cd web && npm run test -- --coverage
-      - name: Upload coverage to Codecov
+      - name: Upload frontend coverage to Codecov
+        if: always()
         uses: codecov/codecov-action@v5
         with:
           files: web/coverage/lcov.info
           flags: frontend
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Build
-        run: cd web && npm run build

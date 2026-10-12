@@ -41,7 +41,7 @@ describe("GET /api/correlativas", () => {
 		expect(await res.json()).toEqual({ total: 1, items: [] });
 		expect(fetch).toHaveBeenCalledWith(
 			expect.stringContaining(
-				"/api/v1/correlativas?materia_id=abc&skip=0&limit=20",
+				"/api/v1/correlativas?skip=0&limit=20&materia_id=abc",
 			),
 			expect.objectContaining({
 				headers: expect.objectContaining({
@@ -49,5 +49,29 @@ describe("GET /api/correlativas", () => {
 				}),
 			}),
 		);
+	});
+
+	it("mapea el detail del API ante error 500", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(500, { detail: "DB caída" }),
+		);
+
+		const res = await GET(makeRequest("token-dir"));
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: "DB caída" });
+	});
+
+	it("descarta skip inválido pero conserva materia_id", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(200, { total: 0, items: [] }),
+		);
+
+		const res = await GET(makeRequest("token-dir", "?materia_id=abc&skip=x"));
+
+		expect(res.status).toBe(200);
+		const url = vi.mocked(fetch).mock.calls[0][0] as string;
+		expect(url).toContain("materia_id=abc");
+		expect(url).not.toContain("skip=");
 	});
 });

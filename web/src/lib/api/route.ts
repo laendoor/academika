@@ -37,6 +37,17 @@ export function ok(): NextResponse {
 	return NextResponse.json({ ok: true });
 }
 
+// Solo reenvía skip/limit numéricos al backend; el resto se descarta y el
+// backend aplica sus defaults. Evita que `?limit=abc` llegue como 422.
+export function paginationParams(params: URLSearchParams): URLSearchParams {
+	const clean = new URLSearchParams();
+	for (const key of ["skip", "limit"] as const) {
+		const value = params.get(key);
+		if (value !== null && /^\d+$/.test(value)) clean.set(key, value);
+	}
+	return clean;
+}
+
 function requireAdminToken(req: NextRequest): string {
 	const token = req.cookies.get(ACCESS_TOKEN)?.value;
 	if (!token) throw new RouteError("No autorizado", 401);
