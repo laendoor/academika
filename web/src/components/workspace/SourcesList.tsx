@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 
-import { SourcesTable } from "@/components/workspace/SourcesTable";
 import { Pagination } from "@/components/ui/Pagination";
+import { SourcesTable } from "@/components/workspace/SourcesTable";
 import { useSources } from "@/hooks/workspace";
 
 const PAGE_SIZE = 20;
