@@ -1,12 +1,14 @@
 "use client";
 import { useRef, useState } from "react";
 
-import { SourcesTable } from "@/components/workspace/SourcesTable";
-import { useAdminImport } from "@/hooks/admin";
+import { ImportLogList } from "@/components/admin/ImportLogList";
+import { Pagination } from "@/components/ui/Pagination";
+import { IMPORT_PAGE_SIZE, useAdminImport } from "@/hooks/admin";
 
 export function ImportPlanillas() {
+	const [skip, setSkip] = useState(0);
 	const { uploading, items, total, loading, error, handleUpload, refresh } =
-		useAdminImport();
+		useAdminImport(skip);
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,13 +61,21 @@ export function ImportPlanillas() {
 				</div>
 			)}
 
-			<SourcesTable items={items} />
+			<ImportLogList items={items} />
 
 			{total === 0 && !loading && (
 				<p className="mt-4 text-sm text-zinc-500">
 					Sin importaciones registradas todavía.
 				</p>
 			)}
+
+			<Pagination
+				skip={skip}
+				total={total}
+				pageSize={IMPORT_PAGE_SIZE}
+				loading={loading}
+				onChange={setSkip}
+			/>
 		</div>
 	);
 }

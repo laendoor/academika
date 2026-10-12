@@ -16,7 +16,6 @@ export function AdminSidebar() {
 				<LinkItem label="Correlativas" href="/admin/correlativas" />
 				<hr className="mx-1 my-1 border-zinc-200" />
 				<LinkItem label="Importar Datos" href="/admin/importar" />
-				<LinkItem label="Ver Datos Importados" href="/admin/datos" />
 			</div>
 
 			<div>

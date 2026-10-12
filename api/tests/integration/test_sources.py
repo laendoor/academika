@@ -108,7 +108,18 @@ async def test_sources_returns_import_details_shape(client: AsyncClient, test_us
 
     response = await client.get("/api/v1/sources", headers={"Authorization": f"Bearer {token}"})
     item = response.json()["items"][0]
-    assert set(item["details"].keys()) == {"sheet_type", "files", "processed", "skipped", "error"}
+    assert set(item["details"].keys()) == {
+        "sheet_type",
+        "files",
+        "processed",
+        "skipped",
+        "error",
+        "file_hash",
+        "preview",
+        "preview_truncated",
+        "uploader_email",
+        "skipped_sample",
+    }
     assert item["details"]["sheet_type"] is None
 
 

@@ -39,6 +39,8 @@ from app.utils.dates import date_to_year_term
 
 logger = logging.getLogger(__name__)
 
+_SKIP_SAMPLE_MAX = 50
+
 _RESULT_TO_STATUS: dict[str, str] = {
     "I": "inscripto",
     "P": "promocionado",
@@ -57,12 +59,21 @@ def _result_to_status(result: str) -> str:
 class GuaraniImporterService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        self.skip_sample: list[str] = []
 
     @classmethod
     def dep(cls, session: SessionDep) -> Self:
         return cls(session)
 
+    def _skip(self, fmt: str, *args: object) -> None:
+        """Descarta una fila: log + muestra para trazabilidad (con cap, es logging)."""
+        reason = fmt % args if args else fmt
+        logger.warning("%s", reason)
+        if len(self.skip_sample) < _SKIP_SAMPLE_MAX:
+            self.skip_sample.append(reason)
+
     async def importar(self, sheet_type: GuaraniSheetType, contents: list[str]) -> tuple[int, int]:
+        self.skip_sample = []
         method = {
             GuaraniSheetType.CARRERAS: self.importar_carreras,
             GuaraniSheetType.MATERIAS: self.importar_materias,
@@ -126,17 +137,13 @@ class GuaraniImporterService:
         for row in rows:
             carrera = carreras.get(row.degree_code)
             if carrera is None:
-                logger.warning(
-                    "import_students: carrera '%s' not found — skipping doc_id=%s",
-                    row.degree_code,
-                    row.doc_id,
-                )
+                self._skip("import_students: carrera '%s' not found — skipping doc_id=%s", row.degree_code, row.doc_id)
                 skipped += 1
                 continue
 
             plan = planes.get((carrera.id, row.study_plan_year))
             if plan is None:
-                logger.warning(
+                self._skip(
                     "import_students: plan year=%s not found for carrera '%s' — skipping enrollment for doc_id=%s",
                     row.study_plan_year,
                     row.degree_code,
@@ -207,7 +214,7 @@ class GuaraniImporterService:
             carrera = carreras.get(row.degree_code)
 
             if alumno is None or materia is None or carrera is None:
-                logger.warning(
+                self._skip(
                     "import_enrollment_history: missing refs — skipping doc_id=%s course=%s degree=%s",
                     row.doc_id,
                     row.course_code,
@@ -273,7 +280,7 @@ class GuaraniImporterService:
             carrera = carreras.get(row.degree_code)
 
             if alumno is None or materia is None or carrera is None:
-                logger.warning(
+                self._skip(
                     "import_enrollments: missing refs — skipping doc_id=%s course=%s degree=%s",
                     row.doc_id,
                     row.course_code,
@@ -378,7 +385,7 @@ class GuaraniImporterService:
             carrera = carreras.get(row.degree_code)
             materia = materias.get(row.course_code)
             if carrera is None or materia is None:
-                logger.warning(
+                self._skip(
                     "import_study_plans: missing refs — skipping degree=%s course=%s",
                     row.degree_code,
                     row.course_code,
@@ -387,7 +394,7 @@ class GuaraniImporterService:
                 continue
             plan = planes.get((carrera.id, row.plan_year))
             if plan is None:
-                logger.warning(
+                self._skip(
                     "import_study_plans: plan not found after upsert — degree=%s year=%d",
                     row.degree_code,
                     row.plan_year,
@@ -421,7 +428,7 @@ class GuaraniImporterService:
         for row in rows:
             materia = materias.get(row.course_code)
             if materia is None:
-                logger.warning("import_prerequisites: materia not found — code=%s", row.course_code)
+                self._skip("import_prerequisites: materia not found — code=%s", row.course_code)
                 skipped += 1
                 continue
 
@@ -431,7 +438,7 @@ class GuaraniImporterService:
             for prereq_code, es_obligatoria in prereqs.items():
                 prereq = materias.get(prereq_code)
                 if prereq is None:
-                    logger.warning("_upsert_correlativas: materia requerida not found — code=%s", prereq_code)
+                    self._skip("_upsert_correlativas: materia requerida not found — code=%s", prereq_code)
                     skipped += 1
                     continue
                 stmt = (

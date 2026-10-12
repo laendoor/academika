@@ -25,6 +25,12 @@ describe("AdminSidebar", () => {
 			"href",
 			"/admin/usuarios",
 		);
+		expect(
+			screen.getByRole("link", { name: "Importar Datos" }),
+		).toHaveAttribute("href", "/admin/importar");
+		expect(
+			screen.queryByRole("link", { name: "Ver Datos Importados" }),
+		).not.toBeInTheDocument();
 	});
 
 	it("resalta el link activo según el pathname", () => {

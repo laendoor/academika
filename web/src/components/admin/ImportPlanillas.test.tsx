@@ -4,7 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 import { ImportPlanillas } from "@/components/admin/ImportPlanillas";
 import { useAdminImport } from "@/hooks/admin";
 
-vi.mock("@/hooks/admin", () => ({ useAdminImport: vi.fn() }));
+vi.mock("@/hooks/admin", () => ({
+	useAdminImport: vi.fn(),
+	IMPORT_PAGE_SIZE: 20,
+}));
 
 const useAdminImportMock = vi.mocked(useAdminImport);
 
@@ -59,5 +62,14 @@ describe("ImportPlanillas", () => {
 		fireEvent.submit(form);
 
 		expect(handleUpload).toHaveBeenCalledWith([file]);
+	});
+
+	it("pagina el historial cuando supera la página", () => {
+		useAdminImportMock.mockReturnValue(makeImport({ total: 25 }));
+		render(<ImportPlanillas />);
+		expect(screen.getByText("1-20 de 25")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: "Siguiente" }));
+		expect(screen.getByText("21-25 de 25")).toBeInTheDocument();
 	});
 });

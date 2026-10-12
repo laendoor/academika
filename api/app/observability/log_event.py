@@ -70,7 +70,7 @@ def log_event(
                         "type": "log_event",
                         "payload": {
                             "id": str(event.id),
-                            "created_at": str(event.created_at),
+                            "created_at": event.created_at.isoformat(),
                             "action": action,
                             "status": status,
                             "details": details,

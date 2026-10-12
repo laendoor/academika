@@ -1,3 +1,4 @@
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,28 @@ async def _post(client: AsyncClient, token: str, files: list[tuple[str, bytes]])
         files=payload,
     )
     return response
+
+
+@pytest.mark.asyncio
+async def test_import_guarani_broadcasts_iso_created_at(
+    client: AsyncClient, admin_token: str, db_session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regresión: el payload WS debe llevar created_at ISO (no str() de Python),
+    si no los navegadores estrictos no lo parsean y el live update se pierde."""
+    import re
+
+    from app.observability.ws_manager import manager
+
+    seen: list[dict] = []
+
+    async def capture(message: dict) -> None:
+        seen.append(message)
+
+    monkeypatch.setattr(manager, "broadcast", capture)
+    await _post(client, admin_token, [("carreras.csv", await _read("carreras.csv"))])
+    assert seen
+    for message in seen:
+        assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*", message["payload"]["created_at"])
 
 
 @pytest.mark.asyncio
@@ -68,6 +91,13 @@ async def test_import_guarani_logs_ok_row_per_file(
     assert e.details["processed"] > 0
     assert e.details["skipped"] == 0
     assert e.details["error"] is None
+    assert e.details["file_hash"] == sha256(await _read("carreras.csv")).hexdigest()
+    assert e.details["preview"] is not None
+    assert len(e.details["preview"]) == 6
+    assert e.details["preview"] == (await _read("carreras.csv")).decode("utf-8").splitlines()[:6]
+    assert e.details["preview_truncated"] is True
+    assert e.details["uploader_email"] == test_admin.email
+    assert e.details["skipped_sample"] == []
 
 
 @pytest.mark.asyncio
@@ -126,6 +156,9 @@ async def test_import_guarani_logs_encoding_error(
     assert err.details["files"] == ["latin1.csv"]
     assert err.details["sheet_type"] is None
     assert "encoding" in err.details["error"]
+    assert err.details["file_hash"] == sha256(bad_content).hexdigest()
+    assert err.details["preview"] is None
+    assert err.details["uploader_email"] == test_admin.email
 
 
 @pytest.mark.asyncio

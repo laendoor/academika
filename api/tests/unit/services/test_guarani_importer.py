@@ -30,6 +30,15 @@ class TestUpsertAlumnos:
 
         assert upserted == 0
         assert skipped == 1
+        assert len(service.skip_sample) == 1
+        assert "carrera 'P' not found" in service.skip_sample[0]
+
+    async def test_skip_sample_caps_at_max(self):
+        service = GuaraniImporterService(AsyncMock())
+        for i in range(55):
+            service._skip("reason %d", i)
+        assert len(service.skip_sample) == 50
+        assert service.skip_sample[0] == "reason 0"
 
     async def test_upserts_when_carrera_and_plan_found(self):
         session = AsyncMock()

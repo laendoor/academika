@@ -4,14 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useSources } from "@/hooks/workspace";
 import * as admin from "@/lib/api/admin";
 
-const LIMIT = 15;
+export const IMPORT_PAGE_SIZE = 20;
 
-export function useAdminImport() {
+export function useAdminImport(skip = 0) {
 	const [uploading, setUploading] = useState(false);
 	const [expectedTarget, setExpectedTarget] = useState<number | null>(null);
 	const baselineRef = useRef(0);
 	const { items, total, loading, error, refresh, wsEventCount } = useSources({
-		limit: LIMIT,
+		skip,
+		limit: IMPORT_PAGE_SIZE,
 	});
 
 	useEffect(() => {
