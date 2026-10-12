@@ -1,4 +1,10 @@
-"""Agrega columna creditos a cursadas (importador historial Guaraní, #68)."""
+"""Agrega columna creditos a cursadas (importador historial Guaraní, #68).
+
+Revision ID: af4e79aecac5
+Revises: 5293fcf210fc
+Create Date: 2026-10-12 14:06:27.301326
+
+"""
 
 from collections.abc import Sequence
 
