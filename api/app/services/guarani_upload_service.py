@@ -31,6 +31,7 @@ class FileOutcome:
     preview: list[str] | None = None
     preview_truncated: bool = False
     uploader_email: str | None = None
+    skipped_sample: list[str] | None = None
 
 
 def _file_hash(raw: bytes) -> str:
@@ -62,6 +63,7 @@ def _import_details(outcome: FileOutcome) -> dict[str, Any]:
         "preview": outcome.preview,
         "preview_truncated": outcome.preview_truncated,
         "uploader_email": outcome.uploader_email,
+        "skipped_sample": outcome.skipped_sample,
     }
 
 
@@ -179,4 +181,5 @@ class GuaraniUploadService:
             preview=preview,
             preview_truncated=preview_truncated,
             uploader_email=uploader_email,
+            skipped_sample=importer.skip_sample,
         )

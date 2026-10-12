@@ -2,9 +2,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import {
-	formatDayHeader,
-	groupByDay,
+	formatIsoLocal,
 	ImportLogList,
+	parseDate,
 	resubmittedIds,
 } from "@/components/admin/ImportLogList";
 import type { SourceItem } from "@/lib/api/sources";
@@ -22,23 +22,26 @@ function makeSource(overrides: Partial<SourceItem> = {}): SourceItem {
 			error: null,
 			file_hash: "abc",
 			uploader_email: "lean@unq.edu.ar",
+			skipped_sample: [],
 		},
 		...overrides,
 	};
 }
 
-const NOON = new Date(2026, 9, 12, 20, 0, 0);
-
-describe("formatDayHeader", () => {
-	it("etiqueta hoy y ayer en español", () => {
-		expect(formatDayHeader("2026-10-12T14:32:08", NOON)).toMatch(/^Hoy · /);
-		expect(formatDayHeader("2026-10-11T18:20:01", NOON)).toMatch(/^Ayer · /);
+describe("formatIsoLocal", () => {
+	it("formatea ISO localsortable", () => {
+		expect(formatIsoLocal("2026-10-12T14:32:08")).toBe("2026-10-12 14:32:08");
 	});
 
-	it("días viejos van sin etiqueta relativa", () => {
-		const header = formatDayHeader("2026-10-10T09:00:00", NOON);
-		expect(header).not.toMatch(/Hoy|Ayer/);
-		expect(header).toContain("octubre");
+	it("tolera el str() de Python del payload WS", () => {
+		expect(formatIsoLocal("2026-10-12 14:32:08.123456+00:00")).toMatch(
+			/^2026-10-12 \d{2}:\d{2}:\d{2}$/,
+		);
+	});
+
+	it("fecha inválida no revienta: devuelve el crudo", () => {
+		expect(parseDate("no-es-fecha")).toBeNull();
+		expect(formatIsoLocal("no-es-fecha")).toBe("no-es-fecha");
 	});
 });
 
@@ -64,7 +67,7 @@ describe("resubmittedIds", () => {
 });
 
 describe("ImportLogList", () => {
-	it("agrupa por día y muestra archivo, tipo, conteos y usuario", () => {
+	it("lista plana con fecha ISO, archivo, tipo, conteos y usuario", () => {
 		render(
 			<ImportLogList
 				items={[
@@ -74,15 +77,11 @@ describe("ImportLogList", () => {
 			/>,
 		);
 
-		expect(screen.getAllByRole("heading").length).toBe(2);
+		expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+		expect(screen.getByText("2026-10-12 14:32:08")).toBeInTheDocument();
 		expect(screen.getAllByText("alumnos.csv")).toHaveLength(2);
 		expect(screen.getAllByText("Alumnos")).toHaveLength(2);
-		const counts = `· ${(1240).toLocaleString("es-AR")} ok · ${(3).toLocaleString("es-AR")} omitidas`;
-		expect(
-			screen.getAllByText((_, el) => el?.textContent === counts),
-		).toHaveLength(2);
 		expect(screen.getAllByText("por lean", { exact: false })).toHaveLength(2);
-		expect(screen.getAllByText(/\d{2}:\d{2}:\d{2}/)).toHaveLength(2);
 	});
 
 	it("muestra el error en vez de conteos y marca re-subidas", () => {
@@ -113,90 +112,74 @@ describe("ImportLogList", () => {
 		expect(screen.getByText("por —", { exact: false })).toBeInTheDocument();
 	});
 
-	it("groupByDay preserva el orden DESC dentro del día", () => {
-		const groups = groupByDay(
-			[
-				makeSource({ id: "1", created_at: "2026-10-12T14:32:08" }),
-				makeSource({ id: "2", created_at: "2026-10-12T11:05:44" }),
-			],
-			NOON,
-		);
-		expect(groups).toHaveLength(1);
-		expect(groups[0].items.map((i) => i.id)).toEqual(["1", "2"]);
-	});
-});
-
-describe("ImportLogList expand", () => {
-	function openRow(id = "1") {
-		render(<ImportLogList items={[makeSource({ id })]} />);
-		fireEvent.click(screen.getByRole("button", { expanded: false }));
-	}
-
-	it("L1 muestra evento en texto plano con email completo", () => {
-		openRow();
-		expect(screen.getByText("por: lean@unq.edu.ar")).toBeInTheDocument();
-		expect(screen.getByText(/procesadas:/)).toBeInTheDocument();
-	});
-
-	it("L1 se colapsa al segundo click", () => {
-		openRow();
-		fireEvent.click(screen.getByRole("button", { expanded: true }));
-		expect(screen.queryByText("por: lean@unq.edu.ar")).not.toBeInTheDocument();
-	});
-
-	it("L2 muestra la muestra del archivo y avisa truncado", () => {
+	it("fila con fecha del WS (formato Python) se renderiza sin reventar", () => {
 		render(
 			<ImportLogList
 				items={[
 					makeSource({
 						id: "1",
-						details: {
-							...makeSource().details,
-							preview: ["h1;h2", "1;x"],
-							preview_truncated: true,
-						},
+						created_at: "2026-10-12 14:32:08.123456+00:00",
 					}),
 				]}
 			/>,
 		);
+		expect(
+			screen.getByText(/^2026-10-12 \d{2}:\d{2}:\d{2}$/),
+		).toBeInTheDocument();
+	});
+});
+
+describe("ImportLogList expand", () => {
+	function openRow(item: SourceItem) {
+		render(<ImportLogList items={[item]} />);
 		fireEvent.click(screen.getByRole("button", { expanded: false }));
-		fireEvent.click(
-			screen.getByRole("button", { name: /muestra del archivo/ }),
+	}
+
+	it("muestra directo el contenido del archivo", () => {
+		openRow(
+			makeSource({
+				id: "1",
+				details: {
+					...makeSource().details,
+					preview: ["h1;h2", "1;x"],
+					preview_truncated: true,
+				},
+			}),
 		);
 		expect(screen.getByText(/h1;h2/)).toBeInTheDocument();
 		expect(screen.getByText(/muestra truncada/)).toBeInTheDocument();
+		expect(screen.queryByText(/procesadas:/)).not.toBeInTheDocument();
 	});
 
 	it("sin preview muestra fallback de importación anterior", () => {
-		openRow();
+		openRow(makeSource({ id: "1" }));
 		expect(
 			screen.getByText("sin muestra (importación anterior)"),
 		).toBeInTheDocument();
 	});
 
-	it("error se muestra en bloque monoespaciado", () => {
-		render(
-			<ImportLogList
-				items={[
-					makeSource({
-						id: "1",
-						status: "error",
-						details: {
-							sheet_type: null,
-							files: ["raro.csv"],
-							processed: 0,
-							skipped: 0,
-							error: "tipo desconocido",
-							file_hash: "abc",
-							uploader_email: null,
-						},
-					}),
-				]}
-			/>,
+	it("error y muestra de omitidas explican qué pasó", () => {
+		openRow(
+			makeSource({
+				id: "1",
+				status: "error",
+				details: {
+					sheet_type: null,
+					files: ["raro.csv"],
+					processed: 0,
+					skipped: 2,
+					error: "tipo desconocido",
+					file_hash: "abc",
+					uploader_email: null,
+					skipped_sample: ["import_x: missing refs — skipping doc_id=1"],
+				},
+			}),
 		);
-		fireEvent.click(screen.getByRole("button", { expanded: false }));
 		const blocks = screen.getAllByText("tipo desconocido");
-		expect(blocks.length).toBeGreaterThanOrEqual(1);
 		expect(blocks[blocks.length - 1].tagName).toBe("PRE");
+		expect(screen.getByText("omitidas (muestra):")).toBeInTheDocument();
+		expect(
+			screen.getByText(/missing refs — skipping doc_id=1/),
+		).toBeInTheDocument();
 	});
 });

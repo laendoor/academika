@@ -20,6 +20,7 @@ class ImportGuaraniDetails(BaseModel):
     preview: list[str] | None = None
     preview_truncated: bool = False
     uploader_email: str | None = None
+    skipped_sample: list[str] | None = None
 
 
 class SourceResponse(BaseModel):

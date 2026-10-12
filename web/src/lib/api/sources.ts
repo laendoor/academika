@@ -10,6 +10,7 @@ export interface ImportGuaraniDetails {
 	preview?: string[] | null;
 	preview_truncated?: boolean;
 	uploader_email?: string | null;
+	skipped_sample?: string[] | null;
 }
 
 export interface SourceItem {
