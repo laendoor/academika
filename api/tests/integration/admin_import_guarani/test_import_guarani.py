@@ -1,3 +1,4 @@
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
@@ -68,6 +69,12 @@ async def test_import_guarani_logs_ok_row_per_file(
     assert e.details["processed"] > 0
     assert e.details["skipped"] == 0
     assert e.details["error"] is None
+    assert e.details["file_hash"] == sha256(await _read("carreras.csv")).hexdigest()
+    assert e.details["preview"] is not None
+    assert len(e.details["preview"]) == 6
+    assert e.details["preview"] == (await _read("carreras.csv")).decode("utf-8").splitlines()[:6]
+    assert e.details["preview_truncated"] is True
+    assert e.details["uploader_email"] == test_admin.email
 
 
 @pytest.mark.asyncio
@@ -126,6 +133,9 @@ async def test_import_guarani_logs_encoding_error(
     assert err.details["files"] == ["latin1.csv"]
     assert err.details["sheet_type"] is None
     assert "encoding" in err.details["error"]
+    assert err.details["file_hash"] == sha256(bad_content).hexdigest()
+    assert err.details["preview"] is None
+    assert err.details["uploader_email"] == test_admin.email
 
 
 @pytest.mark.asyncio

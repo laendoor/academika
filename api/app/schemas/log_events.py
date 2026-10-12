@@ -16,6 +16,10 @@ class ImportGuaraniDetails(BaseModel):
     processed: int = 0
     skipped: int = 0
     error: str | None = None
+    file_hash: str | None = None
+    preview: list[str] | None = None
+    preview_truncated: bool = False
+    uploader_email: str | None = None
 
 
 class SourceResponse(BaseModel):
