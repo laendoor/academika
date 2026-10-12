@@ -83,3 +83,33 @@ export function getEstudiantes(
 	if (estado_academico) params.set("estado_academico", estado_academico);
 	return get<EstudiantesResponse>(`/api/workspace/estudiantes?${params}`);
 }
+
+export interface CorrelativaRef {
+	id: string;
+	codigo: string;
+	nombre: string;
+}
+
+export interface CorrelativaRow {
+	materia: CorrelativaRef;
+	requisito: CorrelativaRef;
+	es_obligatoria: boolean;
+}
+
+export interface CorrelativasResponse {
+	total: number;
+	items: CorrelativaRow[];
+}
+
+export function getCorrelativas(
+	skip = 0,
+	limit = 20,
+	materia_id?: string,
+): Promise<ApiResult<CorrelativasResponse>> {
+	const params = new URLSearchParams({
+		skip: String(skip),
+		limit: String(limit),
+	});
+	if (materia_id) params.set("materia_id", materia_id);
+	return get<CorrelativasResponse>(`/api/correlativas?${params}`);
+}

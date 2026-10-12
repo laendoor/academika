@@ -8,6 +8,7 @@ from app.routers import (
     alumnos,
     auth,
     carreras,
+    correlativas,
     cursadas,
     health,
     lookups,
@@ -32,6 +33,7 @@ app.include_router(admin_import_guarani.router, prefix=f"{api_prefix}/admin/impo
 app.include_router(admin_settings.router, prefix=f"{api_prefix}/admin/settings", tags=["admin"])
 
 app.include_router(carreras.router, prefix=f"{api_prefix}/carreras", tags=["carreras"])
+app.include_router(correlativas.router, prefix=f"{api_prefix}/correlativas", tags=["correlativas"])
 app.include_router(materias.router, prefix=f"{api_prefix}/materias", tags=["materias"])
 app.include_router(planes_de_estudio.router, prefix=f"{api_prefix}/planes", tags=["planes"])
 app.include_router(alumnos.router, prefix=f"{api_prefix}/alumnos", tags=["alumnos"])
