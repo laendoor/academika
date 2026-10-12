@@ -18,6 +18,8 @@ export function ImportDetailModal({
 	const { details } = item;
 	const ok = item.status !== "error";
 	const skipSample = details.skipped_sample ?? [];
+	const sampleTruncated =
+		details.skipped_sample_truncated ?? details.skipped > skipSample.length;
 	const panelRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -93,7 +95,7 @@ export function ImportDetailModal({
 						<div className="mt-3">
 							<h3 className="text-sm font-medium text-zinc-700">
 								No procesadas
-								{details.skipped_sample_truncated &&
+								{sampleTruncated &&
 									` (mostrando ${skipSample.length} de ${details.skipped.toLocaleString("es-AR")})`}
 							</h3>
 							{skipSample.length > 0 ? (

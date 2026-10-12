@@ -70,6 +70,20 @@ describe("ImportDetailModal", () => {
 		expect(screen.queryByText("No procesadas")).not.toBeInTheDocument();
 	});
 
+	it("sin flag (fila vieja) deduce el recorte por conteo", () => {
+		renderModal(
+			makeItem({
+				details: {
+					...makeItem().details,
+					skipped: 16,
+					skipped_sample: ["a", "b", "c", "d", "e"],
+					skipped_sample_truncated: undefined,
+				},
+			}),
+		);
+		expect(screen.getByText(/mostrando 5 de 16/)).toBeInTheDocument();
+	});
+
 	it("cierra con Escape, backdrop y botón", () => {
 		const onClose = renderModal();
 		fireEvent.keyDown(document, { key: "Escape" });
