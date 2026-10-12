@@ -32,14 +32,14 @@ export interface CarreraOption {
 }
 
 export function getCarreras(
-	skip?: number,
-	limit?: number,
+	skip = 0,
+	limit = 20,
 ): Promise<ApiResult<{ total: number; items: CarreraOption[] }>> {
-	const params = new URLSearchParams();
-	if (skip !== undefined) params.set("skip", String(skip));
-	if (limit !== undefined) params.set("limit", String(limit));
-	const qs = params.toString();
-	return get(`/api/carreras${qs ? `?${qs}` : ""}`);
+	const params = new URLSearchParams({
+		skip: String(skip),
+		limit: String(limit),
+	});
+	return get(`/api/carreras?${params}`);
 }
 
 export interface PlanInfo {

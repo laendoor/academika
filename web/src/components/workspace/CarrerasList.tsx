@@ -6,6 +6,7 @@ import { useCarreras } from "@/hooks/workspace";
 
 const PAGE_SIZE = 20;
 
+// shortcut: paginación duplicada en MateriasList/CorrelativasList, extraer componente compartido si diverge más
 export function CarrerasList() {
 	const [skip, setSkip] = useState(0);
 

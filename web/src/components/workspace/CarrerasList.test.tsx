@@ -50,4 +50,17 @@ describe("CarrerasList", () => {
 		expect(screen.getByRole("button", { name: "Siguiente" })).toBeEnabled();
 		expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
 	});
+
+	it("muestra error sin mensaje vacío", () => {
+		useCarrerasMock.mockReturnValue({
+			items: [],
+			total: 0,
+			loading: false,
+			error: "Falló la carga",
+			refresh: vi.fn(),
+		});
+		render(<CarrerasList />);
+		expect(screen.getByText("Falló la carga")).toBeInTheDocument();
+		expect(screen.queryByText("Sin carreras.")).not.toBeInTheDocument();
+	});
 });

@@ -55,7 +55,33 @@ describe("GET /api/carreras", () => {
 		const res = await GET(makeRequest("token-doc"));
 
 		expect(res.status).toBe(403);
+		expect(await res.json()).toEqual({ error: "Sin permiso" });
 		expect(fetch).toHaveBeenCalled();
+	});
+
+	it("mapea el detail del API ante error 500", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(500, { detail: "DB caída" }),
+		);
+
+		const res = await GET(makeRequest("token-dir"));
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: "DB caída" });
+	});
+
+	it("descarta skip/limit no numéricos", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(200, { total: 0, items: [] }),
+		);
+
+		const res = await GET(makeRequest("token-dir", "?skip=abc&limit=-5"));
+
+		expect(res.status).toBe(200);
+		const url = vi.mocked(fetch).mock.calls[0][0] as string;
+		expect(url).toContain("/api/v1/carreras");
+		expect(url).not.toContain("skip=");
+		expect(url).not.toContain("limit=");
 	});
 
 	it("corta con 401 sin token de sesión", async () => {
