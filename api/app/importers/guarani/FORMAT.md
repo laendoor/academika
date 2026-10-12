@@ -207,7 +207,7 @@ Materias de un plan de estudios. Una fila por materia-plan. Archivos separados p
 | Codigo Carrera | `string` | `PlanDeEstudio` (vía carrera)    | Debe existir en `degree.code`                                      |
 | Plan           | `int`    | `PlanDeEstudio.anio`             | Año del plan; ej: 2015, 2018                                       |
 | Cuatrimestre   | `string` | —                                | Ignorado (posición en el plan, sin columna; ver #68)               |
-| Nucleo         | `string` | `Materia.nucleo` (normalizado)   | Label ("Básico") → key lkp (`basico`); desconocido → warn + null   |
+| Nucleo         | `string` | `Materia.nucleo` (normalizado)   | Label ("Básico") → key lkp (`basico`); códigos de exports reales ("A"/"B") → warn + null hasta mapear |
 | Area           | `string` | —                                | Ignorado (sin columna; ver #68)                                    |
 | Codigo         | `string` | `planes_materias` (vía `Materia`) | Debe existir en `course.code`                                     |
 | Creditos       | `int`    | `Materia.creditos`               | Actualiza la materia vinculada; vacío → no toca                    |
@@ -216,6 +216,8 @@ Materias de un plan de estudios. Una fila por materia-plan. Archivos separados p
 El upsert crea/actualiza el `PlanDeEstudio` con `name = "Plan {year}"`, vincula las materias en `planes_materias` (ON CONFLICT DO NOTHING) y actualiza `Materia.nucleo`/`Materia.creditos` con los valores de la fila (solo los no-vacíos).
 
 > **Orden de importación:** importar `materias` antes que `planes` — los créditos y el núcleo de la materia viven en planes.csv. Si se invierte el orden, las filas de planes se skipean (warn) y hay que re-importar planes (el upsert es idempotente).
+>
+> Si una materia aparece en varios planes con distinto núcleo/créditos, gana el último CSV procesado — el CSV manda sobre ediciones manuales.
 
 ### Ejemplo de parseo
 

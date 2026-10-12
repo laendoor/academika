@@ -3,7 +3,7 @@ import unicodedata
 
 from app.utils.csv import parse_csv
 from app.utils.dates import parse_date
-from app.utils.strings import or_none
+from app.utils.strings import is_integer, or_none
 
 from .types import (
     CourseRow,
@@ -46,19 +46,30 @@ def parse_study_plan_courses(content: str) -> list[StudyPlanCourseRow]:
             plan_year=int(plan_year_str.strip()),
             course_code=course_code.strip(),
             nucleo=_normalize_nucleo(or_none(nucleo_str)),
-            creditos=int(creditos_str.strip()) if creditos_str.strip() else None,
+            creditos=_parse_creditos(creditos_str),
         )
 
     return parse_csv(content, _row)
 
 
+def _parse_creditos(value: str) -> int | None:
+    text = value.strip()
+    if not text:
+        return None
+    if is_integer(text):
+        return int(text)
+    logger.warning("crédito no numérico '%s' — se ignora", text)
+    return None
+
+
+# Acoplado al seed lkp_nucleo_carrera (seeds/sql/reference/01_lkp.sql): toda key nueva va en ambos lados.
 _NUCLEO_KEYS = {"basico", "avanzado", "orientacion"}
 
 
 def _normalize_nucleo(value: str | None) -> str | None:
     if value is None:
         return None
-    key = unicodedata.normalize("NFKD", value.lower()).encode("ascii", "ignore").decode()
+    key = unicodedata.normalize("NFKD", value.strip().lower()).encode("ascii", "ignore").decode()
     if key in _NUCLEO_KEYS:
         return key
     logger.warning("núcleo desconocido '%s' — se ignora", value)

@@ -83,3 +83,59 @@ async def test_importar_inscripciones_desde_csv(db_session: AsyncSession) -> Non
     assert upserted > 0
     assert skipped == 0
     assert len(cursadas) == upserted
+
+
+PLANES_CSV = """Codigo Carrera;Plan;Cuatrimestre;Nucleo;Area;Codigo;Creditos;Nombre
+TPI;2015;1;Básico;Programación;80005;8;Elementos de Programación
+TPI;2015;1;A;Matemática;80010;6;Algoritmos
+"""
+
+
+@pytest.mark.asyncio
+async def test_importar_planes_actualiza_materia(db_session: AsyncSession) -> None:
+    await _seed(db_session)
+    service = GuaraniImporterService(db_session)
+
+    upserted, skipped = await service.importar_planes([PLANES_CSV])
+
+    assert skipped == 0
+    assert upserted == 2
+    materia = (await db_session.execute(select(Materia).where(Materia.codigo == "80005"))).scalars().one()
+    assert materia.nucleo == "basico"
+    assert materia.creditos == 8
+    # código de núcleo desconocido ("A" en exports reales) → warn + null, pero los créditos se guardan
+    materia_a = (await db_session.execute(select(Materia).where(Materia.codigo == "80010"))).scalars().one()
+    assert materia_a.nucleo is None
+    assert materia_a.creditos == 6
+
+
+HISTORIAL_SIN_CREDITOS = (
+    "Legajo;DNI;Carrera;Regular;Calidad;Cod.Materia;Nombre_materia;Fecha;Result;Nota;"
+    "Forma Aprobación;Créditos;Acta Promo;Acta Ex;Plan\n"
+    "12001;35120001;TPI;;;80005;Elementos de Programación;01/07/2018;P;9;Promoción;;;1001;2015\n"
+)
+
+
+@pytest.mark.asyncio
+async def test_historial_preserva_creditos_en_reimport_sin_dato(db_session: AsyncSession) -> None:
+    await _seed(db_session)
+    service = GuaraniImporterService(db_session)
+    await service.importar_alumnos([_read("datos_personales.csv")])
+    await service.importar_historial_cursadas([_read("alumnos_guarani.csv")])
+
+    upserted, skipped = await service.importar_historial_cursadas([HISTORIAL_SIN_CREDITOS])
+
+    assert skipped == 0
+    assert upserted == 1
+    alumno_id = (await db_session.execute(select(Alumno.id).where(Alumno.dni == "35120001"))).scalar_one()
+    materia_id = (await db_session.execute(select(Materia.id).where(Materia.codigo == "80005"))).scalar_one()
+    cursada = (
+        (
+            await db_session.execute(
+                select(Cursada).where(Cursada.alumno_id == alumno_id, Cursada.materia_id == materia_id)
+            )
+        )
+        .scalars()
+        .one()
+    )
+    assert cursada.creditos == 10

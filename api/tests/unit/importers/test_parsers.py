@@ -148,6 +148,16 @@ class TestParsePlanes:
         assert row.nucleo is None
         assert row.creditos is None
 
+    def test_non_numeric_creditos_ignored_row_kept(self) -> None:
+        content = (
+            "Codigo Carrera;Plan;Cuatrimestre;Nucleo;Area;Codigo;Creditos;Nombre\n"
+            "TPI;2015;1;Básico;Programación;101;s/d;Algoritmos\n"
+        )
+        rows = parse_study_plan_courses(content)
+        assert len(rows) == 1
+        assert rows[0].creditos is None
+        assert rows[0].nucleo == "basico"
+
     def test_multiple_degrees(self) -> None:
         rows = parse_study_plan_courses(_read("planes.csv"))
         assert rows[2].degree_code == "LDS"

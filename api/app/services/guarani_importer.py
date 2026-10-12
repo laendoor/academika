@@ -218,6 +218,17 @@ class GuaraniImporterService:
 
             anio, cuatrimestre = date_to_year_term(row.enrollment_date)
             estado = _result_to_status(row.result)
+            conflict_set: dict[str, object] = {
+                "estado_cursada": estado,
+                "nota": row.grade,
+                "fecha_inscripcion": row.enrollment_date,
+                "es_regular": row.is_regular,
+                "tipo_aprobacion": row.approval_type,
+                "anio_plan": row.plan_year,
+                "updated_at": func.now(),
+            }
+            if row.credits is not None:
+                conflict_set["creditos"] = row.credits
 
             stmt = (
                 insert(Cursada)
@@ -239,16 +250,7 @@ class GuaraniImporterService:
                 )
                 .on_conflict_do_update(
                     constraint="uq_cursada_alumno_materia_carrera_cuatrimestre",
-                    set_={
-                        "estado_cursada": estado,
-                        "nota": row.grade,
-                        "fecha_inscripcion": row.enrollment_date,
-                        "es_regular": row.is_regular,
-                        "tipo_aprobacion": row.approval_type,
-                        "anio_plan": row.plan_year,
-                        "creditos": row.credits,
-                        "updated_at": func.now(),
-                    },
+                    set_=conflict_set,
                 )
             )
             await self.session.execute(stmt)
