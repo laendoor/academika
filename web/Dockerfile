@@ -1,9 +1,13 @@
 FROM node:24-slim AS builder
+ARG APP_VERSION=dev
+ARG APP_SHA=dev
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_APP_VERSION=$APP_VERSION
+ENV NEXT_PUBLIC_APP_SHA=$APP_SHA
 RUN npm run build
 
 FROM node:24-slim AS runner
