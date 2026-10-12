@@ -28,12 +28,18 @@ export interface EstudiantesResponse {
 export interface CarreraOption {
 	id: string;
 	nombre: string;
+	codigo: string;
 }
 
-export function getCarreras(): Promise<
-	ApiResult<{ total: number; items: CarreraOption[] }>
-> {
-	return get("/api/carreras");
+export function getCarreras(
+	skip?: number,
+	limit?: number,
+): Promise<ApiResult<{ total: number; items: CarreraOption[] }>> {
+	const params = new URLSearchParams();
+	if (skip !== undefined) params.set("skip", String(skip));
+	if (limit !== undefined) params.set("limit", String(limit));
+	const qs = params.toString();
+	return get(`/api/carreras${qs ? `?${qs}` : ""}`);
 }
 
 export interface PlanInfo {

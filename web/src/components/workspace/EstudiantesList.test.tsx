@@ -86,7 +86,10 @@ describe("EstudiantesList", () => {
 		});
 		getCarreras.mockResolvedValue({
 			ok: true,
-			data: { total: 1, items: [{ id: "c1", nombre: "Ingeniería" }] },
+			data: {
+				total: 1,
+				items: [{ id: "c1", nombre: "Ingeniería", codigo: "ING" }],
+			},
 		});
 
 		render(<EstudiantesList />);
