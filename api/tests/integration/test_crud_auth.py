@@ -31,6 +31,7 @@ CRUD_ENDPOINTS = [
     ("POST", "/api/v1/cursadas"),
     ("PUT", "/api/v1/cursadas/{id}"),
     ("DELETE", "/api/v1/cursadas/{id}"),
+    ("GET", "/api/v1/correlativas"),
 ]
 
 
