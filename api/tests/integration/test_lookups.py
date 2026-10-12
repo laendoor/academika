@@ -6,6 +6,8 @@ LOOKUP_PATHS = [
     "/api/v1/lookups/estado-cursada",
     "/api/v1/lookups/tipo-cursada",
     "/api/v1/lookups/user-roles",
+    "/api/v1/lookups/nivel-carrera",
+    "/api/v1/lookups/nucleo-carrera",
 ]
 
 
@@ -61,6 +63,32 @@ async def test_list_tipo_cursada(client: AsyncClient, admin_token: str) -> None:
     assert response.status_code == 200
     items = response.json()
     assert {item["key"] for item in items} == {"regular", "libre"}
+    assert all(item["label"] for item in items)
+
+
+@pytest.mark.asyncio
+async def test_list_nivel_carrera(client: AsyncClient, admin_token: str) -> None:
+    response = await client.get(
+        "/api/v1/lookups/nivel-carrera",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    items = response.json()
+    assert {"grado", "pregrado"} <= {item["key"] for item in items}
+    assert all({"key", "label"} <= set(item) for item in items)
+    assert all(item["label"] for item in items)
+
+
+@pytest.mark.asyncio
+async def test_list_nucleo_carrera(client: AsyncClient, admin_token: str) -> None:
+    response = await client.get(
+        "/api/v1/lookups/nucleo-carrera",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    items = response.json()
+    assert {"basico", "avanzado", "orientacion"} <= {item["key"] for item in items}
+    assert all({"key", "label"} <= set(item) for item in items)
     assert all(item["label"] for item in items)
 
 
