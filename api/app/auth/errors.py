@@ -12,5 +12,8 @@ class InvalidTokenError(UnauthorizedError):
 
 
 class UnauthorizedDomainError(UnauthorizedError):
-    def __init__(self, domain: str) -> None:
-        super().__init__(f"El email debe pertenecer al dominio {domain}")
+    def __init__(self, allowed: list[str]) -> None:
+        if len(allowed) == 1:
+            super().__init__(f"El email debe pertenecer al dominio {allowed[0]}")
+        else:
+            super().__init__(f"El email debe pertenecer a uno de los dominios: {', '.join(allowed)}")

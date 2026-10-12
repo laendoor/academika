@@ -59,11 +59,11 @@ async def test_update_setting_success(
     await _seed_setting(db_session)
     response = await client.put(
         "/api/v1/admin/settings/auth.allowed_domains",
-        json={"value": []},
+        json={"value": ["*"]},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 200
-    assert response.json()["value"] == []
+    assert response.json()["value"] == ["*"]
 
 
 @pytest.mark.asyncio
@@ -91,3 +91,62 @@ async def test_update_setting_forbidden(client: AsyncClient, test_user: User):
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 403
+
+
+# ── PUT /admin/settings/auth.allowed_domains (validación) ─────────────────────
+
+
+@pytest.mark.asyncio
+async def test_update_domains_rejects_empty(
+    client: AsyncClient, test_admin: User, admin_token: str, db_session: AsyncSession
+):
+    await _seed_setting(db_session)
+    response = await client.put(
+        "/api/v1/admin/settings/auth.allowed_domains",
+        json={"value": []},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_domains_rejects_without_at(
+    client: AsyncClient, test_admin: User, admin_token: str, db_session: AsyncSession
+):
+    await _seed_setting(db_session)
+    response = await client.put(
+        "/api/v1/admin/settings/auth.allowed_domains",
+        json={"value": ["gmail.com"]},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_domains_normalizes(
+    client: AsyncClient, test_admin: User, admin_token: str, db_session: AsyncSession
+):
+    setting = await _seed_setting(db_session)
+    setting_id = setting.id
+    response = await client.put(
+        "/api/v1/admin/settings/auth.allowed_domains",
+        json={"value": [" @GMAIL.COM "]},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["value"] == ["@gmail.com"]
+    db_session.expire_all()
+    assert (await db_session.get(Setting, setting_id)).value == ["@gmail.com"]
+
+
+@pytest.mark.asyncio
+async def test_update_other_key_skips_domain_validation(
+    client: AsyncClient, test_admin: User, admin_token: str, db_session: AsyncSession
+):
+    await _seed_setting(db_session, key="otra.clave", value="x")
+    response = await client.put(
+        "/api/v1/admin/settings/otra.clave",
+        json={"value": []},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
