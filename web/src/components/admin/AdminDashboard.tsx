@@ -23,12 +23,12 @@ export function AdminDashboard() {
 			{status === "error" && (
 				<p className="mb-4 text-sm text-red-600">Error al cargar datos.</p>
 			)}
-			<div className="flex flex-col gap-4">
+			<div className="grid grid-cols-2 gap-4">
 				<StatCard
-					label="Estudiantes"
-					href="/admin/estudiantes"
-					value={estudiantes}
-					Icon={GraduationCap}
+					label="Carreras"
+					href="/admin/carreras"
+					value={carreras}
+					Icon={School}
 				/>
 				<StatCard
 					label="Materias"
@@ -37,16 +37,16 @@ export function AdminDashboard() {
 					Icon={BookOpen}
 				/>
 				<StatCard
-					label="Carreras"
-					href="/admin/carreras"
-					value={carreras}
-					Icon={School}
-				/>
-				<StatCard
 					label="Planes"
 					href="/admin/planes"
 					value={planes}
 					Icon={ClipboardList}
+				/>
+				<StatCard
+					label="Estudiantes"
+					href="/admin/estudiantes"
+					value={estudiantes}
+					Icon={GraduationCap}
 				/>
 			</div>
 		</div>
