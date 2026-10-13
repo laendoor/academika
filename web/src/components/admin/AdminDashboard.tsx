@@ -1,12 +1,18 @@
 "use client";
 import type { LucideIcon } from "lucide-react";
-import { BookOpen, GraduationCap, LayoutList } from "lucide-react";
+import {
+	BookOpen,
+	ClipboardList,
+	GraduationCap,
+	LayoutList,
+	School,
+} from "lucide-react";
 import Link from "next/link";
 
 import { useAdminStats } from "@/hooks/admin";
 
 export function AdminDashboard() {
-	const { estudiantes, materias, status } = useAdminStats();
+	const { estudiantes, materias, carreras, planes, status } = useAdminStats();
 
 	return (
 		<div className="p-8">
@@ -29,6 +35,18 @@ export function AdminDashboard() {
 					href="/admin/materias"
 					value={materias}
 					Icon={BookOpen}
+				/>
+				<StatCard
+					label="Carreras"
+					href="/admin/carreras"
+					value={carreras}
+					Icon={School}
+				/>
+				<StatCard
+					label="Planes"
+					href="/admin/planes"
+					value={planes}
+					Icon={ClipboardList}
 				/>
 			</div>
 		</div>
