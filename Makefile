@@ -95,5 +95,8 @@ seed-admin: ## Crea primer usuario admin (interactivo)
 	cd api && DATABASE_URL=$(DB_URL) uv run python -m seeds.create_admin
 
 ## Release
-release: ## Crea release (bump version + git tag + push)
+release: ## Crea release (bump version + git tag + push). Solo desde main en sync con origin/main.
+	@test "$$(git branch --show-current)" = "main" || (echo "ERROR: release solo desde main (estás en $$(git branch --show-current))" >&2; exit 1)
+	@git fetch origin main --quiet
+	@test "$$(git rev-parse main)" = "$$(git rev-parse origin/main)" || (echo "ERROR: main no está en sync con origin/main (hacé pull/push primero)" >&2; exit 1)
 	npm run release
