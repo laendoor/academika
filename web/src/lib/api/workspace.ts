@@ -119,3 +119,57 @@ export function getCorrelativas(
 	if (materia_id) params.set("materia_id", materia_id);
 	return get<CorrelativasResponse>(`/api/correlativas?${params}`);
 }
+
+export interface PlanRow {
+	id: string;
+	carrera_id: string;
+	carrera_nombre: string;
+	nombre: string;
+	nivel: string | null;
+	anio: number;
+	vigente: boolean;
+}
+
+export interface PlanesResponse {
+	total: number;
+	items: PlanRow[];
+}
+
+export function getPlanes(
+	skip = 0,
+	limit = 20,
+	carrera_id?: string,
+): Promise<ApiResult<PlanesResponse>> {
+	const params = new URLSearchParams({
+		skip: String(skip),
+		limit: String(limit),
+	});
+	if (carrera_id) params.set("carrera_id", carrera_id);
+	return get<PlanesResponse>(`/api/planes?${params}`);
+}
+
+export interface MateriaEnPlan {
+	id: string;
+	codigo: string;
+	sigla: string | null;
+	nombre: string;
+	creditos: number | null;
+	nucleo: string | null;
+	horas_semanales: number | null;
+	carga_horaria_total: number | null;
+}
+
+export interface PlanDetail {
+	id: string;
+	carrera_id: string;
+	carrera_nombre: string;
+	nombre: string;
+	nivel: string | null;
+	anio: number;
+	vigente: boolean;
+	materias: MateriaEnPlan[];
+}
+
+export function getPlanDetail(id: string): Promise<ApiResult<PlanDetail>> {
+	return get<PlanDetail>(`/api/planes/${encodeURIComponent(id)}`);
+}
