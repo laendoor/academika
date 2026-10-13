@@ -7,22 +7,28 @@ import * as workspace from "@/lib/api/workspace";
 vi.mock("@/lib/api/workspace", () => ({
 	getEstudiantes: vi.fn(),
 	getMaterias: vi.fn(),
+	getCarreras: vi.fn(),
+	getPlanes: vi.fn(),
 }));
 
 const getEstudiantes = vi.mocked(workspace.getEstudiantes);
 const getMaterias = vi.mocked(workspace.getMaterias);
+const getCarreras = vi.mocked(workspace.getCarreras);
+const getPlanes = vi.mocked(workspace.getPlanes);
 
 describe("useAdminStats", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
-	it("carga totales de estudiantes y materias", async () => {
+	it("carga totales de estudiantes, materias, carreras y planes", async () => {
 		getEstudiantes.mockResolvedValue({
 			ok: true,
 			data: { total: 120, items: [] },
 		});
 		getMaterias.mockResolvedValue({ ok: true, data: { total: 45, items: [] } });
+		getCarreras.mockResolvedValue({ ok: true, data: { total: 8, items: [] } });
+		getPlanes.mockResolvedValue({ ok: true, data: { total: 12, items: [] } });
 
 		const { result } = renderHook(() => useAdminStats());
 
@@ -30,6 +36,8 @@ describe("useAdminStats", () => {
 		await waitFor(() => expect(result.current.status).toBe("ok"));
 		expect(result.current.estudiantes).toBe(120);
 		expect(result.current.materias).toBe(45);
+		expect(result.current.carreras).toBe(8);
+		expect(result.current.planes).toBe(12);
 	});
 
 	it("marca error si alguna consulta falla", async () => {
