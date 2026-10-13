@@ -66,3 +66,32 @@ async def test_list_planes_filter_by_carrera(auth_client: AsyncClient) -> None:
     assert data["total"] == 1
     assert data["items"][0]["anio"] == 2015
     assert data["items"][0]["carrera_nombre"] == "Carrera TPI"
+
+
+@pytest.mark.asyncio
+async def test_update_plan(auth_client: AsyncClient) -> None:
+    carrera = await _create_carrera(auth_client)
+    materia = await _create_materia(auth_client, "MAT1")
+    plan = await _create_plan(auth_client, carrera["id"])
+
+    response = await auth_client.put(
+        f"/api/v1/planes/{plan['id']}",
+        json={"nombre": "Plan Nuevo", "materia_ids": [materia["id"]]},
+    )
+    assert response.status_code == 200
+    assert response.json()["nombre"] == "Plan Nuevo"
+
+    detail = (await auth_client.get(f"/api/v1/planes/{plan['id']}")).json()
+    assert [m["codigo"] for m in detail["materias"]] == ["MAT1"]
+
+
+@pytest.mark.asyncio
+async def test_delete_plan(auth_client: AsyncClient) -> None:
+    carrera = await _create_carrera(auth_client)
+    plan = await _create_plan(auth_client, carrera["id"])
+
+    response = await auth_client.delete(f"/api/v1/planes/{plan['id']}")
+    assert response.status_code == 204
+
+    response = await auth_client.get(f"/api/v1/planes/{plan['id']}")
+    assert response.status_code == 404

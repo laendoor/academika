@@ -60,6 +60,43 @@ describe("GET /api/planes", () => {
 		expect(await res.json()).toEqual({ error: "Sin permiso" });
 	});
 
+	it("mapea el detail del API ante error 500", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(500, { detail: "DB caída" }),
+		);
+
+		const res = await GET(makeRequest("token-dir"));
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: "DB caída" });
+	});
+
+	it("mapea el 422 con lista de Pydantic al error genérico", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(422, { detail: [{ msg: "Input inválido" }] }),
+		);
+
+		const res = await GET(makeRequest("token-dir", "?carrera_id=no-uuid"));
+
+		expect(res.status).toBe(422);
+		expect(await res.json()).toEqual({
+			error: "Error inesperado. Intentá de nuevo más tarde.",
+		});
+	});
+
+	it("omite el query cuando no hay filtros", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(200, { total: 0, items: [] }),
+		);
+
+		const res = await GET(makeRequest("token-dir"));
+
+		expect(res.status).toBe(200);
+		const url = vi.mocked(fetch).mock.calls[0][0] as string;
+		expect(url).toContain("/api/v1/planes");
+		expect(url).not.toContain("?");
+	});
+
 	it("corta con 401 sin token de sesión", async () => {
 		const res = await GET(makeRequest());
 

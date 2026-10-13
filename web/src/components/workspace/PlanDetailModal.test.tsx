@@ -75,7 +75,7 @@ describe("PlanDetailModal", () => {
 		expect(screen.getByRole("alert")).toHaveTextContent("Falló la carga");
 	});
 
-	it("cierra con Escape y con click en el backdrop", () => {
+	it("cierra con Escape y con click en el backdrop, no con otras teclas", () => {
 		const onClose = vi.fn();
 		render(
 			<PlanDetailModal
@@ -86,10 +86,73 @@ describe("PlanDetailModal", () => {
 			/>,
 		);
 
+		fireEvent.keyDown(document, { key: "Enter" });
+		expect(onClose).not.toHaveBeenCalled();
+
 		fireEvent.keyDown(document, { key: "Escape" });
 		expect(onClose).toHaveBeenCalledTimes(1);
 
 		fireEvent.click(screen.getByTestId("plan-modal-backdrop"));
 		expect(onClose).toHaveBeenCalledTimes(2);
+
+		fireEvent.click(screen.getByRole("dialog"));
+		expect(onClose).toHaveBeenCalledTimes(2);
+	});
+
+	it("muestra materia rala con guiones y labels crudos sin lookup", () => {
+		render(
+			<PlanDetailModal
+				detail={{
+					...makeDetail(),
+					vigente: false,
+					materias: [
+						{
+							id: "m2",
+							codigo: "OPT1",
+							sigla: null,
+							nombre: "Optativa I",
+							creditos: null,
+							nucleo: "basico",
+							horas_semanales: null,
+							carga_horaria_total: null,
+						},
+						{
+							id: "m3",
+							codigo: "OPT2",
+							sigla: null,
+							nombre: "Optativa II",
+							creditos: null,
+							nucleo: null,
+							horas_semanales: null,
+							carga_horaria_total: null,
+						},
+					],
+				}}
+				loading={false}
+				nivelLabels={{}}
+				nucleoLabels={{}}
+				onClose={() => {}}
+			/>,
+		);
+
+		expect(screen.getByText(/grado · no vigente/)).toBeInTheDocument();
+		expect(screen.getByText("Optativa I")).toBeInTheDocument();
+		expect(screen.getByText("basico")).toBeInTheDocument();
+		expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+	});
+
+	it("avisa cuando el plan no tiene materias", () => {
+		render(
+			<PlanDetailModal
+				detail={{ ...makeDetail(), nivel: null, materias: [] }}
+				loading={false}
+				{...LABELS}
+				onClose={() => {}}
+			/>,
+		);
+
+		expect(
+			screen.getByText("Este plan no tiene materias vinculadas."),
+		).toBeInTheDocument();
 	});
 });

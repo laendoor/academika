@@ -59,6 +59,49 @@ describe("GET /api/planes/[id]", () => {
 		expect(await res.json()).toEqual({ error: "Plan no encontrado" });
 	});
 
+	it("mapea el detail del API ante error 500", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(500, { detail: "DB caída" }),
+		);
+
+		const res = await GET(makeRequest("token-dir"), CTX);
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({ error: "DB caída" });
+	});
+
+	it("propaga el status ante error no-500 con detail", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(400, { detail: "Solicitud inválida" }),
+		);
+
+		const res = await GET(makeRequest("token-dir"), CTX);
+
+		expect(res.status).toBe(400);
+		expect(await res.json()).toEqual({ error: "Solicitud inválida" });
+	});
+
+	it("mapea el 422 con lista de Pydantic al error genérico", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(422, { detail: [{ msg: "Input inválido" }] }),
+		);
+
+		const res = await GET(makeRequest("token-dir"), CTX);
+
+		expect(res.status).toBe(422);
+		expect(await res.json()).toEqual({
+			error: "Error inesperado. Intentá de nuevo más tarde.",
+		});
+	});
+
+	it("lanza error sin contexto", async () => {
+		const res = await GET(makeRequest("token-dir"), undefined);
+
+		expect(res.status).toBe(400);
+		expect(await res.json()).toEqual({ error: "Falta contexto" });
+		expect(fetch).not.toHaveBeenCalled();
+	});
+
 	it("corta con 401 sin token de sesión", async () => {
 		const res = await GET(makeRequest(), CTX);
 

@@ -95,3 +95,51 @@ async def test_update_conflict(service: PlanDeEstudioService, session: AsyncMock
     with pytest.raises(ConflictError):
         await service.update(mock_plan.id, PlanDeEstudioUpdate(nombre="Nuevo"))
     session.rollback.assert_awaited_once()
+
+
+def _mock_execute_first(session: AsyncMock, value) -> None:
+    result = MagicMock()
+    result.scalars.return_value.first.return_value = value
+    session.execute.return_value = result
+
+
+def _mock_execute_list(session: AsyncMock, total: int | None, items: list) -> None:
+    session.scalar.return_value = total
+    result = MagicMock()
+    result.scalars.return_value.all.return_value = items
+    session.execute.return_value = result
+
+
+# ── get_detail ────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_get_detail_found(service: PlanDeEstudioService, session: AsyncMock, mock_plan: MagicMock):
+    _mock_execute_first(session, mock_plan)
+    assert await service.get_detail(mock_plan.id) is mock_plan
+
+
+@pytest.mark.asyncio
+async def test_get_detail_not_found(service: PlanDeEstudioService, session: AsyncMock):
+    _mock_execute_first(session, None)
+    with pytest.raises(NotFoundError):
+        await service.get_detail(uuid.uuid4())
+
+
+# ── list_filtered ─────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_list_filtered_no_carrera(service: PlanDeEstudioService, session: AsyncMock):
+    _mock_execute_list(session, 2, ["p1", "p2"])
+    assert await service.list_filtered() == (2, ["p1", "p2"])
+    session.scalar.assert_awaited_once()
+    session.execute.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_list_filtered_by_carrera(service: PlanDeEstudioService, session: AsyncMock):
+    _mock_execute_list(session, 1, ["p1"])
+    carrera_id = uuid.uuid4()
+    assert await service.list_filtered(carrera_id=carrera_id) == (1, ["p1"])
+    assert "carrera_id" in str(session.execute.await_args.args[0])
