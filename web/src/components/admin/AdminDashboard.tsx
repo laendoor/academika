@@ -1,12 +1,18 @@
 "use client";
 import type { LucideIcon } from "lucide-react";
-import { BookOpen, GraduationCap, LayoutList } from "lucide-react";
+import {
+	BookOpen,
+	ClipboardList,
+	GraduationCap,
+	LayoutList,
+	School,
+} from "lucide-react";
 import Link from "next/link";
 
 import { useAdminStats } from "@/hooks/admin";
 
 export function AdminDashboard() {
-	const { estudiantes, materias, status } = useAdminStats();
+	const { estudiantes, materias, carreras, planes, status } = useAdminStats();
 
 	return (
 		<div className="p-8">
@@ -17,18 +23,30 @@ export function AdminDashboard() {
 			{status === "error" && (
 				<p className="mb-4 text-sm text-red-600">Error al cargar datos.</p>
 			)}
-			<div className="flex flex-col gap-4">
+			<div className="grid grid-cols-2 gap-4">
 				<StatCard
-					label="Estudiantes"
-					href="/admin/estudiantes"
-					value={estudiantes}
-					Icon={GraduationCap}
+					label="Carreras"
+					href="/admin/carreras"
+					value={carreras}
+					Icon={School}
 				/>
 				<StatCard
 					label="Materias"
 					href="/admin/materias"
 					value={materias}
 					Icon={BookOpen}
+				/>
+				<StatCard
+					label="Planes"
+					href="/admin/planes"
+					value={planes}
+					Icon={ClipboardList}
+				/>
+				<StatCard
+					label="Estudiantes"
+					href="/admin/estudiantes"
+					value={estudiantes}
+					Icon={GraduationCap}
 				/>
 			</div>
 		</div>
