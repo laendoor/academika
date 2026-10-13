@@ -15,10 +15,9 @@ export const GET = route.apiHandler(async (req: NextRequest) => {
 	);
 	if (!res.ok) {
 		const json = (await res.json().catch(() => ({}))) as { detail?: string };
-		return NextResponse.json(
-			{ error: json.detail ?? route.UNEXPECTED_ERROR },
-			{ status: res.status },
-		);
+		const message =
+			typeof json.detail === "string" ? json.detail : route.UNEXPECTED_ERROR;
+		throw new route.RouteError(message, res.status >= 500 ? 500 : res.status);
 	}
 	return NextResponse.json(await res.json());
 });

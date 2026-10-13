@@ -8,7 +8,10 @@ export const GET = route.apiHandler(async (req: NextRequest, ctx) => {
 	if (!ctx) throw new route.RouteError("Falta contexto", 400);
 	const { id } = await ctx.params;
 
-	const res = await route.fetchWithToken(req, `${API_URL}/api/v1/planes/${id}`);
+	const res = await route.fetchWithToken(
+		req,
+		`${API_URL}/api/v1/planes/${encodeURIComponent(id)}`,
+	);
 
 	if (!res.ok) {
 		if (res.status === 404)

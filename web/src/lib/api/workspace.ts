@@ -123,6 +123,7 @@ export function getCorrelativas(
 export interface PlanRow {
 	id: string;
 	carrera_id: string;
+	carrera_nombre: string;
 	nombre: string;
 	nivel: string | null;
 	anio: number;
@@ -170,5 +171,5 @@ export interface PlanDetail {
 }
 
 export function getPlanDetail(id: string): Promise<ApiResult<PlanDetail>> {
-	return get<PlanDetail>(`/api/planes/${id}`);
+	return get<PlanDetail>(`/api/planes/${encodeURIComponent(id)}`);
 }

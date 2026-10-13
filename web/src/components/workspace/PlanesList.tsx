@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Pagination } from "@/components/ui/Pagination";
 import { Table, Tbody, Th } from "@/components/ui/Table";
@@ -22,10 +22,11 @@ export function PlanesList() {
 	const [carreras, setCarreras] = useState<CarreraOption[]>([]);
 	const [niveles, setNiveles] = useState<LookupOption[]>([]);
 	const [nucleos, setNucleos] = useState<LookupOption[]>([]);
-	const [selected, setSelected] = useState<PlanRow | null>(null);
+	const [selected, setSelected] = useState(false);
 	const [detail, setDetail] = useState<PlanDetail | null>(null);
 	const [detailLoading, setDetailLoading] = useState(false);
 	const [detailError, setDetailError] = useState<string | undefined>(undefined);
+	const requestId = useRef(0);
 
 	const { items, total, loading, error } = usePlanes({
 		skip,
@@ -49,13 +50,22 @@ export function PlanesList() {
 	}, []);
 
 	const nivelLabels = toLabels(niveles);
+	const nucleoLabels = toLabels(nucleos);
+
+	const closeDetail = useCallback(() => {
+		setSelected(false);
+		setDetail(null);
+		setDetailError(undefined);
+	}, []);
 
 	async function openDetail(plan: PlanRow) {
-		setSelected(plan);
+		const id = ++requestId.current;
+		setSelected(true);
 		setDetail(null);
 		setDetailError(undefined);
 		setDetailLoading(true);
 		const r = await workspace.getPlanDetail(plan.id);
+		if (requestId.current !== id) return;
 		setDetailLoading(false);
 		if (r.ok) setDetail(r.data);
 		else setDetailError(r.error);
@@ -115,9 +125,7 @@ export function PlanesList() {
 									{item.nombre}
 								</button>
 							</td>
-							<td className="px-4 py-3 text-zinc-600">
-								{carreras.find((c) => c.id === item.carrera_id)?.nombre ?? "—"}
-							</td>
+							<td className="px-4 py-3 text-zinc-600">{item.carrera_nombre}</td>
 							<td className="px-4 py-3 text-zinc-600">{item.anio}</td>
 							<td className="px-4 py-3 text-zinc-600">
 								{item.nivel ? (nivelLabels[item.nivel] ?? item.nivel) : "—"}
@@ -148,8 +156,8 @@ export function PlanesList() {
 					loading={detailLoading}
 					error={detailError}
 					nivelLabels={nivelLabels}
-					nucleoLabels={toLabels(nucleos)}
-					onClose={() => setSelected(null)}
+					nucleoLabels={nucleoLabels}
+					onClose={closeDetail}
 				/>
 			)}
 		</div>

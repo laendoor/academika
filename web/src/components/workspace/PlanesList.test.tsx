@@ -27,6 +27,7 @@ function makePlan(id: string): PlanRow {
 	return {
 		id,
 		carrera_id: "c1",
+		carrera_nombre: "TPI",
 		nombre: `Plan ${id}`,
 		nivel: "grado",
 		anio: 2015,

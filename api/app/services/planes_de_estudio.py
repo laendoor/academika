@@ -33,7 +33,8 @@ class PlanDeEstudioService(BaseService[PlanDeEstudio, PlanDeEstudioCreate, PlanD
         if carrera_id is not None:
             builder.filter(PlanDeEstudio.carrera_id == carrera_id)
         total = await self.session.scalar(builder.count_stmt())
-        result = await self.session.execute(builder.paginated(skip, limit))
+        stmt = builder.paginated(skip, limit).options(joinedload(PlanDeEstudio.carrera))
+        result = await self.session.execute(stmt)
         return total or 0, list(result.scalars().all())
 
     async def create(self, data: PlanDeEstudioCreate) -> PlanDeEstudio:

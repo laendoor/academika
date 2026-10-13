@@ -42,6 +42,20 @@ class MateriaEnPlan(BaseModel):
     horas_semanales: int | None
     carga_horaria_total: int | None
 
+    model_config = {"from_attributes": True}
+
+
+class PlanDeEstudioRow(BaseModel):
+    id: uuid.UUID
+    carrera_id: uuid.UUID
+    carrera_nombre: str
+    nombre: str
+    nivel: str | None
+    anio: int
+    vigente: bool
+    created_at: datetime
+    updated_at: datetime
+
 
 class PlanDeEstudioDetail(BaseModel):
     id: uuid.UUID
