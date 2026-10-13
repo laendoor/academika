@@ -13,6 +13,7 @@ export function AdminSidebar() {
 				<LinkItem label="Estudiantes" href="/admin/estudiantes" />
 				<LinkItem label="Materias" href="/admin/materias" />
 				<LinkItem label="Carreras" href="/admin/carreras" />
+				<LinkItem label="Planes" href="/admin/planes" />
 				<LinkItem label="Correlativas" href="/admin/correlativas" />
 				<hr className="mx-1 my-1 border-zinc-200" />
 				<LinkItem label="Importar Datos" href="/admin/importar" />

@@ -21,6 +21,10 @@ describe("AdminSidebar", () => {
 			"href",
 			"/admin/materias",
 		);
+		expect(screen.getByRole("link", { name: "Planes" })).toHaveAttribute(
+			"href",
+			"/admin/planes",
+		);
 		expect(screen.getByRole("link", { name: "Usuarios" })).toHaveAttribute(
 			"href",
 			"/admin/usuarios",

@@ -124,6 +124,7 @@ export interface PlanRow {
 	id: string;
 	carrera_id: string;
 	nombre: string;
+	nivel: string | null;
 	anio: number;
 	vigente: boolean;
 }

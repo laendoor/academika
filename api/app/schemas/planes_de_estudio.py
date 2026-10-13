@@ -23,6 +23,7 @@ class PlanDeEstudioResponse(BaseModel):
     id: uuid.UUID
     carrera_id: uuid.UUID
     nombre: str
+    nivel: str | None
     anio: int
     vigente: bool
     created_at: datetime
