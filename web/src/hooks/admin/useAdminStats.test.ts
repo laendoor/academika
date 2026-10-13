@@ -51,4 +51,15 @@ describe("useAdminStats", () => {
 
 		await waitFor(() => expect(result.current.status).toBe("error"));
 	});
+
+	it("marca error si estudiantes, carreras o planes fallan", async () => {
+		getEstudiantes.mockResolvedValue({ ok: false, error: "boom" });
+		getMaterias.mockResolvedValue({ ok: true, data: { total: 45, items: [] } });
+		getCarreras.mockResolvedValue({ ok: false, error: "boom" });
+		getPlanes.mockResolvedValue({ ok: false, error: "boom" });
+
+		const { result } = renderHook(() => useAdminStats());
+
+		await waitFor(() => expect(result.current.status).toBe("error"));
+	});
 });
