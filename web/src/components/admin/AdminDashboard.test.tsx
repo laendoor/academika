@@ -22,11 +22,13 @@ describe("AdminDashboard", () => {
 		expect(screen.getByText("45")).toBeInTheDocument();
 		expect(screen.getByText("8")).toBeInTheDocument();
 		expect(screen.getByText("12")).toBeInTheDocument();
-		expect(screen.getAllByRole("link").map((a) => a.getAttribute("href"))).toEqual([
-		"/admin/carreras",
-		"/admin/materias",
-		"/admin/planes",
-		"/admin/estudiantes",
+		expect(
+			screen.getAllByRole("link").map((a) => a.getAttribute("href")),
+		).toEqual([
+			"/admin/carreras",
+			"/admin/materias",
+			"/admin/planes",
+			"/admin/estudiantes",
 		]);
 	});
 
