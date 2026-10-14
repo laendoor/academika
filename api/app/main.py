@@ -6,6 +6,7 @@ from app.routers import (
     admin_settings,
     admin_users,
     alumnos,
+    analytics,
     auth,
     carreras,
     correlativas,
@@ -40,5 +41,6 @@ app.include_router(alumnos.router, prefix=f"{api_prefix}/alumnos", tags=["alumno
 app.include_router(cursadas.router, prefix=f"{api_prefix}/cursadas", tags=["cursadas"])
 app.include_router(lookups.router, prefix=f"{api_prefix}/lookups", tags=["lookups"])
 app.include_router(sources.router, prefix=f"{api_prefix}/sources", tags=["sources"])
+app.include_router(analytics.router, prefix=f"{api_prefix}/analytics", tags=["analytics"])
 app.include_router(workspace_studio.router, prefix=f"{api_prefix}/workspace", tags=["workspace"])
 app.include_router(ws.router, prefix="/ws", tags=["ws"])
