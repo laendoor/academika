@@ -2,7 +2,7 @@
 	"info": {
 		"name": "Académika API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"description": "Endpoints de Académika. Fiel al código actual: los CRUD de dominio, `sources` y `workspace` requieren rol director o admin; el backoffice (`auth/invite`, `admin/users`, `admin/import-guarani`) requiere admin; los lookups, cualquier usuario autenticado. Hacé `POST /auth/login` con un usuario del rol correspondiente antes de los requests protegidos. El WebSocket `/ws` no se incluye (Postman v2.1 no lo soporta)."
+		"description": "Endpoints de Académika. Fiel al código actual: los CRUD de dominio, `sources`, `workspace` y `analytics` requieren rol director o admin; el backoffice (`auth/invite`, `admin/users`, `admin/import-guarani`) requiere admin; los lookups, cualquier usuario autenticado. Hacé `POST /auth/login` con un usuario del rol correspondiente antes de los requests protegidos. El WebSocket `/ws` no se incluye (Postman v2.1 no lo soporta)."
 	},
 	"variable": [
 		{
@@ -902,6 +902,40 @@
 								{ "key": "skip", "value": "0" },
 								{ "key": "limit", "value": "20" }
 							]
+						}
+					}
+				},
+				{
+					"name": "GET /analytics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{AIKA_BASE_URL}}/api/v1/analytics",
+							"host": ["{{AIKA_BASE_URL}}"],
+							"path": ["api", "v1", "analytics"]
+						}
+					}
+				},
+				{
+					"name": "GET /analytics/:nombre",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{AIKA_BASE_URL}}/api/v1/analytics/smoke",
+							"host": ["{{AIKA_BASE_URL}}"],
+							"path": ["api", "v1", "analytics", "smoke"]
 						}
 					}
 				}

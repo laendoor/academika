@@ -283,11 +283,11 @@ Todo endpoint nace **con auth**. Los únicos públicos son la whitelist explíci
 
 Los aliases viven en `app/auth/dependencies.py` — los routers no definen los suyos:
 
-| Alias                 | Rol            | Endpoints                                                                              |
-| --------------------- | -------------- | -------------------------------------------------------------------------------------- |
-| `AdminRole`           | admin          | `auth/invite`, `admin/users`, `admin/import-guarani`, `admin/settings`                 |
-| `DirectorOrAdminRole` | director+admin | CRUD (`carreras`, `materias`, `planes`, `alumnos`, `cursadas`), `sources`, `workspace` |
-| `CurrentUser`         | autenticado    | `lookups`                                                                              |
+| Alias                 | Rol            | Endpoints                                                                                           |
+| --------------------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| `AdminRole`           | admin          | `auth/invite`, `admin/users`, `admin/import-guarani`, `admin/settings`                              |
+| `DirectorOrAdminRole` | director+admin | CRUD (`carreras`, `materias`, `planes`, `alumnos`, `cursadas`), `sources`, `workspace`, `analytics` |
+| `CurrentUser`         | autenticado    | `lookups`                                                                                           |
 
 El director es el gestor de los datos de su carrera: accede a lectura **y escritura** de los CRUD.
 `docente` no accede a ninguno de estos endpoints (todavía no tiene superficie en la app).
