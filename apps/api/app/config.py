@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -7,8 +9,11 @@ class Settings(BaseSettings):
 
     Resolución (mayor a menor prioridad):
       1. Variable de entorno del sistema (ej: export JWT_SECRET_KEY=...)
-      2. Archivo .env en el directorio de arranque de la app
+      2. Archivo .env junto a la app (apps/api/.env) — anclado, no depende del cwd
       3. Default definido en esta clase (solo válido para dev/test local)
+
+    El .env de la raíz es para compose (entra como env del container =
+    prioridad 1) — python nunca lo lee directo.
 
     Los nombres de campo se mapean a env vars en UPPER_SNAKE_CASE automáticamente.
     Por ejemplo, `jwt_secret_key` se lee de JWT_SECRET_KEY.
@@ -16,7 +21,7 @@ class Settings(BaseSettings):
     Ver .env.example en la raíz del repo para las vars requeridas en producción.
     """
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=Path(__file__).resolve().parent.parent / ".env", extra="ignore")
 
     database_url: str = "postgresql+asyncpg://academika:academika@localhost:5432/academika"
 
