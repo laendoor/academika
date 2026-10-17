@@ -5,6 +5,28 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 
 ---
 
+## Monorepo (`apps/` + `packages/`)
+
+```txt
+apps/api/       ← FastAPI deployable (routers, services, config, alembic, seeds)
+apps/web/       ← Next.js deployable
+apps/cli/       ← lyka (#94, cuando exista)
+packages/analytika/  ← motor de métricas: contratos + registry (solo sqlalchemy)
+packages/db/         ← capa de datos: session factory, Base, modelos
+```
+
+Workspace uv en la raíz (`uv.lock` en raíz, un solo `.venv`). Comandos desde la raíz:
+`uv sync --all-packages --all-groups` (install), `uv run pytest apps/api/tests/unit/ packages/analytika`, `uv run ruff check apps/api packages`.
+
+Boundary dura, en este orden de dependencia (nada importa hacia arriba):
+
+- `packages/` no importa `apps/` ni lee env — solo sqlalchemy/pydantic + parámetros.
+- `apps/` no importan entre sí — lo compartido baja a `packages/`.
+- El engine de DB se crea lazy (`get_session_factory()`), nunca a import-time:
+  importar un módulo no debe requerir driver ni env.
+
+---
+
 ## Componentes (frontend)
 
 El criterio es conceptual: componentizar cuando mejora la legibilidad y la estructura del código, no mecánicamente. El fragmento merece ser componente cuando tiene nombre propio y cuando su extracción hace que el código que queda sea más fácil de leer y razonar.
@@ -14,7 +36,7 @@ La repetición es la señal práctica más confiable. Los programadores la usan 
 ### Ubicación
 
 ```txt
-web/src/components/
+apps/web/src/components/
   auth/      ← componentes de dominio (auth, recovery)
   ui/        ← primitivos sin dominio (PageState, ...)
 ```
@@ -49,7 +71,7 @@ Sin `"use client"` por defecto. Agregar solo cuando el componente necesita hooks
 Los custom hooks encapsulan estado, efectos y llamadas a la API. Los componentes son presentación pura.
 
 ```txt
-web/src/hooks/
+apps/web/src/hooks/
   auth/      ← hooks de dominio auth (useLoginForm, useForgotPasswordForm, ...)
   admin/     ← hooks de dominio admin (useAdminUsers, ...)
 ```
@@ -76,8 +98,8 @@ Cada carpeta de dominio tiene un `index.ts` con barrel exports.
 
 ### Lookups
 
-Los lookups (`/api/v1/lookups/*`) se consumen por el módulo central `web/src/lib/api/lookups.ts`, con el
-tipo `{ key, label }` fiel al `LookupResponse` del API. Los hooks van en `web/src/hooks/lookups.ts`
+Los lookups (`/api/v1/lookups/*`) se consumen por el módulo central `apps/web/src/lib/api/lookups.ts`, con el
+tipo `{ key, label }` fiel al `LookupResponse` del API. Los hooks van en `apps/web/src/hooks/lookups.ts`
 (ej. `useUserRoles`).
 
 Usar el lookup en vez de hardcodear labels en el frontend: los labels viven en las tablas `lkp_*`, y
@@ -92,15 +114,15 @@ como prop — no un hook por componente (serían requests duplicados).
 ## BFF / route handlers (frontend)
 
 El navegador nunca habla directo con la API: toda llamada pasa por un route handler de Next en
-`web/src/app/api/**` (patrón BFF). El token de sesión vive en una cookie httpOnly, así que el JS del
+`apps/web/src/app/api/**` (patrón BFF). El token de sesión vive en una cookie httpOnly, así que el JS del
 cliente no lo ve ni lo maneja.
 
-- Los handlers se envuelven con `apiHandler` (`web/src/lib/api/route.ts`): traduce `RouteError` a
+- Los handlers se envuelven con `apiHandler` (`apps/web/src/lib/api/route.ts`): traduce `RouteError` a
   `{ error, status }` y cualquier otra excepción a un 500 genérico.
 - Para endpoints autenticados se usa `fetchWithToken(req, url, init)`: lee la cookie `access_token`,
   agrega `Authorization: Bearer` y, ante 401/403, lanza `RouteError` con el `detail` que devolvió la API
   (así el usuario ve "El email debe pertenecer al dominio @unq.edu.ar" y no un "No autorizado" genérico).
-- Las funciones cliente viven en `web/src/lib/api/*` y devuelven `ApiResult<T>`
+- Las funciones cliente viven en `apps/web/src/lib/api/*` y devuelven `ApiResult<T>`
   (`{ ok: true, data } | { ok: false, error }`). Para endpoints sin payload existe `OkResponse`.
 
 ### Endpoints con 204 → el proxy responde `ok()`
@@ -126,8 +148,10 @@ if (res.status === 409 && typeof detail === "string") throw new RouteError(detai
 
 Nunca acceder a `process.env.*` (frontend) ni a `os.environ` (backend) directamente en código de negocio. Toda lectura de env vars va en un módulo central:
 
-- **Frontend:** `web/src/lib/constants.ts`
-- **Backend:** `api/app/config.py` (pydantic-settings)
+- **Frontend:** `apps/web/src/lib/constants.ts`
+- **Backend:** cada app lee las suyas (`apps/api/app/config.py` con pydantic-settings). Los packages **nunca leen env**: reciben lo que necesitan por parámetros (ej. `session_factory_for(url)`).
+
+El `.env` de la raíz es para compose (entra como env del container). Python no lo lee directo: `env_file` está anclado al dir de la app, así los tests nunca leakean el `.env` local. `DATABASE_URL` con scheme bare (`postgresql://`) se normaliza a `postgresql+asyncpg://` en el validator de config.
 
 ```typescript
 // constants.ts
@@ -157,12 +181,12 @@ Dos opciones para exponer una var al cliente:
 
 ### Testing frontend (Vitest + RTL)
 
-Tests en `web/` con Vitest + React Testing Library + jest-dom, environment `jsdom`. Van junto al fuente con
+Tests en `apps/web/` con Vitest + React Testing Library + jest-dom, environment `jsdom`. Van junto al fuente con
 extensión `.test.ts(x)` — no hay directorio `__tests__`.
 
 Sin `globals: true`: importar explícitamente de `vitest` (`describe`, `it`, `expect`, `vi`).
 
-El setup (`web/vitest.setup.ts`) registra los matchers de jest-dom y `afterEach(cleanup)`. Sin `globals`,
+El setup (`apps/web/vitest.setup.ts`) registra los matchers de jest-dom y `afterEach(cleanup)`. Sin `globals`,
 RTL no auto-limpia el DOM entre tests — los renders se acumulan y `screen.getBy*` falla con
 "Found multiple elements".
 
@@ -175,7 +199,7 @@ se mockea para `usePathname`/`useRouter`; `next/link` no necesita mock (renderiz
 ```bash
 npm run test     # vitest run (no-watch)
 make test-web
-make test        # api unit + web
+make test        # python unit + web
 ```
 
 ### Testing de route handlers (BFF)
@@ -192,21 +216,21 @@ expect(await res.json()).toEqual({ ok: true });
 ```
 
 Casos que valen la pena: 204 del API → `ok()`, error del API con `detail` (409/401), 422 con lista de
-`msg`, y request sin cookie → 401 sin llamar a `fetch`. Ver `web/src/app/api/auth/invite/route.test.ts`.
+`msg`, y request sin cookie → 401 sin llamar a `fetch`. Ver `apps/web/src/app/api/auth/invite/route.test.ts`.
 
 ### Unit vs Integration
 
-| Carpeta              | Regla                                                                 |
-| -------------------- | --------------------------------------------------------------------- |
-| `tests/unit/`        | Sin infraestructura. Dependencias externas mockeadas. Corren offline. |
-| `tests/integration/` | Requieren infraestructura real (DB, etc.). Usan testcontainers.       |
+| Carpeta                       | Regla                                                                 |
+| ----------------------------- | --------------------------------------------------------------------- |
+| `apps/api/tests/unit/`        | Sin infraestructura. Dependencias externas mockeadas. Corren offline. |
+| `apps/api/tests/integration/` | Requieren infraestructura real (DB, etc.). Usan testcontainers.       |
 
-Si un test necesita base de datos, va en `tests/integration/`. Sin excepciones.
+Si un test necesita base de datos, va en `apps/api/tests/integration/`. Sin excepciones.
 
 ### Fixtures de testcontainers
 
-Los fixtures de DB viven en `tests/integration/conftest.py`, nunca en `tests/conftest.py` raíz.
-Así `pytest tests/unit/` nunca arranca un contenedor.
+Los fixtures de DB viven en `apps/api/tests/integration/conftest.py`, nunca en `apps/api/tests/conftest.py` raíz.
+Así `pytest apps/api/tests/unit/` nunca arranca un contenedor.
 
 **Patrón NullPool** — cada test recibe su propio engine sin connection pool:
 
@@ -304,7 +328,7 @@ El director es el gestor de los datos de su carrera: accede a lectura **y escrit
 - `client` — sin auth: para 401 (falta token) y 403 (token de rol sin permiso).
 - `auth_client` — token de director por default: para flujos funcionales de endpoints dir+admin.
 - `admin_token` / `docente_token` — para casos puntuales por rol.
-- La matriz 401/403 de los CRUD vive en `tests/integration/test_crud_auth.py`: al agregar un
+- La matriz 401/403 de los CRUD vive en `apps/api/tests/integration/test_crud_auth.py`: al agregar un
   endpoint CRUD, sumarlo a `CRUD_ENDPOINTS`.
 
 ---
@@ -404,7 +428,7 @@ No aplicar mecánicamente: un `if x is None: raise` de una línea no necesita he
 
 ## IDs
 
-UUID v7 via `generate_uuid()` de `app.db.base`. Nunca `uuid_utils.uuid7()` directo.
+UUID v7 via `generate_uuid()` de `db.base`. Nunca `uuid_utils.uuid7()` directo.
 
 ```python
 id: Mapped[uuid.UUID] = mapped_column(Uuid(native_uuid=True), primary_key=True, default=generate_uuid)

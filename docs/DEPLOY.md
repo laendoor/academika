@@ -77,11 +77,11 @@ cd /opt/academika && IMAGE_TAG=<version_vieja> docker compose -f compose.prod.ya
 
 ```bash
 # 2. Solo si la migración fue destructiva (borrar/renombrar columna o tabla) (en el servidor)
-cd /opt/academika && docker compose -f compose.prod.yaml run --rm api uv run alembic downgrade <revision_anterior>
+cd /opt/academika && docker compose -f compose.prod.yaml run --rm api uv run alembic -c apps/api/alembic.ini downgrade <revision_anterior>
 ```
 
 Notas:
 
 - **Migraciones aditivas** (agregar columna/tabla) no rompen la versión anterior → el paso 2 no es necesario.
 - **Migraciones destructivas** (borrar/renombrar) sí requieren el `downgrade`.
-- Para ver el histórico de revisiones: `docker compose -f compose.prod.yaml run --rm api uv run alembic history`.
+- Para ver el histórico de revisiones: `docker compose -f compose.prod.yaml run --rm api uv run alembic -c apps/api/alembic.ini history`.
