@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +19,13 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = "postgresql+asyncpg://academika:academika@localhost:5432/academika"
+
+    @field_validator("database_url")
+    @classmethod
+    def _default_driver(cls, url: str) -> str:
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
 
     # Requerido en producción: JWT_SECRET_KEY debe ser un string aleatorio largo.
     # El default solo sirve para dev/test local — nunca deployar con él.

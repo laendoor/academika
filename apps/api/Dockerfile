@@ -9,9 +9,14 @@ WORKDIR /app
 RUN pip install uv
 
 COPY pyproject.toml uv.lock ./
+COPY apps/api/pyproject.toml apps/api/
+COPY packages/analytika/pyproject.toml packages/analytika/
+COPY packages/db/pyproject.toml packages/db/
 RUN uv sync --frozen --no-dev
 
-COPY . .
+COPY apps/api ./apps/api
+COPY packages/analytika ./packages/analytika
+COPY packages/db ./packages/db
 
 RUN chown -R appuser:appuser /app
 ENV UV_CACHE_DIR=/app/.cache/uv

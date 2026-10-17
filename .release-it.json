@@ -11,7 +11,7 @@
 		"releaseName": "v${version}"
 	},
 	"hooks": {
-		"after:bump": "node scripts/sync-versions.mjs && (cd api && uv lock) && git add web/package.json web/package-lock.json api/pyproject.toml api/uv.lock"
+		"after:bump": "node scripts/sync-versions.mjs && uv lock && git add apps/web/package.json apps/web/package-lock.json pyproject.toml apps/api/pyproject.toml packages/analytika/pyproject.toml packages/db/pyproject.toml uv.lock"
 	},
 	"plugins": {
 		"@release-it/conventional-changelog": {

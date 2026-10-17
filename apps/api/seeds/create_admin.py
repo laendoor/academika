@@ -15,7 +15,7 @@ from db.models.user import User
 from sqlalchemy import select
 
 from app.auth.password import hash_password
-from app.session import AsyncSessionLocal
+from app.session import get_session_factory
 
 
 async def main() -> None:
@@ -30,7 +30,7 @@ async def main() -> None:
         print("Error: la contraseña no puede estar vacía.", file=sys.stderr)
         sys.exit(1)
 
-    async with AsyncSessionLocal() as session:
+    async with get_session_factory()() as session:
         result = await session.execute(select(User).where(User.email == email))
         if result.scalar_one_or_none() is not None:
             print(f"Error: ya existe un usuario con email '{email}'.", file=sys.stderr)

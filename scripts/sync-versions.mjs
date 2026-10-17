@@ -1,4 +1,4 @@
-// ponytail: replica la versión del package.json raíz a web/ y api/ (una sola fuente de verdad).
+// ponytail: replica la versión del package.json raíz a apps/ y packages/ (una sola fuente de verdad).
 import { readFileSync, writeFileSync } from "node:fs";
 
 const version = JSON.parse(
@@ -14,18 +14,24 @@ function bumpJson(url, extra) {
 	writeFileSync(url, `${JSON.stringify(json, null, indent)}\n`);
 }
 
-bumpJson(new URL("../web/package.json", import.meta.url));
-bumpJson(new URL("../web/package-lock.json", import.meta.url), (json) => {
+bumpJson(new URL("../apps/web/package.json", import.meta.url));
+bumpJson(new URL("../apps/web/package-lock.json", import.meta.url), (json) => {
 	if (json.packages?.[""]) json.packages[""].version = version;
 });
 
-const pyUrl = new URL("../api/pyproject.toml", import.meta.url);
-writeFileSync(
-	pyUrl,
-	readFileSync(pyUrl, "utf8").replace(
-		/^version = ".*"$/m,
-		`version = "${version}"`,
-	),
-);
+function bumpPy(url) {
+	writeFileSync(
+		url,
+		readFileSync(url, "utf8").replace(
+			/^version = ".*"$/m,
+			`version = "${version}"`,
+		),
+	);
+}
+
+bumpPy(new URL("../pyproject.toml", import.meta.url));
+bumpPy(new URL("../apps/api/pyproject.toml", import.meta.url));
+bumpPy(new URL("../packages/analytika/pyproject.toml", import.meta.url));
+bumpPy(new URL("../packages/db/pyproject.toml", import.meta.url));
 
 console.log(`synced to ${version}`);

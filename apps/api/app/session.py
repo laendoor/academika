@@ -7,16 +7,19 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import settings
 
-AsyncSessionLocal = session_factory_for(settings.database_url)
-
-
-async def get_session() -> AsyncGenerator[AsyncSession]:
-    async with AsyncSessionLocal() as session:
-        yield session
+_factory: async_sessionmaker[AsyncSession] | None = None
 
 
 def get_session_factory() -> async_sessionmaker[AsyncSession]:
-    return AsyncSessionLocal
+    global _factory
+    if _factory is None:
+        _factory = session_factory_for(settings.database_url)
+    return _factory
+
+
+async def get_session() -> AsyncGenerator[AsyncSession]:
+    async with get_session_factory()() as session:
+        yield session
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]

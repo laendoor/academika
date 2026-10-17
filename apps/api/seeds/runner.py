@@ -12,7 +12,7 @@ from pathlib import Path
 
 from sqlalchemy import text
 
-from app.session import AsyncSessionLocal
+from app.session import get_session_factory
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ async def run(name: str) -> None:
         logger.info("%s: no SQL files found", name)
         return
 
-    async with AsyncSessionLocal() as session:
+    async with get_session_factory()() as session:
         for sql_file in sql_files:
             statements = [s.strip() for s in sql_file.read_text().split(";") if s.strip()]
             for stmt in statements:

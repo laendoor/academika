@@ -1,24 +1,26 @@
 services:
   api:
     build:
-      context: ./api
+      context: .
+      dockerfile: apps/api/Dockerfile
     command: ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     ports:
       - "8000:8000"
     volumes:
-      - ./api:/app
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
     env_file: .env
     depends_on:
       - postgres
 
   web:
     build:
-      context: ./web
+      context: ./apps/web
     command: ["npm", "run", "dev"]
     ports:
       - "3000:3000"
     volumes:
-      - ./web:/app
+      - ./apps/web:/app
       - /app/node_modules
     env_file: .env
 
