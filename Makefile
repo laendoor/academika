@@ -45,29 +45,29 @@ lyka: ## REPL local para probar métricas de analytika
 
 ## Calidad
 check: ## Linter y verificación de formato (python + web)
-	uv run ruff check apps/api packages && uv run ruff format --check apps/api packages
+	uv run ruff check apps/api apps/cli packages && uv run ruff format --check apps/api apps/cli packages
 	cd apps/web && npm run lint
 
 format: ## Formatea automáticamente (python + web)
-	uv run ruff check --fix apps/api packages && uv run ruff format apps/api packages
+	uv run ruff check --fix apps/api apps/cli packages && uv run ruff format apps/api apps/cli packages
 	cd apps/web && npm run format
 
 ## Tests
 test: ## Tests unitarios (python + web)
-	uv run pytest apps/api/tests/unit/ packages/analytika
+	uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika
 	cd apps/web && npm run test
 
 test-api: ## Tests unitarios de la API
-	uv run pytest apps/api/tests/unit/ packages/analytika
+	uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika
 
 test-web: ## Tests unitarios del frontend (Vitest)
 	cd apps/web && npm run test
 
 test-integration: ## Tests de integración con DB real (testcontainers)
-	uv run pytest apps/api/tests/integration/ -v
+	uv run pytest apps/api/tests/integration/ apps/cli/tests/integration/ -v
 
 test-api-cov: ## Tests de la API (unit + integration) con coverage en consola
-	uv run pytest apps/api/tests/unit/ apps/api/tests/integration/ packages/analytika --cov=app --cov-report=term-missing -q
+	uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ apps/api/tests/integration/ apps/cli/tests/integration/ packages/analytika --cov=app --cov-report=term-missing -q
 
 test-web-cov: ## Tests del frontend con coverage en consola
 	cd apps/web && npm run test -- --coverage
