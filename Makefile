@@ -2,7 +2,7 @@
 
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
-.PHONY: help install clean docker-dev db-start db-stop dev-api dev-web check format \
+.PHONY: help install clean docker-dev db-start db-stop dev-api dev-web clika check format \
         test test-api test-web test-integration test-api-cov test-web-cov alembic-current alembic-upgrade alembic-downgrade \
         alembic-check alembic-revision seed seed-dev seed-admin release
 
@@ -39,6 +39,9 @@ dev-api: ## Servidor FastAPI con hot-reload
 
 dev-web: ## Servidor Next.js con hot-reload
 	cd apps/web && npm run dev
+
+lyka: ## REPL local para probar métricas de analytika
+	cd apps/cli && uv run python -m lyka
 
 ## Calidad
 check: ## Linter y verificación de formato (python + web)
