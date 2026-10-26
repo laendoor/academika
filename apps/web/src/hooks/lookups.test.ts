@@ -2,6 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+	useEstadosAcademicos,
 	useEstadosCursada,
 	useNivelesCarrera,
 	useNucleosCarrera,
@@ -14,6 +15,7 @@ vi.mock("@/lib/api/lookups", () => ({
 	getUserRoles: vi.fn(),
 	getNivelesCarrera: vi.fn(),
 	getNucleosCarrera: vi.fn(),
+	getEstadosAcademicos: vi.fn(),
 	getEstadosCursada: vi.fn(),
 	getTiposCursada: vi.fn(),
 }));
@@ -21,6 +23,7 @@ vi.mock("@/lib/api/lookups", () => ({
 const getUserRoles = vi.mocked(lookups.getUserRoles);
 const getNivelesCarrera = vi.mocked(lookups.getNivelesCarrera);
 const getNucleosCarrera = vi.mocked(lookups.getNucleosCarrera);
+const getEstadosAcademicos = vi.mocked(lookups.getEstadosAcademicos);
 const getEstadosCursada = vi.mocked(lookups.getEstadosCursada);
 const getTiposCursada = vi.mocked(lookups.getTiposCursada);
 
@@ -158,5 +161,25 @@ describe("useTiposCursada", () => {
 			{ key: "regular", label: "Cursada Regular" },
 		]);
 		expect(result.current.error).toBeUndefined();
+	});
+});
+
+describe("useEstadosAcademicos", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("carga los estados académicos del lookup", async () => {
+		getEstadosAcademicos.mockResolvedValue({
+			ok: true,
+			data: [{ key: "alumno_regular", label: "Alumno Regular" }],
+		});
+
+		const { result } = renderHook(() => useEstadosAcademicos());
+
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		expect(result.current.estados).toEqual([
+			{ key: "alumno_regular", label: "Alumno Regular" },
+		]);
 	});
 });

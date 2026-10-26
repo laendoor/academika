@@ -64,7 +64,11 @@ const emptyPage = {
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	useCarrerasMock.mockReturnValue(emptyPage);
+	useCarrerasMock.mockReturnValue({
+		...emptyPage,
+		items: [{ id: "c1", nombre: "Tecnicatura", codigo: "TPI" }],
+		total: 1,
+	});
 	useCursadasMock.mockReturnValue({
 		...emptyPage,
 		items: [makeRow()],
@@ -140,6 +144,47 @@ describe("CursadasList", () => {
 		);
 	});
 
+	it("cada filtro llega al hook", () => {
+		render(<CursadasList />);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por carrera"), {
+			target: { value: "c1" },
+		});
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ carrera_id: "c1" }),
+		);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por año"), {
+			target: { value: "2024" },
+		});
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ anio: 2024 }),
+		);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por cuatrimestre"), {
+			target: { value: "2C" },
+		});
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ cuatrimestre: "2C" }),
+		);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por tipo"), {
+			target: { value: "regular" },
+		});
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ tipo_cursada: "regular" }),
+		);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por alumno"), {
+			target: { value: "gar" },
+		});
+		fireEvent.change(screen.getByLabelText("Filtrar por materia"), {
+			target: { value: "ayed" },
+		});
+		expect(screen.getByLabelText("Filtrar por alumno")).toHaveValue("gar");
+		expect(screen.getByLabelText("Filtrar por materia")).toHaveValue("ayed");
+	});
+
 	it("el select de estado pisa el preset del tab", () => {
 		render(<CursadasList />);
 
@@ -197,6 +242,33 @@ describe("CursadasList", () => {
 		expect(screen.getByText(/Plan 2015/)).toBeInTheDocument();
 		expect(screen.getByText(/Alumno Regular/)).toBeInTheDocument();
 		expect(screen.getByText("Historial de cursadas (1)")).toBeInTheDocument();
+	});
+
+	it("muestra los vacíos del detalle y cierra el modal", async () => {
+		useEstudianteDetalleMock.mockReturnValue({
+			loading: false,
+			error: undefined,
+			detail: {
+				id: "a1",
+				nombre: "Ana",
+				apellido: "García",
+				dni: "12345678",
+				legajo: null,
+				carreras: [],
+				cursadas: [],
+			},
+		});
+
+		render(<CursadasList />);
+		fireEvent.click(screen.getByRole("button", { name: "García, Ana" }));
+
+		await waitFor(() =>
+			expect(screen.getByText("Sin carreras.")).toBeInTheDocument(),
+		);
+		expect(screen.getByText("Sin cursadas.")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: "Cerrar detalle" }));
+		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	});
 
 	it("muestra el error del detalle sin romper la tabla", async () => {
