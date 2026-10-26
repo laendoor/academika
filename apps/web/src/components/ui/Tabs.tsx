@@ -6,8 +6,22 @@ export interface TabItem {
 	content: ReactNode;
 }
 
-export function Tabs({ items }: { items: TabItem[] }) {
-	const [active, setActive] = useState(0);
+interface TabsBase {
+	items: TabItem[];
+}
+
+// `active` sin `onChange` dejaría los tabs muertos: el click actualiza el estado
+// interno que el índice controlado ignora.
+type TabsProps = TabsBase &
+	(
+		| { active?: undefined; onChange?: undefined }
+		| { active: number; onChange: (index: number) => void }
+	);
+
+export function Tabs({ items, active, onChange }: TabsProps) {
+	const [internal, setInternal] = useState(0);
+	const current = active ?? internal;
+	const select = onChange ?? setInternal;
 
 	return (
 		<div>
@@ -16,9 +30,9 @@ export function Tabs({ items }: { items: TabItem[] }) {
 					<button
 						key={item.label}
 						type="button"
-						onClick={() => setActive(i)}
+						onClick={() => select(i)}
 						className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
-							active === i
+							current === i
 								? "border-zinc-900 text-zinc-900"
 								: "border-transparent text-zinc-500 hover:text-zinc-700"
 						}`}
@@ -27,7 +41,7 @@ export function Tabs({ items }: { items: TabItem[] }) {
 					</button>
 				))}
 			</div>
-			{items[active].content}
+			{items[current].content}
 		</div>
 	);
 }

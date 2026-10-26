@@ -23,6 +23,12 @@ export function useNucleosCarrera() {
 	return { nucleos: data, loading, error };
 }
 
+export function useEstadosAcademicos() {
+	const { data, loading, error } = useLookup(lookups.getEstadosAcademicos);
+
+	return { estados: data, loading, error };
+}
+
 export function useEstadosCursada() {
 	const { data, loading, error } = useLookup(lookups.getEstadosCursada);
 
