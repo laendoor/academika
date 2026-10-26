@@ -3,12 +3,14 @@ from typing import Self
 
 from db.models.alumno import Alumno
 from db.models.alumno_carrera import AlumnoCarrera
+from db.models.cursada import Cursada
 from db.models.materia import Materia
 from db.models.plan_de_estudio import PlanDeEstudio
-from sqlalchemy import func, select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.errors import NotFoundError
 from app.session import SessionDep
 
 
@@ -62,3 +64,94 @@ class WorkspaceStudioService:
         )
         result = await self.session.execute(stmt)
         return total, list(result.scalars().all())
+
+    async def list_cursadas(
+        self,
+        skip: int = 0,
+        limit: int = 20,
+        carrera_id: uuid.UUID | None = None,
+        alumno_id: uuid.UUID | None = None,
+        alumno: str | None = None,
+        materia: str | None = None,
+        anio: int | None = None,
+        cuatrimestre: str | None = None,
+        estado_cursada: list[str] | None = None,
+        tipo_cursada: str | None = None,
+    ) -> tuple[int, list[Cursada]]:
+        criteria = []
+        if carrera_id is not None:
+            criteria.append(Cursada.carrera_id == carrera_id)
+        if alumno_id is not None:
+            criteria.append(Cursada.alumno_id == alumno_id)
+        if alumno:
+            # shortcut: búsqueda sensible a tildes — "garcia" no encuentra "García".
+            # unaccent() (extensión + migración) cuando el padrón lo haga doler.
+            term = f"%{alumno}%"
+            criteria.append(
+                or_(
+                    Alumno.legajo.ilike(term),
+                    Alumno.dni.ilike(term),
+                    Alumno.apellido.ilike(term),
+                    Alumno.nombre.ilike(term),
+                )
+            )
+        if materia:
+            term = f"%{materia}%"
+            criteria.append(or_(Materia.codigo.ilike(term), Materia.sigla.ilike(term), Materia.nombre.ilike(term)))
+        if anio is not None:
+            criteria.append(Cursada.anio == anio)
+        if cuatrimestre is not None:
+            criteria.append(Cursada.cuatrimestre == cuatrimestre)
+        if estado_cursada:
+            criteria.append(Cursada.estado_cursada.in_(estado_cursada))
+        if tipo_cursada is not None:
+            criteria.append(Cursada.tipo_cursada == tipo_cursada)
+
+        id_stmt = select(Cursada.id).join(Cursada.alumno).join(Cursada.materia).where(*criteria)
+        total = await self.session.scalar(select(func.count()).select_from(id_stmt.subquery())) or 0
+        return total, await self._fetch_cursadas(criteria, skip, limit)
+
+    async def _fetch_cursadas(self, criteria: list[ColumnElement[bool]], skip: int, limit: int) -> list[Cursada]:
+        stmt = (
+            select(Cursada)
+            .join(Cursada.alumno)
+            .join(Cursada.materia)
+            .where(*criteria)
+            .options(*_CURSADA_REFS)
+            .order_by(*_CURSADA_ORDER)
+            .offset(skip)
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_estudiante_detalle(self, alumno_id: uuid.UUID) -> tuple[Alumno, list[Cursada]]:
+        stmt = (
+            select(Alumno)
+            .where(Alumno.id == alumno_id)
+            .options(selectinload(Alumno.carreras).selectinload(AlumnoCarrera.plan).selectinload(PlanDeEstudio.carrera))
+        )
+        alumno = (await self.session.execute(stmt)).scalar_one_or_none()
+        if alumno is None:
+            raise NotFoundError("alumnos", alumno_id)
+
+        cursadas = await self._fetch_cursadas([Cursada.alumno_id == alumno_id], 0, _HISTORIAL_LIMIT)
+        return alumno, cursadas
+
+
+# shortcut: historial del modal topeado en 200 filas (un plan de grado ronda 40);
+# paginar el modal si alguna carrera pasa ese techo.
+_HISTORIAL_LIMIT = 200
+
+_CURSADA_REFS = (
+    selectinload(Cursada.alumno),
+    selectinload(Cursada.materia),
+    selectinload(Cursada.carrera),
+)
+
+_CURSADA_ORDER = (
+    Cursada.anio.desc(),
+    Cursada.cuatrimestre.desc(),
+    Materia.nombre,
+    Cursada.id,
+)
