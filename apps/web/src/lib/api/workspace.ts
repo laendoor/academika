@@ -173,3 +173,80 @@ export interface PlanDetail {
 export function getPlanDetail(id: string): Promise<ApiResult<PlanDetail>> {
 	return get<PlanDetail>(`/api/planes/${encodeURIComponent(id)}`);
 }
+
+export interface CursadaRow {
+	id: string;
+	alumno: {
+		id: string;
+		nombre: string;
+		apellido: string;
+		legajo: string | null;
+	};
+	materia: { id: string; codigo: string; nombre: string };
+	carrera: { id: string; codigo: string; nombre: string };
+	anio: number;
+	cuatrimestre: string;
+	comision: string | null;
+	tipo_cursada: string;
+	estado_cursada: string;
+	nota: string | null;
+}
+
+export interface CursadasResponse {
+	total: number;
+	items: CursadaRow[];
+}
+
+export interface CursadasFilters {
+	carrera_id?: string;
+	alumno?: string;
+	materia?: string;
+	anio?: number;
+	cuatrimestre?: string;
+	estado_cursada?: string[];
+	tipo_cursada?: string;
+}
+
+export function getCursadas(
+	skip = 0,
+	limit = 20,
+	filters: CursadasFilters = {},
+): Promise<ApiResult<CursadasResponse>> {
+	const params = new URLSearchParams({
+		skip: String(skip),
+		limit: String(limit),
+	});
+	for (const key of [
+		"carrera_id",
+		"alumno",
+		"materia",
+		"anio",
+		"cuatrimestre",
+		"tipo_cursada",
+	] as const) {
+		const value = filters[key];
+		if (value !== undefined && value !== "") params.set(key, String(value));
+	}
+	for (const estado of filters.estado_cursada ?? []) {
+		params.append("estado_cursada", estado);
+	}
+	return get<CursadasResponse>(`/api/workspace/cursadas?${params}`);
+}
+
+export interface EstudianteDetalle {
+	id: string;
+	nombre: string;
+	apellido: string;
+	dni: string;
+	legajo: string | null;
+	carreras: CarreraInfo[];
+	cursadas: CursadaRow[];
+}
+
+export function getEstudianteDetalle(
+	id: string,
+): Promise<ApiResult<EstudianteDetalle>> {
+	return get<EstudianteDetalle>(
+		`/api/workspace/estudiantes/${encodeURIComponent(id)}`,
+	);
+}

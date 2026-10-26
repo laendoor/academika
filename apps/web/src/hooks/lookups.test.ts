@@ -2,8 +2,10 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+	useEstadosCursada,
 	useNivelesCarrera,
 	useNucleosCarrera,
+	useTiposCursada,
 	useUserRoles,
 } from "@/hooks/lookups";
 import * as lookups from "@/lib/api/lookups";
@@ -12,11 +14,15 @@ vi.mock("@/lib/api/lookups", () => ({
 	getUserRoles: vi.fn(),
 	getNivelesCarrera: vi.fn(),
 	getNucleosCarrera: vi.fn(),
+	getEstadosCursada: vi.fn(),
+	getTiposCursada: vi.fn(),
 }));
 
 const getUserRoles = vi.mocked(lookups.getUserRoles);
 const getNivelesCarrera = vi.mocked(lookups.getNivelesCarrera);
 const getNucleosCarrera = vi.mocked(lookups.getNucleosCarrera);
+const getEstadosCursada = vi.mocked(lookups.getEstadosCursada);
+const getTiposCursada = vi.mocked(lookups.getTiposCursada);
 
 describe("useUserRoles", () => {
 	beforeEach(() => {
@@ -106,5 +112,51 @@ describe("useNucleosCarrera", () => {
 		await waitFor(() => expect(result.current.loading).toBe(false));
 		expect(result.current.error).toBe("no autorizado");
 		expect(result.current.nucleos).toEqual([]);
+	});
+});
+
+describe("useEstadosCursada", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("carga los estados de cursada del lookup", async () => {
+		getEstadosCursada.mockResolvedValue({
+			ok: true,
+			data: [
+				{ key: "inscripto", label: "Inscripto" },
+				{ key: "regular", label: "Regular" },
+			],
+		});
+
+		const { result } = renderHook(() => useEstadosCursada());
+
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		expect(result.current.estados.map((e) => e.key)).toEqual([
+			"inscripto",
+			"regular",
+		]);
+		expect(result.current.error).toBeUndefined();
+	});
+});
+
+describe("useTiposCursada", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("carga los tipos de cursada del lookup", async () => {
+		getTiposCursada.mockResolvedValue({
+			ok: true,
+			data: [{ key: "regular", label: "Cursada Regular" }],
+		});
+
+		const { result } = renderHook(() => useTiposCursada());
+
+		await waitFor(() => expect(result.current.loading).toBe(false));
+		expect(result.current.tipos).toEqual([
+			{ key: "regular", label: "Cursada Regular" },
+		]);
+		expect(result.current.error).toBeUndefined();
 	});
 });
