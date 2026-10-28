@@ -9,6 +9,7 @@ from sqlalchemy.types import Uuid
 
 from db.base import AuditMixin, Base, generate_uuid
 from db.models.planes_materias import planes_materias
+from db.search import MATERIA_SEARCH_TERM
 
 if TYPE_CHECKING:
     from db.models.correlativa import Correlativa
@@ -28,9 +29,7 @@ class Materia(AuditMixin, Base):
     horas_semanales: Mapped[int | None] = mapped_column(Integer, nullable=True)
     carga_horaria_total: Mapped[int | None] = mapped_column(Integer, nullable=True)
     # Normalizado (sin tildes, minúsculas) para buscar; no sirve para mostrar.
-    search_term: Mapped[str] = mapped_column(
-        Text, Computed("f_unaccent(lower(codigo || ' ' || coalesce(sigla, '') || ' ' || nombre))", persisted=True)
-    )
+    search_term: Mapped[str] = mapped_column(Text, Computed(MATERIA_SEARCH_TERM, persisted=True))
 
     planes: Mapped[list[PlanDeEstudio]] = relationship(
         "PlanDeEstudio", secondary=planes_materias, back_populates="materias"

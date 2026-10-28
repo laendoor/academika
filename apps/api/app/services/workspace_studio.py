@@ -6,22 +6,13 @@ from db.models.alumno_carrera import AlumnoCarrera
 from db.models.cursada import Cursada
 from db.models.materia import Materia
 from db.models.plan_de_estudio import PlanDeEstudio
+from db.search import search_criteria
 from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import InstrumentedAttribute, selectinload
+from sqlalchemy.orm import selectinload
 
 from app.errors import NotFoundError
 from app.session import SessionDep
-
-
-def _search_tokens(column: InstrumentedAttribute[str], term: str) -> list[ColumnElement[bool]]:
-    """Un `AND` por token, contra el `search_term` normalizado: "luci fer" encuentra "Fernández Lucía"."""
-    return [column.like(func.f_unaccent(func.lower(f"%{_escape_like(t)}%")), escape="\\") for t in term.split()]
-
-
-def _escape_like(token: str) -> str:
-    """Los comodines que escribe el usuario son texto, no operadores."""
-    return token.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 class WorkspaceStudioService:
@@ -94,9 +85,9 @@ class WorkspaceStudioService:
         if alumno_id is not None:
             criteria.append(Cursada.alumno_id == alumno_id)
         if alumno:
-            criteria.extend(_search_tokens(Alumno.search_term, alumno))
+            criteria.extend(search_criteria(Alumno.search_term, alumno))
         if materia:
-            criteria.extend(_search_tokens(Materia.search_term, materia))
+            criteria.extend(search_criteria(Materia.search_term, materia))
         if anio is not None:
             criteria.append(Cursada.anio == anio)
         if cuatrimestre is not None:

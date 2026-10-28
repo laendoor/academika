@@ -13,6 +13,7 @@ from db.models.lkp_nucleo_carrera import LkpNucleoCarrera
 from db.models.lkp_tipo_cursada import LkpTipoCursada
 from db.models.lkp_user_role import LkpUserRole
 from db.models.user import User
+from db.search import F_UNACCENT_SQL
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
@@ -30,14 +31,7 @@ def _create_search_helpers(engine) -> None:
     """Las columnas search_term se generan con f_unaccent(), que el schema no crea."""
     with Session(engine) as session:
         session.execute(text("CREATE EXTENSION IF NOT EXISTS unaccent"))
-        session.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
-        session.execute(
-            text(
-                "CREATE FUNCTION f_unaccent(text) RETURNS text "
-                "LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE "
-                "AS $$ SELECT public.unaccent('public.unaccent', $1) $$"
-            )
-        )
+        session.execute(text(F_UNACCENT_SQL))
         session.commit()
 
 

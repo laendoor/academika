@@ -3,6 +3,7 @@ from typing import Self
 
 from db.models.alumno import Alumno
 from db.models.alumno_carrera import AlumnoCarrera
+from db.search import search_criteria
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
@@ -18,6 +19,13 @@ class AlumnoService(BaseService[Alumno, AlumnoCreate, AlumnoUpdate]):
     @classmethod
     def dep(cls, session: SessionDep) -> Self:
         return cls(session)
+
+    async def search(self, q: str, limit: int = 8) -> list[Alumno]:
+        criteria = search_criteria(Alumno.search_term, q)
+        if not criteria:
+            return []
+        stmt = select(Alumno).where(*criteria).order_by(Alumno.apellido, Alumno.nombre).limit(limit)
+        return list((await self.session.execute(stmt)).scalars().all())
 
     async def get_carreras(self, alumno_id: uuid.UUID) -> list[AlumnoCarrera]:
         await self.get_by_id(alumno_id)
