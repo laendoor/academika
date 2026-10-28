@@ -26,6 +26,21 @@ from app.main import app
 from app.session import get_session, get_session_factory
 
 
+def _create_search_helpers(engine) -> None:
+    """Las columnas search_term se generan con f_unaccent(), que el schema no crea."""
+    with Session(engine) as session:
+        session.execute(text("CREATE EXTENSION IF NOT EXISTS unaccent"))
+        session.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+        session.execute(
+            text(
+                "CREATE FUNCTION f_unaccent(text) RETURNS text "
+                "LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE "
+                "AS $$ SELECT public.unaccent('public.unaccent', $1) $$"
+            )
+        )
+        session.commit()
+
+
 def _seed_lkp(engine) -> None:
     """Inserta datos estáticos de lookup una vez para toda la sesión de tests."""
     with Session(engine) as session:
@@ -97,6 +112,7 @@ def db_url(postgres_container):
     """Crea el schema y seedea lookups una vez; devuelve la URL asyncpg."""
     sync_url = postgres_container.get_connection_url()
     engine = create_engine(sync_url)
+    _create_search_helpers(engine)
     Base.metadata.create_all(engine)
     _seed_lkp(engine)
     engine.dispose()

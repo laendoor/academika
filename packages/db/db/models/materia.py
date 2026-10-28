@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import Computed, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
@@ -27,6 +27,10 @@ class Materia(AuditMixin, Base):
     nucleo: Mapped[str | None] = mapped_column(String(50), ForeignKey("lkp_nucleo_carrera.key"), nullable=True)
     horas_semanales: Mapped[int | None] = mapped_column(Integer, nullable=True)
     carga_horaria_total: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Normalizado (sin tildes, minúsculas) para buscar; no sirve para mostrar.
+    search_term: Mapped[str] = mapped_column(
+        Text, Computed("f_unaccent(lower(codigo || ' ' || coalesce(sigla, '') || ' ' || nombre))", persisted=True)
+    )
 
     planes: Mapped[list[PlanDeEstudio]] = relationship(
         "PlanDeEstudio", secondary=planes_materias, back_populates="materias"

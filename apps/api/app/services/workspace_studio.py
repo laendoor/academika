@@ -6,12 +6,22 @@ from db.models.alumno_carrera import AlumnoCarrera
 from db.models.cursada import Cursada
 from db.models.materia import Materia
 from db.models.plan_de_estudio import PlanDeEstudio
-from sqlalchemy import ColumnElement, func, or_, select
+from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import InstrumentedAttribute, selectinload
 
 from app.errors import NotFoundError
 from app.session import SessionDep
+
+
+def _search_tokens(column: InstrumentedAttribute[str], term: str) -> list[ColumnElement[bool]]:
+    """Un `AND` por token, contra el `search_term` normalizado: "luci fer" encuentra "Fernández Lucía"."""
+    return [column.like(func.f_unaccent(func.lower(f"%{_escape_like(t)}%")), escape="\\") for t in term.split()]
+
+
+def _escape_like(token: str) -> str:
+    """Los comodines que escribe el usuario son texto, no operadores."""
+    return token.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 class WorkspaceStudioService:
@@ -84,20 +94,9 @@ class WorkspaceStudioService:
         if alumno_id is not None:
             criteria.append(Cursada.alumno_id == alumno_id)
         if alumno:
-            # shortcut: búsqueda sensible a tildes — "garcia" no encuentra "García".
-            # unaccent() (extensión + migración) cuando el padrón lo haga doler.
-            term = f"%{alumno}%"
-            criteria.append(
-                or_(
-                    Alumno.legajo.ilike(term),
-                    Alumno.dni.ilike(term),
-                    Alumno.apellido.ilike(term),
-                    Alumno.nombre.ilike(term),
-                )
-            )
+            criteria.extend(_search_tokens(Alumno.search_term, alumno))
         if materia:
-            term = f"%{materia}%"
-            criteria.append(or_(Materia.codigo.ilike(term), Materia.sigla.ilike(term), Materia.nombre.ilike(term)))
+            criteria.extend(_search_tokens(Materia.search_term, materia))
         if anio is not None:
             criteria.append(Cursada.anio == anio)
         if cuatrimestre is not None:
