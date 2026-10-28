@@ -87,7 +87,7 @@ describe("ImportDetailModal", () => {
 		fireEvent.keyDown(document, { key: "Escape" });
 		expect(onClose).toHaveBeenCalledTimes(1);
 
-		fireEvent.click(screen.getByTestId("import-modal-backdrop"));
+		fireEvent.click(screen.getByTestId("modal-backdrop"));
 		expect(onClose).toHaveBeenCalledTimes(2);
 
 		fireEvent.click(screen.getByRole("button", { name: "Cerrar detalle" }));

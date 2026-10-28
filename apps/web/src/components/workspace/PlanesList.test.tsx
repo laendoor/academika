@@ -216,11 +216,11 @@ describe("PlanesList", () => {
 
 		await waitFor(() =>
 			expect(
-				screen.getByRole("dialog", { name: "Detalle de Plan p2" }),
+				screen.getByRole("dialog", { name: "Plan p2" }),
 			).toBeInTheDocument(),
 		);
 		expect(
-			screen.queryByRole("dialog", { name: "Detalle de Plan p1" }),
+			screen.queryByRole("dialog", { name: "Plan p1" }),
 		).not.toBeInTheDocument();
 	});
 
