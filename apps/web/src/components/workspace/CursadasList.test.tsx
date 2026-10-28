@@ -1,4 +1,5 @@
 import {
+	act,
 	fireEvent,
 	render,
 	screen,
@@ -130,7 +131,7 @@ describe("CursadasList", () => {
 		);
 	});
 
-	it("Igual pide si el lookup de estados falla", () => {
+	it("con el lookup de estados caído muestra el error y no renderiza la tabla", () => {
 		useEstadosCursadaMock.mockReturnValue({
 			estados: [],
 			loading: false,
@@ -140,8 +141,32 @@ describe("CursadasList", () => {
 		render(<CursadasList />);
 
 		expect(useCursadasMock).toHaveBeenLastCalledWith(
-			expect.objectContaining({ ready: true }),
+			expect.objectContaining({ ready: false }),
 		);
+		expect(screen.getByRole("alert")).toHaveTextContent(
+			"No se pudo cargar el filtro de estados: no autorizado",
+		);
+		expect(screen.queryByRole("table")).not.toBeInTheDocument();
+	});
+
+	it("el filtro Año pasa por el debounce y dispara una vez", () => {
+		vi.useFakeTimers();
+		render(<CursadasList />);
+
+		const input = screen.getByLabelText("Filtrar por año");
+		for (const value of ["2", "20", "202", "2024"]) {
+			fireEvent.change(input, { target: { value } });
+		}
+		expect(useCursadasMock).not.toHaveBeenLastCalledWith(
+			expect.objectContaining({ anio: 2024 }),
+		);
+
+		act(() => vi.advanceTimersByTime(300));
+
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ anio: 2024 }),
+		);
+		vi.useRealTimers();
 	});
 
 	it("cada filtro llega al hook", () => {
@@ -157,9 +182,7 @@ describe("CursadasList", () => {
 		fireEvent.change(screen.getByLabelText("Filtrar por año"), {
 			target: { value: "2024" },
 		});
-		expect(useCursadasMock).toHaveBeenLastCalledWith(
-			expect.objectContaining({ anio: 2024 }),
-		);
+		expect(screen.getByLabelText("Filtrar por año")).toHaveValue(2024);
 
 		fireEvent.change(screen.getByLabelText("Filtrar por cuatrimestre"), {
 			target: { value: "2C" },
