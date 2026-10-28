@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 
+import { Combobox } from "@/components/ui/Combobox";
 import { Pagination } from "@/components/ui/Pagination";
 import { Table, Tbody, Th } from "@/components/ui/Table";
 import { Tabs } from "@/components/ui/Tabs";
@@ -11,8 +12,13 @@ import {
 	useTiposCursada,
 } from "@/hooks/lookups";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { useCarreras, useCursadas } from "@/hooks/workspace";
+import {
+	useCarreras,
+	useCursadas,
+	useSearchSuggestions,
+} from "@/hooks/workspace";
 import { toLabels } from "@/lib/api/lookups";
+import { searchAlumnos, searchMaterias } from "@/lib/api/search";
 
 const PAGE_SIZE = 20;
 const INPUT_CLASS =
@@ -32,11 +38,16 @@ export function CursadasList() {
 	const alumnoDebounced = useDebouncedValue(alumno);
 	const materiaDebounced = useDebouncedValue(materia);
 	const anioDebounced = useDebouncedValue(anio);
+	// Menos de dos caracteres no filtra: el backend lo rechaza y no distingue nada.
+	const alumnoTerm = alumnoDebounced.trim();
+	const materiaTerm = materiaDebounced.trim();
 
 	const { estados, error: estadosError } = useEstadosCursada();
 	const { tipos } = useTiposCursada();
 	const { estados: estadosAcademicos } = useEstadosAcademicos();
 	const { items: carreras } = useCarreras({ limit: 100 });
+	const alumnoSugerencias = useSearchSuggestions(searchAlumnos, alumno);
+	const materiaSugerencias = useSearchSuggestions(searchMaterias, materia);
 
 	// Historial = todo lo que no es una inscripción abierta.
 	const historialKeys = estados
@@ -53,8 +64,8 @@ export function CursadasList() {
 		skip,
 		limit: PAGE_SIZE,
 		carrera_id: carreraId || undefined,
-		alumno: alumnoDebounced || undefined,
-		materia: materiaDebounced || undefined,
+		alumno: alumnoTerm.length >= 2 ? alumnoTerm : undefined,
+		materia: materiaTerm.length >= 2 ? materiaTerm : undefined,
 		anio: anioDebounced ? Number(anioDebounced) : undefined,
 		cuatrimestre: cuatrimestre || undefined,
 		estado_cursada: estadosFiltrados,
@@ -90,22 +101,20 @@ export function CursadasList() {
 					))}
 				</select>
 
-				<input
-					aria-label="Filtrar por alumno"
-					type="search"
-					placeholder="Alumno (legajo, DNI o nombre)"
+				<Combobox
+					label="Filtrar por alumno"
+					placeholder="Alumno (DNI o nombre)"
 					value={alumno}
-					onChange={(e) => cambiarFiltro(setAlumno)(e.target.value)}
-					className={INPUT_CLASS}
+					onChange={cambiarFiltro(setAlumno)}
+					suggestions={alumnoSugerencias}
 				/>
 
-				<input
-					aria-label="Filtrar por materia"
-					type="search"
+				<Combobox
+					label="Filtrar por materia"
 					placeholder="Materia (código o nombre)"
 					value={materia}
-					onChange={(e) => cambiarFiltro(setMateria)(e.target.value)}
-					className={INPUT_CLASS}
+					onChange={cambiarFiltro(setMateria)}
+					suggestions={materiaSugerencias}
 				/>
 
 				<input

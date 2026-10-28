@@ -6,4 +6,5 @@ export { useEstudiantes } from "./useEstudiantes";
 export { useMaterias } from "./useMaterias";
 export { usePagination } from "./usePagination";
 export { usePlanes } from "./usePlanes";
+export { useSearchSuggestions } from "./useSearchSuggestions";
 export { useSources } from "./useSources";

@@ -18,6 +18,7 @@ import {
 	useCarreras,
 	useCursadas,
 	useEstudianteDetalle,
+	useSearchSuggestions,
 } from "@/hooks/workspace";
 import type { CursadaRow } from "@/lib/api/workspace";
 
@@ -25,6 +26,7 @@ vi.mock("@/hooks/workspace", () => ({
 	useCursadas: vi.fn(),
 	useCarreras: vi.fn(),
 	useEstudianteDetalle: vi.fn(),
+	useSearchSuggestions: vi.fn(),
 }));
 vi.mock("@/hooks/lookups", () => ({
 	useEstadosCursada: vi.fn(),
@@ -35,6 +37,7 @@ vi.mock("@/hooks/lookups", () => ({
 const useCursadasMock = vi.mocked(useCursadas);
 const useCarrerasMock = vi.mocked(useCarreras);
 const useEstudianteDetalleMock = vi.mocked(useEstudianteDetalle);
+const useSearchSuggestionsMock = vi.mocked(useSearchSuggestions);
 const useEstadosCursadaMock = vi.mocked(useEstadosCursada);
 const useTiposCursadaMock = vi.mocked(useTiposCursada);
 const useEstadosAcademicosMock = vi.mocked(useEstadosAcademicos);
@@ -65,6 +68,7 @@ const emptyPage = {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	useSearchSuggestionsMock.mockReturnValue([]);
 	useCarrerasMock.mockReturnValue({
 		...emptyPage,
 		items: [{ id: "c1", nombre: "Tecnicatura", codigo: "TPI" }],
@@ -165,6 +169,28 @@ describe("CursadasList", () => {
 
 		expect(useCursadasMock).toHaveBeenLastCalledWith(
 			expect.objectContaining({ anio: 2024 }),
+		);
+		vi.useRealTimers();
+	});
+
+	it("filtra con el texto tipeado, sin elegir una sugerencia", () => {
+		vi.useFakeTimers();
+		render(<CursadasList />);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por materia"), {
+			target: { value: "anali" },
+		});
+		act(() => vi.advanceTimersByTime(300));
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ materia: "anali" }),
+		);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por alumno"), {
+			target: { value: "luci" },
+		});
+		act(() => vi.advanceTimersByTime(300));
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ materia: "anali", alumno: "luci" }),
 		);
 		vi.useRealTimers();
 	});
