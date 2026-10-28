@@ -23,6 +23,24 @@ export function useNucleosCarrera() {
 	return { nucleos: data, loading, error };
 }
 
+export function useEstadosAcademicos() {
+	const { data, loading, error } = useLookup(lookups.getEstadosAcademicos);
+
+	return { estados: data, loading, error };
+}
+
+export function useEstadosCursada() {
+	const { data, loading, error } = useLookup(lookups.getEstadosCursada);
+
+	return { estados: data, loading, error };
+}
+
+export function useTiposCursada() {
+	const { data, loading, error } = useLookup(lookups.getTiposCursada);
+
+	return { tipos: data, loading, error };
+}
+
 function useLookup(fetch: () => Promise<ApiResult<LookupOption[]>>) {
 	const [data, setData] = useState<LookupOption[]>([]);
 	const [loading, setLoading] = useState(true);

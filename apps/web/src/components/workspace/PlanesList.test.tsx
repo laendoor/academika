@@ -13,7 +13,8 @@ vi.mock("@/lib/api/workspace", () => ({
 	getCarreras: vi.fn(),
 	getPlanDetail: vi.fn(),
 }));
-vi.mock("@/lib/api/lookups", () => ({
+vi.mock("@/lib/api/lookups", async (importOriginal) => ({
+	...(await importOriginal<typeof import("@/lib/api/lookups")>()),
 	getNivelesCarrera: vi.fn(),
 	getNucleosCarrera: vi.fn(),
 }));

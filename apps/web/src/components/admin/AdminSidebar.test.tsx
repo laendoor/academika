@@ -21,6 +21,9 @@ describe("AdminSidebar", () => {
 			"href",
 			"/admin/materias",
 		);
+		expect(
+			screen.getByRole("link", { name: "Cursadas e Inscripciones" }),
+		).toHaveAttribute("href", "/admin/cursadas");
 		expect(screen.getByRole("link", { name: "Planes" })).toHaveAttribute(
 			"href",
 			"/admin/planes",

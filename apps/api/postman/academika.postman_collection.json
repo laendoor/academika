@@ -906,6 +906,46 @@
 					}
 				},
 				{
+					"name": "GET /workspace/estudiantes/:id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{AIKA_BASE_URL}}/api/v1/workspace/estudiantes/{{alumno_id}}",
+							"host": ["{{AIKA_BASE_URL}}"],
+							"path": ["api", "v1", "workspace", "estudiantes", "{{alumno_id}}"]
+						}
+					}
+				},
+				{
+					"name": "GET /workspace/cursadas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{AIKA_BASE_URL}}/api/v1/workspace/cursadas?skip=0&limit=20&estado_cursada=regular&estado_cursada=aprobado",
+							"host": ["{{AIKA_BASE_URL}}"],
+							"path": ["api", "v1", "workspace", "cursadas"],
+							"query": [
+								{ "key": "skip", "value": "0" },
+								{ "key": "limit", "value": "20" },
+								{ "key": "estado_cursada", "value": "regular" },
+								{ "key": "estado_cursada", "value": "aprobado" }
+							]
+						}
+					}
+				},
+				{
 					"name": "GET /analytics",
 					"request": {
 						"method": "GET",

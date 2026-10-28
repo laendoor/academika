@@ -11,6 +11,7 @@ export function AdminSidebar() {
 			<div>
 				<SectionHeader label="Datos Académicos" Icon={LayoutList} />
 				<LinkItem label="Estudiantes" href="/admin/estudiantes" />
+				<LinkItem label="Cursadas e Inscripciones" href="/admin/cursadas" />
 				<LinkItem label="Materias" href="/admin/materias" />
 				<LinkItem label="Carreras" href="/admin/carreras" />
 				<LinkItem label="Planes" href="/admin/planes" />

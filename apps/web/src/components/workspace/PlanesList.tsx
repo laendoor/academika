@@ -7,14 +7,11 @@ import { PlanDetailModal } from "@/components/workspace/PlanDetailModal";
 import { usePlanes } from "@/hooks/workspace";
 import type { LookupOption } from "@/lib/api/lookups";
 import * as lookups from "@/lib/api/lookups";
+import { toLabels } from "@/lib/api/lookups";
 import type { CarreraOption, PlanDetail, PlanRow } from "@/lib/api/workspace";
 import * as workspace from "@/lib/api/workspace";
 
 const PAGE_SIZE = 20;
-
-function toLabels(options: LookupOption[]): Record<string, string> {
-	return Object.fromEntries(options.map((o) => [o.key, o.label]));
-}
 
 export function PlanesList() {
 	const [skip, setSkip] = useState(0);
