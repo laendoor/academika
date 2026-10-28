@@ -359,6 +359,25 @@ result = await self.session.execute(select(User).where(...))
 user = await self.users.find_active_by_email(email)
 ```
 
+### Búsqueda de texto
+
+Toda búsqueda de texto libre va contra la columna generada `search_term` de la entidad, con
+`search_criteria` de `packages/db/db/search.py`. Nunca `ILIKE` suelto sobre columnas individuales:
+la normalización vive en la columna, así la query no la repite y un índice futuro la encuentra sin tocar
+el service.
+
+- `search_term` se arma con las columnas que se buscan a mano (alumnos: DNI, apellido, nombre; materias:
+  código, sigla, nombre) y guarda el valor **normalizado** (`f_unaccent(lower(...))`): no sirve para
+  mostrar.
+- El término se parte en tokens y cada uno es un `AND` sobre la misma columna, así `luci fernandez`
+  encuentra `Fernández Lucía` en cualquier orden.
+- Los comodines que escribe el usuario se escapan: `%` es texto, no "cualquier cosa".
+- `unaccent()` es `STABLE`, por eso las columnas y las queries usan el wrapper `f_unaccent()`
+  (`IMMUTABLE`). Cualquier índice nuevo sobre una expresión normalizada tiene que usar el wrapper, o
+  Postgres rechaza el `CREATE INDEX`.
+- Autocompletado: `GET /alumnos/search` y `GET /materias/search` (`q`, `limit=8`), declarados **antes**
+  de `/{id}` en su router. Después, `search` se parsea como UUID y devuelve 422.
+
 ### Inyección de services en services
 
 Las dependencias entre services se declaran en el constructor e inyectan desde `dep()`.
