@@ -89,7 +89,7 @@ alembic-revision: ## Genera migración (uso: make alembic-revision MSG="descripc
 seed: ## Seeds de referencia (LKPs) — prod-safe, idempotente
 	cd apps/api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference
 
-seed-dev: ## Seeds de desarrollo (datos de muestra) — solo local
+seed-dev: ## Seeds de desarrollo (datos de muestra + admin@unq.edu.ar/admin) — solo local
 	cd apps/api && DATABASE_URL=$(DB_URL) uv run python -m seeds.runner reference && \
 	          DATABASE_URL=$(DB_URL) uv run python -m seeds.runner dev
 
