@@ -1,5 +1,5 @@
 import pytest
-from lyka.parser import Command, UsageError, parse
+from clika.parser import Command, UsageError, parse
 
 
 def test_linea_vacia_se_ignora():

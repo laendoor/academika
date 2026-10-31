@@ -10,7 +10,7 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 ```txt
 apps/api/       ← FastAPI deployable (routers, services, config, alembic, seeds)
 apps/web/       ← Next.js deployable
-apps/cli/       ← lyka (#94)
+apps/cli/       ← clika (#94)
 packages/analytika/  ← motor de métricas: contratos + registry (solo sqlalchemy)
 packages/db/         ← capa de datos: session factory, Base, modelos
 ```

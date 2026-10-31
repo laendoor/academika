@@ -1,4 +1,4 @@
-import lyka.__main__ as entry
+import clika.__main__ as entry
 import pytest
 
 

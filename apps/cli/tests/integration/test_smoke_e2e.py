@@ -1,5 +1,5 @@
-from lyka.parser import parse
-from lyka.repl import execute
+from clika.parser import parse
+from clika.repl import execute
 
 
 async def test_metrica_smoke_end_to_end(session_factory):

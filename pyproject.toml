@@ -2,7 +2,7 @@
 name = "academika"
 version = "0.6.0"
 requires-python = ">=3.13"
-dependencies = ["academika-api", "lyka"]
+dependencies = ["academika-api", "clika"]
 
 [dependency-groups]
 dev = [
@@ -17,7 +17,7 @@ members = ["apps/api", "apps/cli", "packages/*"]
 
 [tool.uv.sources]
 academika-api = { workspace = true }
-lyka = { workspace = true }
+clika = { workspace = true }
 
 [tool.ruff]
 target-version = "py313"

@@ -6,8 +6,8 @@ from prompt_toolkit.completion import NestedCompleter
 from prompt_toolkit.history import FileHistory
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from lyka.parser import Command, UsageError, parse
-from lyka.render import render_result
+from clika.parser import Command, UsageError, parse
+from clika.render import render_result
 
 HELP = {
     "": "commands: metrica <name> [key=value ...] | metricas | help [command] | exit",
@@ -44,7 +44,7 @@ async def execute(command: Command, factory: async_sessionmaker[AsyncSession]) -
 
 
 async def run_repl(factory: async_sessionmaker[AsyncSession]) -> None:
-    session: PromptSession[str] = PromptSession(history=FileHistory(str(Path.home() / ".lyka_history")))
+    session: PromptSession[str] = PromptSession(history=FileHistory(str(Path.home() / ".clika_history")))
     completer = build_completer()
     while True:
         try:

@@ -22,7 +22,7 @@ make seed-dev         # datos de desarrollo, incluye admin@unq.edu.ar / admin (s
 make seed-admin       # crear el primer usuario admin (interactivo)
 make dev-api          # servidor FastAPI en :8000
 make dev-web           # servidor Next.js en :3000
-make lyka             # REPL de métricas de analytika contra la DB local
+make clika            # REPL de métricas de analytika contra la DB local
 ```
 
 ## Seeds

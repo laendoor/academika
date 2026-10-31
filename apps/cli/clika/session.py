@@ -12,7 +12,7 @@ def database_url() -> str:
     url = os.environ.get("DATABASE_URL", "").strip()
     if not url:
         raise ConfigError(
-            "lyka necesita DATABASE_URL "
+            "clika necesita DATABASE_URL "
             "(ej. export DATABASE_URL=postgresql://academika:academika@localhost:5432/academika)"
         )
     if url.startswith("postgresql://"):

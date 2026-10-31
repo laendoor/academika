@@ -1,8 +1,8 @@
 import asyncio
 import sys
 
-from lyka.repl import run_repl
-from lyka.session import ConfigError, get_session_factory
+from clika.repl import run_repl
+from clika.session import ConfigError, get_session_factory
 
 
 def main() -> None:

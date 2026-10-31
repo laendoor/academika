@@ -1,4 +1,4 @@
-from lyka.render import render_result
+from clika.render import render_result
 
 
 def test_dict_a_tabla_campo_valor():

@@ -1,5 +1,5 @@
 [project]
-name = "lyka"
+name = "clika"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
@@ -24,4 +24,4 @@ academika-db = { workspace = true }
 analytika = { workspace = true }
 
 [tool.setuptools.packages.find]
-include = ["lyka*"]
+include = ["clika*"]

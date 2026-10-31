@@ -1,8 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from lyka.parser import Command
-from lyka.repl import execute, run_repl
+from clika.parser import Command
+from clika.repl import execute, run_repl
 
 
 def _factory_with(session) -> MagicMock:
@@ -63,7 +63,7 @@ def _scripted_prompt(monkeypatch, lines: list[str | BaseException]) -> None:
                 raise item
             return item
 
-    monkeypatch.setattr("lyka.repl.PromptSession", FakeSession)
+    monkeypatch.setattr("clika.repl.PromptSession", FakeSession)
 
 
 async def test_run_repl_sale_con_exit(monkeypatch, capsys):
@@ -105,6 +105,6 @@ async def test_run_repl_sobrevive_a_ctrl_c_en_una_metrica(monkeypatch, capsys):
         raise KeyboardInterrupt
 
     _scripted_prompt(monkeypatch, ["metrica smoke", "exit"])
-    monkeypatch.setattr("lyka.repl.execute", fake_execute)
+    monkeypatch.setattr("clika.repl.execute", fake_execute)
     await run_repl(AsyncMock())
     assert "cancelado" in capsys.readouterr().out

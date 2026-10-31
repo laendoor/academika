@@ -40,8 +40,8 @@ dev-api: ## Servidor FastAPI con hot-reload
 dev-web: ## Servidor Next.js con hot-reload
 	cd apps/web && npm run dev
 
-lyka: ## REPL local para probar métricas de analytika
-	cd apps/cli && DATABASE_URL=$(DB_URL) uv run python -m lyka
+clika: ## REPL local para probar métricas de analytika
+	cd apps/cli && DATABASE_URL=$(DB_URL) uv run python -m clika
 
 ## Calidad
 check: ## Linter y verificación de formato (python + web)
