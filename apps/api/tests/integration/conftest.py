@@ -13,6 +13,7 @@ from db.models.lkp_nucleo_carrera import LkpNucleoCarrera
 from db.models.lkp_tipo_cursada import LkpTipoCursada
 from db.models.lkp_user_role import LkpUserRole
 from db.models.user import User
+from db.search import F_UNACCENT_SQL
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
@@ -24,6 +25,14 @@ from app.auth.password import hash_password
 from app.auth.tokens import create_access_token
 from app.main import app
 from app.session import get_session, get_session_factory
+
+
+def _create_search_helpers(engine) -> None:
+    """Las columnas search_term se generan con f_unaccent(), que el schema no crea."""
+    with Session(engine) as session:
+        session.execute(text("CREATE EXTENSION IF NOT EXISTS unaccent"))
+        session.execute(text(F_UNACCENT_SQL))
+        session.commit()
 
 
 def _seed_lkp(engine) -> None:
@@ -97,6 +106,7 @@ def db_url(postgres_container):
     """Crea el schema y seedea lookups una vez; devuelve la URL asyncpg."""
     sync_url = postgres_container.get_connection_url()
     engine = create_engine(sync_url)
+    _create_search_helpers(engine)
     Base.metadata.create_all(engine)
     _seed_lkp(engine)
     engine.dispose()

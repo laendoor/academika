@@ -367,6 +367,27 @@
 					}
 				},
 				{
+					"name": "GET /materias/search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{AIKA_BASE_URL}}/api/v1/materias/search?q=analisis&limit=8",
+							"host": ["{{AIKA_BASE_URL}}"],
+							"path": ["api", "v1", "materias", "search"],
+							"query": [
+								{ "key": "q", "value": "analisis" },
+								{ "key": "limit", "value": "8" }
+							]
+						}
+					}
+				},
+				{
 					"name": "POST /materias",
 					"event": [
 						{
@@ -564,6 +585,27 @@
 							"query": [
 								{ "key": "skip", "value": "0" },
 								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+				{
+					"name": "GET /alumnos/search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AIKA_ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{AIKA_BASE_URL}}/api/v1/alumnos/search?q=nunez&limit=8",
+							"host": ["{{AIKA_BASE_URL}}"],
+							"path": ["api", "v1", "alumnos", "search"],
+							"query": [
+								{ "key": "q", "value": "nunez" },
+								{ "key": "limit", "value": "8" }
 							]
 						}
 					}

@@ -18,6 +18,7 @@ make install          # instalar dependencias (api + web)
 make db-start         # levantar postgres en background
 make alembic-upgrade  # aplicar migraciones
 make seed             # seeds de referencia (LKPs) — correr siempre antes de seed-admin
+make seed-dev         # datos de desarrollo, incluye admin@unq.edu.ar / admin (solo local)
 make seed-admin       # crear el primer usuario admin (interactivo)
 make dev-api          # servidor FastAPI en :8000
 make dev-web           # servidor Next.js en :3000
@@ -25,11 +26,11 @@ make dev-web           # servidor Next.js en :3000
 
 ## Seeds
 
-| Comando           | Cuándo usarlo                                        |
-| ----------------- | ---------------------------------------------------- |
-| `make seed`       | Siempre — LKPs de referencia, prod-safe, idempotente |
-| `make seed-admin` | Primera vez en dev (local) — crea el admin inicial   |
-| `make seed-dev`   | Solo local — datos de muestra para desarrollo        |
+| Comando           | Cuándo usarlo                                                |
+| ----------------- | ------------------------------------------------------------ |
+| `make seed`       | Siempre — LKPs de referencia, prod-safe, idempotente         |
+| `make seed-admin` | Primera vez en dev (local) — crea el admin inicial           |
+| `make seed-dev`   | Solo local — datos de muestra y `admin@unq.edu.ar` / `admin` |
 
 En producción el admin se crea por el droplet (ver `docs/DEPLOY.md`).
 

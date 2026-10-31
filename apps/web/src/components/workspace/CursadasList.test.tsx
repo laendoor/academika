@@ -1,4 +1,5 @@
 import {
+	act,
 	fireEvent,
 	render,
 	screen,
@@ -17,6 +18,7 @@ import {
 	useCarreras,
 	useCursadas,
 	useEstudianteDetalle,
+	useSearchSuggestions,
 } from "@/hooks/workspace";
 import type { CursadaRow } from "@/lib/api/workspace";
 
@@ -24,6 +26,7 @@ vi.mock("@/hooks/workspace", () => ({
 	useCursadas: vi.fn(),
 	useCarreras: vi.fn(),
 	useEstudianteDetalle: vi.fn(),
+	useSearchSuggestions: vi.fn(),
 }));
 vi.mock("@/hooks/lookups", () => ({
 	useEstadosCursada: vi.fn(),
@@ -34,6 +37,7 @@ vi.mock("@/hooks/lookups", () => ({
 const useCursadasMock = vi.mocked(useCursadas);
 const useCarrerasMock = vi.mocked(useCarreras);
 const useEstudianteDetalleMock = vi.mocked(useEstudianteDetalle);
+const useSearchSuggestionsMock = vi.mocked(useSearchSuggestions);
 const useEstadosCursadaMock = vi.mocked(useEstadosCursada);
 const useTiposCursadaMock = vi.mocked(useTiposCursada);
 const useEstadosAcademicosMock = vi.mocked(useEstadosAcademicos);
@@ -64,6 +68,7 @@ const emptyPage = {
 
 beforeEach(() => {
 	vi.clearAllMocks();
+	useSearchSuggestionsMock.mockReturnValue([]);
 	useCarrerasMock.mockReturnValue({
 		...emptyPage,
 		items: [{ id: "c1", nombre: "Tecnicatura", codigo: "TPI" }],
@@ -130,7 +135,7 @@ describe("CursadasList", () => {
 		);
 	});
 
-	it("Igual pide si el lookup de estados falla", () => {
+	it("con el lookup de estados caído muestra el error y no renderiza la tabla", () => {
 		useEstadosCursadaMock.mockReturnValue({
 			estados: [],
 			loading: false,
@@ -140,8 +145,54 @@ describe("CursadasList", () => {
 		render(<CursadasList />);
 
 		expect(useCursadasMock).toHaveBeenLastCalledWith(
-			expect.objectContaining({ ready: true }),
+			expect.objectContaining({ ready: false }),
 		);
+		expect(screen.getByRole("alert")).toHaveTextContent(
+			"No se pudo cargar el filtro de estados: no autorizado",
+		);
+		expect(screen.queryByRole("table")).not.toBeInTheDocument();
+	});
+
+	it("el filtro Año pasa por el debounce y dispara una vez", () => {
+		vi.useFakeTimers();
+		render(<CursadasList />);
+
+		const input = screen.getByLabelText("Filtrar por año");
+		for (const value of ["2", "20", "202", "2024"]) {
+			fireEvent.change(input, { target: { value } });
+		}
+		expect(useCursadasMock).not.toHaveBeenLastCalledWith(
+			expect.objectContaining({ anio: 2024 }),
+		);
+
+		act(() => vi.advanceTimersByTime(300));
+
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ anio: 2024 }),
+		);
+		vi.useRealTimers();
+	});
+
+	it("filtra con el texto tipeado, sin elegir una sugerencia", () => {
+		vi.useFakeTimers();
+		render(<CursadasList />);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por materia"), {
+			target: { value: "anali" },
+		});
+		act(() => vi.advanceTimersByTime(300));
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ materia: "anali" }),
+		);
+
+		fireEvent.change(screen.getByLabelText("Filtrar por alumno"), {
+			target: { value: "luci" },
+		});
+		act(() => vi.advanceTimersByTime(300));
+		expect(useCursadasMock).toHaveBeenLastCalledWith(
+			expect.objectContaining({ materia: "anali", alumno: "luci" }),
+		);
+		vi.useRealTimers();
 	});
 
 	it("cada filtro llega al hook", () => {
@@ -157,9 +208,7 @@ describe("CursadasList", () => {
 		fireEvent.change(screen.getByLabelText("Filtrar por año"), {
 			target: { value: "2024" },
 		});
-		expect(useCursadasMock).toHaveBeenLastCalledWith(
-			expect.objectContaining({ anio: 2024 }),
-		);
+		expect(screen.getByLabelText("Filtrar por año")).toHaveValue(2024);
 
 		fireEvent.change(screen.getByLabelText("Filtrar por cuatrimestre"), {
 			target: { value: "2C" },

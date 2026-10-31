@@ -1,11 +1,11 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.auth.dependencies import DirectorOrAdminRole
 from app.schemas.alumnos import AlumnoCarreraCreate, AlumnoCarreraResponse, AlumnoCreate, AlumnoResponse, AlumnoUpdate
-from app.schemas.common import PaginatedResponse
+from app.schemas.common import PaginatedResponse, SearchHitResponse
 from app.services.alumnos import AlumnoService
 
 router = APIRouter(dependencies=[DirectorOrAdminRole])
@@ -17,6 +17,16 @@ ServiceDep = Annotated[AlumnoService, Depends(AlumnoService.dep)]
 async def list_alumnos(service: ServiceDep, skip: int = 0, limit: int = 20):
     total, items = await service.list(skip=skip, limit=limit)
     return PaginatedResponse(total=total, items=items)
+
+
+# Antes de /{alumno_id}: si no, "search" se parsea como UUID y devuelve 422.
+@router.get("/search", response_model=list[SearchHitResponse])
+async def search_alumnos(service: ServiceDep, q: str = Query(min_length=2), limit: int = Query(default=8, le=20)):
+    alumnos = await service.search(q, limit)
+    return [
+        SearchHitResponse(id=a.id, label=f"{a.apellido}, {a.nombre} · DNI {a.dni}", term=f"{a.apellido} {a.nombre}")
+        for a in alumnos
+    ]
 
 
 @router.get("/{alumno_id}", response_model=AlumnoResponse)

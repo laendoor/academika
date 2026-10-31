@@ -6,7 +6,8 @@ from db.models.alumno_carrera import AlumnoCarrera
 from db.models.cursada import Cursada
 from db.models.materia import Materia
 from db.models.plan_de_estudio import PlanDeEstudio
-from sqlalchemy import ColumnElement, func, or_, select
+from db.search import search_criteria
+from sqlalchemy import ColumnElement, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -84,20 +85,9 @@ class WorkspaceStudioService:
         if alumno_id is not None:
             criteria.append(Cursada.alumno_id == alumno_id)
         if alumno:
-            # shortcut: búsqueda sensible a tildes — "garcia" no encuentra "García".
-            # unaccent() (extensión + migración) cuando el padrón lo haga doler.
-            term = f"%{alumno}%"
-            criteria.append(
-                or_(
-                    Alumno.legajo.ilike(term),
-                    Alumno.dni.ilike(term),
-                    Alumno.apellido.ilike(term),
-                    Alumno.nombre.ilike(term),
-                )
-            )
+            criteria.extend(search_criteria(Alumno.search_term, alumno))
         if materia:
-            term = f"%{materia}%"
-            criteria.append(or_(Materia.codigo.ilike(term), Materia.sigla.ilike(term), Materia.nombre.ilike(term)))
+            criteria.extend(search_criteria(Materia.search_term, materia))
         if anio is not None:
             criteria.append(Cursada.anio == anio)
         if cuatrimestre is not None:

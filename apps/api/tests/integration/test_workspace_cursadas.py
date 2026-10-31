@@ -8,14 +8,17 @@ async def _create_carrera(auth_client: AsyncClient, codigo: str = "TPI") -> dict
     return response.json()
 
 
-async def _create_materia(auth_client: AsyncClient, codigo: str = "IP") -> dict:
-    response = await auth_client.post("/api/v1/materias", json={"nombre": f"Materia {codigo}", "codigo": codigo})
+async def _create_materia(auth_client: AsyncClient, codigo: str = "IP", nombre: str | None = None) -> dict:
+    payload = {"nombre": nombre or f"Materia {codigo}", "codigo": codigo}
+    response = await auth_client.post("/api/v1/materias", json=payload)
     assert response.status_code == 201
     return response.json()
 
 
-async def _create_alumno(auth_client: AsyncClient, dni: str = "12345678", apellido: str = "García") -> dict:
-    response = await auth_client.post("/api/v1/alumnos", json={"nombre": "Ana", "apellido": apellido, "dni": dni})
+async def _create_alumno(
+    auth_client: AsyncClient, dni: str = "12345678", apellido: str = "García", nombre: str = "Ana"
+) -> dict:
+    response = await auth_client.post("/api/v1/alumnos", json={"nombre": nombre, "apellido": apellido, "dni": dni})
     assert response.status_code == 201
     return response.json()
 
@@ -170,3 +173,51 @@ async def test_estudiante_detalle_not_found(auth_client: AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_cursadas_requires_director_role(client: AsyncClient) -> None:
     assert (await client.get("/api/v1/workspace/cursadas")).status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_filter_alumno_ignores_accents_case_and_enye(auth_client: AsyncClient) -> None:
+    carrera = await _create_carrera(auth_client)
+    materia = await _create_materia(auth_client)
+    alumno = await _create_alumno(auth_client, dni="33333333", apellido="Núñez", nombre="Lucía")
+    await _create_cursada(auth_client, alumno["id"], materia["id"], carrera["id"])
+
+    for term in ("luci", "LUCÍA", "nunez", "NÚÑEZ"):
+        total = (await auth_client.get("/api/v1/workspace/cursadas", params={"alumno": term})).json()["total"]
+        assert total == 1, term
+
+
+@pytest.mark.asyncio
+async def test_filter_alumno_matches_tokens_in_any_order(auth_client: AsyncClient) -> None:
+    carrera = await _create_carrera(auth_client)
+    materia = await _create_materia(auth_client)
+    alumno = await _create_alumno(auth_client, dni="44444444", apellido="Fernández", nombre="Ana Lucía")
+    await _create_cursada(auth_client, alumno["id"], materia["id"], carrera["id"])
+
+    for term in ("luci fernandez", "fernandez luci", "44444444 lucia"):
+        total = (await auth_client.get("/api/v1/workspace/cursadas", params={"alumno": term})).json()["total"]
+        assert total == 1, term
+
+
+@pytest.mark.asyncio
+async def test_filter_materia_ignores_accents(auth_client: AsyncClient) -> None:
+    carrera = await _create_carrera(auth_client)
+    materia = await _create_materia(auth_client, codigo="AM", nombre="Análisis Matemático")
+    alumno = await _create_alumno(auth_client)
+    await _create_cursada(auth_client, alumno["id"], materia["id"], carrera["id"])
+
+    for term in ("analisis", "MATEMATICO", "análi"):
+        response = await auth_client.get("/api/v1/workspace/cursadas", params={"materia": term})
+        assert response.json()["total"] == 1, term
+
+
+@pytest.mark.asyncio
+async def test_filter_does_not_treat_wildcards_as_operators(auth_client: AsyncClient) -> None:
+    carrera = await _create_carrera(auth_client)
+    materia = await _create_materia(auth_client)
+    alumno = await _create_alumno(auth_client)
+    await _create_cursada(auth_client, alumno["id"], materia["id"], carrera["id"])
+
+    for term in ("%%", "__", "gar%"):
+        total = (await auth_client.get("/api/v1/workspace/cursadas", params={"alumno": term})).json()["total"]
+        assert total == 0, term
