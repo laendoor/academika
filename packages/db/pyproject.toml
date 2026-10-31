@@ -3,7 +3,7 @@ name = "academika-db"
 version = "0.6.0"
 requires-python = ">=3.13"
 dependencies = [
-    "sqlalchemy[asyncio]>=2.0",
+    "sqlalchemy[asyncio]>=2.1.6",
     "uuid-utils>=0.9",
 ]
 

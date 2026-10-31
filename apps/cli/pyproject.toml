@@ -7,7 +7,7 @@ dependencies = [
     "analytika",
     "asyncpg>=0.30",
     "prompt-toolkit>=3.0",
-    "sqlalchemy[asyncio]>=2.0",
+    "sqlalchemy[asyncio]>=2.1.6",
 ]
 
 [dependency-groups]
