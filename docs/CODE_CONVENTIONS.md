@@ -10,13 +10,13 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 ```txt
 apps/api/       ← FastAPI deployable (routers, services, config, alembic, seeds)
 apps/web/       ← Next.js deployable
-apps/cli/       ← lyka (#94, cuando exista)
+apps/cli/       ← clika (#94)
 packages/analytika/  ← motor de métricas: contratos + registry (solo sqlalchemy)
 packages/db/         ← capa de datos: session factory, Base, modelos
 ```
 
 Workspace uv en la raíz (`uv.lock` en raíz, un solo `.venv`). Comandos desde la raíz:
-`uv sync --all-packages --all-groups` (install), `uv run pytest apps/api/tests/unit/ packages/analytika`, `uv run ruff check apps/api packages`.
+`uv sync --all-packages --all-groups` (install), `uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika`, `uv run ruff check apps/api apps/cli packages`.
 
 Boundary dura, en este orden de dependencia (nada importa hacia arriba):
 
@@ -220,17 +220,17 @@ Casos que valen la pena: 204 del API → `ok()`, error del API con `detail` (409
 
 ### Unit vs Integration
 
-| Carpeta                       | Regla                                                                 |
-| ----------------------------- | --------------------------------------------------------------------- |
-| `apps/api/tests/unit/`        | Sin infraestructura. Dependencias externas mockeadas. Corren offline. |
-| `apps/api/tests/integration/` | Requieren infraestructura real (DB, etc.). Usan testcontainers.       |
+| Carpeta                         | Regla                                                                 |
+| ------------------------------- | --------------------------------------------------------------------- |
+| `apps/<app>/tests/unit/`        | Sin infraestructura. Dependencias externas mockeadas. Corren offline. |
+| `apps/<app>/tests/integration/` | Requieren infraestructura real (DB, etc.). Usan testcontainers.       |
 
-Si un test necesita base de datos, va en `apps/api/tests/integration/`. Sin excepciones.
+Si un test necesita base de datos, va en el `tests/integration/` de su app: `apps/api/` o `apps/cli/`. Nunca en `unit/`.
 
 ### Fixtures de testcontainers
 
-Los fixtures de DB viven en `apps/api/tests/integration/conftest.py`, nunca en `apps/api/tests/conftest.py` raíz.
-Así `pytest apps/api/tests/unit/` nunca arranca un contenedor.
+Los fixtures de DB viven en el `tests/integration/conftest.py` de cada app, nunca en un `tests/conftest.py` raíz.
+Así `pytest apps/<app>/tests/unit/` nunca arranca un contenedor.
 
 **Patrón NullPool** — cada test recibe su propio engine sin connection pool:
 
@@ -253,6 +253,10 @@ loop`. NullPool elimina el pool; cada test crea y destruye su engine limpio.
 Se usa `Base.metadata.create_all()` en el fixture `db_url` (no `alembic upgrade head`).
 Velocidad sobre fidelidad de migración en el loop local. Las migraciones se validan por separado en CI
 (job `alembic-check`: upgrade → check → downgrade → upgrade).
+
+Si el schema tiene columnas `search_term`, antes de `create_all()` hay que crear la función que las genera:
+`CREATE EXTENSION IF NOT EXISTS unaccent` + `F_UNACCENT_SQL` (`packages/db/db/search.py`), o el `CREATE TABLE`
+falla con `function f_unaccent(text) does not exist`. Ver `_create_search_helpers` en los conftest de integración.
 
 ### Async SQLAlchemy — lazy loading
 

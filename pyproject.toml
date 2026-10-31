@@ -2,20 +2,22 @@
 name = "academika"
 version = "0.6.0"
 requires-python = ">=3.13"
-dependencies = ["academika-api"]
+dependencies = ["academika-api", "clika"]
 
 [dependency-groups]
 dev = [
+    "clika",
     "pytest>=8.3",
     "pytest-asyncio>=0.25",
     "ruff>=0.9",
 ]
 
 [tool.uv.workspace]
-members = ["apps/api", "packages/*"]
+members = ["apps/api", "apps/cli", "packages/*"]
 
 [tool.uv.sources]
 academika-api = { workspace = true }
+clika = { workspace = true }
 
 [tool.ruff]
 target-version = "py313"
@@ -31,8 +33,9 @@ extend-immutable-calls = ["Depends", "Security", "Query", "Header", "Cookie", "B
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
+"apps/*/tests/**" = ["S101"]
 "packages/*/tests/**" = ["S101"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["packages", "apps/api/tests"]
+testpaths = ["packages", "apps/api/tests", "apps/cli/tests"]

@@ -2,7 +2,7 @@
 
 DB_URL ?= postgresql+asyncpg://academika:academika@localhost:5432/academika
 
-.PHONY: help install clean docker-dev db-start db-stop dev-api dev-web check format \
+.PHONY: help install clean docker-dev db-start db-stop dev-api dev-web clika check format \
         test test-api test-web test-integration test-api-cov test-web-cov alembic-current alembic-upgrade alembic-downgrade \
         alembic-check alembic-revision seed seed-dev seed-admin release
 
@@ -40,31 +40,34 @@ dev-api: ## Servidor FastAPI con hot-reload
 dev-web: ## Servidor Next.js con hot-reload
 	cd apps/web && npm run dev
 
+clika: ## REPL local para probar métricas de analytika
+	cd apps/cli && DATABASE_URL=$(DB_URL) uv run python -m clika
+
 ## Calidad
 check: ## Linter y verificación de formato (python + web)
-	uv run ruff check apps/api packages && uv run ruff format --check apps/api packages
+	uv run ruff check apps/api apps/cli packages && uv run ruff format --check apps/api apps/cli packages
 	cd apps/web && npm run lint
 
 format: ## Formatea automáticamente (python + web)
-	uv run ruff check --fix apps/api packages && uv run ruff format apps/api packages
+	uv run ruff check --fix apps/api apps/cli packages && uv run ruff format apps/api apps/cli packages
 	cd apps/web && npm run format
 
 ## Tests
 test: ## Tests unitarios (python + web)
-	uv run pytest apps/api/tests/unit/ packages/analytika
+	uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika
 	cd apps/web && npm run test
 
 test-api: ## Tests unitarios de la API
-	uv run pytest apps/api/tests/unit/ packages/analytika
+	uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika
 
 test-web: ## Tests unitarios del frontend (Vitest)
 	cd apps/web && npm run test
 
 test-integration: ## Tests de integración con DB real (testcontainers)
-	uv run pytest apps/api/tests/integration/ -v
+	uv run pytest apps/api/tests/integration/ apps/cli/tests/integration/ -v
 
 test-api-cov: ## Tests de la API (unit + integration) con coverage en consola
-	uv run pytest apps/api/tests/unit/ apps/api/tests/integration/ packages/analytika --cov=app --cov-report=term-missing -q
+	uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ apps/api/tests/integration/ apps/cli/tests/integration/ packages/analytika --cov=app --cov-report=term-missing -q
 
 test-web-cov: ## Tests del frontend con coverage en consola
 	cd apps/web && npm run test -- --coverage

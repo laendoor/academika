@@ -10,7 +10,7 @@ Alembic (naming, validación en CI).
 
 ## Reglas clave
 
-- Tests que requieren DB van en `apps/api/tests/integration/`, nunca en `apps/api/tests/unit/` (los de packages, en `packages/<pkg>/tests/`)
+- Tests que requieren DB van en el `tests/integration/` de su app (`apps/api/`, `apps/cli/`), nunca en `unit/` (los de packages, en `packages/<pkg>/tests/`)
 - No usar lazy loading en async SQLAlchemy — siempre `selectinload()` o `joinedload()`
 - IDs: siempre via `generate_uuid()` de `db.base` (package `academika-db`), nunca `uuid_utils.uuid7()` directo
 - PRs siempre vía `/aika-create-pr` (preview + confirmación antes de crear) — nunca `gh pr create` directo

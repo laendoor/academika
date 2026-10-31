@@ -40,14 +40,14 @@ jobs:
         run: cd apps/web && npm ci
       - parallel:
           - name: Lint backend (ruff)
-            run: uv run ruff check apps/api packages && uv run ruff format --check apps/api packages
+            run: uv run ruff check apps/api apps/cli packages && uv run ruff format --check apps/api apps/cli packages
           - name: Test backend (pytest)
             # Ambas suites corren aunque la primera falle, para que el
             # coverage.xml exista siempre y Codecov notifique (after_n_builds).
             run: |
               STATUS=0
-              uv run pytest apps/api/tests/unit/ packages/analytika --cov=app --cov-report=term || STATUS=1
-              uv run pytest apps/api/tests/integration/ -v --cov=app --cov-append --cov-report=xml --cov-report=term || STATUS=1
+              uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika --cov=app --cov=clika --cov-report=term || STATUS=1
+              uv run pytest apps/api/tests/integration/ apps/cli/tests/integration/ -v --cov=app --cov=clika --cov-append --cov-report=xml --cov-report=term || STATUS=1
               exit $STATUS
           - name: Check migrations (alembic)
             run: |
