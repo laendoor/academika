@@ -41,7 +41,7 @@ dev-web: ## Servidor Next.js con hot-reload
 	cd apps/web && npm run dev
 
 lyka: ## REPL local para probar métricas de analytika
-	cd apps/cli && uv run python -m lyka
+	cd apps/cli && DATABASE_URL=$(DB_URL) uv run python -m lyka
 
 ## Calidad
 check: ## Linter y verificación de formato (python + web)
