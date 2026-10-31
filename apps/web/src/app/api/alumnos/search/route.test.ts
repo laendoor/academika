@@ -77,4 +77,45 @@ describe.each(HANDLERS)("GET $ruta", ({ ruta, api, handler }) => {
 			error: "String should have at least 2 characters",
 		});
 	});
+
+	it("sin q manda el parámetro vacío", async () => {
+		vi.mocked(fetch).mockResolvedValue(jsonResponse(200, []));
+
+		await handler(makeRequest(`http://localhost:3000${ruta}`));
+
+		expect(fetch).toHaveBeenCalledWith(
+			expect.stringContaining(`${api}?q=`),
+			expect.anything(),
+		);
+	});
+
+	it("un error sin detail usa el mensaje genérico y normaliza el 5xx", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			jsonResponse(502, { error: "upstream caído" }),
+		);
+
+		const res = await handler(
+			makeRequest(`http://localhost:3000${ruta}?q=ana`),
+		);
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({
+			error: "Error inesperado. Intentá de nuevo más tarde.",
+		});
+	});
+
+	it("un body que no es JSON cae al mensaje genérico", async () => {
+		vi.mocked(fetch).mockResolvedValue(
+			new Response("bad gateway", { status: 502 }),
+		);
+
+		const res = await handler(
+			makeRequest(`http://localhost:3000${ruta}?q=ana`),
+		);
+
+		expect(res.status).toBe(500);
+		expect(await res.json()).toEqual({
+			error: "Error inesperado. Intentá de nuevo más tarde.",
+		});
+	});
 });
