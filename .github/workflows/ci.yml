@@ -46,8 +46,8 @@ jobs:
             # coverage.xml exista siempre y Codecov notifique (after_n_builds).
             run: |
               STATUS=0
-              uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika --cov=app --cov-report=term || STATUS=1
-              uv run pytest apps/api/tests/integration/ apps/cli/tests/integration/ -v --cov=app --cov-append --cov-report=xml --cov-report=term || STATUS=1
+              uv run pytest apps/api/tests/unit/ apps/cli/tests/unit/ packages/analytika --cov=app --cov=lyka --cov-report=term || STATUS=1
+              uv run pytest apps/api/tests/integration/ apps/cli/tests/integration/ -v --cov=app --cov=lyka --cov-append --cov-report=xml --cov-report=term || STATUS=1
               exit $STATUS
           - name: Check migrations (alembic)
             run: |

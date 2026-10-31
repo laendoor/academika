@@ -34,6 +34,19 @@ def test_comando_es_case_insensitive():
     assert parse("METRICAS") == Command("metricas")
 
 
+def test_nombre_de_metrica_es_case_insensitive():
+    assert parse("metrica SMOKE") == Command("metrica", metric_key="smoke")
+
+
+def test_parametro_con_espacios_entre_comillas():
+    assert parse('metrica m q="luci fer"').params == {"q": "luci fer"}
+
+
+def test_comillas_sin_cerrar_levanta_usage_error():
+    with pytest.raises(UsageError, match="comillas"):
+        parse('metrica m q="luci')
+
+
 @pytest.mark.parametrize(
     "line",
     ["foo", "metrica", "metrica m limit", "metrica m =10", "metricas x", "exit x", "help a b"],

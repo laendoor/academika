@@ -38,4 +38,4 @@ extend-immutable-calls = ["Depends", "Security", "Query", "Header", "Cookie", "B
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["packages", "apps/api/tests"]
+testpaths = ["packages", "apps/api/tests", "apps/cli/tests"]
