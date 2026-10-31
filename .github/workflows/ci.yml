@@ -68,7 +68,7 @@ jobs:
       # after_n_builds eternamente y el status queda en pending.
       - name: Upload backend coverage to Codecov
         if: always()
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage.xml
           flags: backend
@@ -76,7 +76,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload frontend coverage to Codecov
         if: always()
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: apps/web/coverage/lcov.info
           flags: frontend
