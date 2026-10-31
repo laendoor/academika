@@ -14,7 +14,7 @@ dependencies = [
     "resend>=2.0",
     "sqlalchemy[asyncio]>=2.0",
     "uuid-utils>=0.9",
-    "uvicorn[standard]>=0.34",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [tool.uv.sources]
