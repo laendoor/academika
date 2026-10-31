@@ -7,9 +7,9 @@ dependencies = ["academika-api", "clika"]
 [dependency-groups]
 dev = [
     "clika",
-    "pytest>=8.3",
-    "pytest-asyncio>=0.25",
-    "ruff>=0.9",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1",
+    "ruff>=0.17.3",
 ]
 
 [tool.uv.workspace]

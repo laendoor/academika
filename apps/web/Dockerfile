@@ -1,4 +1,4 @@
-FROM node:24-slim AS builder
+FROM node:26-slim AS builder
 ARG APP_VERSION=dev
 ARG APP_SHA=dev
 WORKDIR /app
@@ -10,7 +10,7 @@ ENV NEXT_PUBLIC_APP_VERSION=$APP_VERSION
 ENV NEXT_PUBLIC_APP_SHA=$APP_SHA
 RUN npm run build
 
-FROM node:24-slim AS runner
+FROM node:26-slim AS runner
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 WORKDIR /app

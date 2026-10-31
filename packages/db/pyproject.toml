@@ -3,8 +3,8 @@ name = "academika-db"
 version = "0.6.0"
 requires-python = ">=3.13"
 dependencies = [
-    "sqlalchemy[asyncio]>=2.0",
-    "uuid-utils>=0.9",
+    "sqlalchemy[asyncio]>=2.1.6",
+    "uuid-utils>=1.2.0",
 ]
 
 [tool.setuptools.packages.find]
