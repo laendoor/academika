@@ -34,12 +34,12 @@ export function ImportPlanillas() {
 					accept=".csv"
 					onChange={onChange}
 					disabled={uploading}
-					className="text-sm text-zinc-700 file:mr-3 file:rounded file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-zinc-700 hover:file:bg-zinc-200 disabled:opacity-50"
+					className="text-sm text-sage-800 file:mr-3 file:rounded file:border-0 file:bg-sage-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-sage-800 hover:file:bg-sage-200 disabled:opacity-50"
 				/>
 				<button
 					type="submit"
 					disabled={uploading || !selectedFiles.length}
-					className="rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+					className="rounded bg-brand px-4 py-1.5 text-sm font-medium text-ink hover:bg-brand-600 disabled:opacity-50"
 				>
 					{uploading ? "Subiendo..." : "Subir planillas"}
 				</button>
@@ -48,7 +48,7 @@ export function ImportPlanillas() {
 						type="button"
 						onClick={refresh}
 						disabled={loading}
-						className="text-sm text-zinc-500 underline hover:text-zinc-700 disabled:opacity-50"
+						className="text-sm text-sage-700 underline hover:text-sage-800 disabled:opacity-50"
 					>
 						Refrescar
 					</button>
@@ -56,7 +56,7 @@ export function ImportPlanillas() {
 			</form>
 
 			{error && (
-				<div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+				<div className="mb-4 rounded border border-danger/20 bg-danger/10 p-3 text-sm text-danger">
 					{error}
 				</div>
 			)}
@@ -64,7 +64,7 @@ export function ImportPlanillas() {
 			<ImportLogList items={items} />
 
 			{total === 0 && !loading && (
-				<p className="mt-4 text-sm text-zinc-500">
+				<p className="mt-4 text-sm text-sage-700">
 					Sin importaciones registradas todavía.
 				</p>
 			)}

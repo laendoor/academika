@@ -22,7 +22,7 @@ import { searchAlumnos, searchMaterias } from "@/lib/api/search";
 
 const PAGE_SIZE = 20;
 const INPUT_CLASS =
-	"rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700";
+	"rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800";
 
 export function CursadasList() {
 	const [tab, setTab] = useState(0);
@@ -167,7 +167,7 @@ export function CursadasList() {
 			</div>
 
 			{error && (
-				<div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+				<div className="mb-4 rounded border border-danger/20 bg-danger/10 p-3 text-sm text-danger">
 					{error}
 				</div>
 			)}
@@ -175,7 +175,7 @@ export function CursadasList() {
 			{lookupError && (
 				<div
 					role="alert"
-					className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+					className="mb-4 rounded border border-danger/20 bg-danger/10 p-3 text-sm text-danger"
 				>
 					No se pudo cargar el filtro de estados: {lookupError}
 				</div>
@@ -184,7 +184,7 @@ export function CursadasList() {
 			{!lookupError && (
 				<>
 					<Table>
-						<thead className="bg-zinc-50">
+						<thead>
 							<tr>
 								<Th>Alumno</Th>
 								<Th>Materia</Th>
@@ -204,31 +204,31 @@ export function CursadasList() {
 										<button
 											type="button"
 											onClick={() => setSelectedAlumno(item.alumno.id)}
-											className="text-zinc-800 underline-offset-2 hover:underline"
+											className="text-sage-800 underline-offset-2 hover:underline"
 										>
 											{item.alumno.apellido}, {item.alumno.nombre}
 										</button>
 									</td>
-									<td className="px-4 py-3 text-zinc-800">
+									<td className="px-4 py-3 text-sage-800">
 										{item.materia.codigo} — {item.materia.nombre}
 									</td>
-									<td className="px-4 py-3 text-zinc-600">
+									<td className="px-4 py-3 text-sage-700">
 										{item.carrera.codigo}
 									</td>
-									<td className="px-4 py-3 text-zinc-600">{item.anio}</td>
-									<td className="px-4 py-3 text-zinc-600">
+									<td className="px-4 py-3 text-sage-700">{item.anio}</td>
+									<td className="px-4 py-3 text-sage-700">
 										{item.cuatrimestre}
 									</td>
-									<td className="px-4 py-3 text-zinc-600">
+									<td className="px-4 py-3 text-sage-700">
 										{item.comision ?? "—"}
 									</td>
-									<td className="px-4 py-3 text-zinc-600">
+									<td className="px-4 py-3 text-sage-700">
 										{tipoLabels[item.tipo_cursada] ?? item.tipo_cursada}
 									</td>
-									<td className="px-4 py-3 text-zinc-600">
+									<td className="px-4 py-3 text-sage-700">
 										{estadoLabels[item.estado_cursada] ?? item.estado_cursada}
 									</td>
-									<td className="px-4 py-3 text-zinc-600">
+									<td className="px-4 py-3 text-sage-700">
 										{item.nota ?? "—"}
 									</td>
 								</tr>
@@ -237,7 +237,7 @@ export function CursadasList() {
 					</Table>
 
 					{total === 0 && !loading && !error && (
-						<p className="mt-4 text-sm text-zinc-500">Sin cursadas.</p>
+						<p className="mt-4 text-sm text-sage-700">Sin cursadas.</p>
 					)}
 
 					<Pagination
@@ -254,7 +254,7 @@ export function CursadasList() {
 
 	return (
 		<div className="p-8">
-			<h2 className="mb-4 text-lg font-medium text-zinc-800">
+			<h2 className="mb-4 text-lg font-medium text-sage-800">
 				Cursadas e Inscripciones
 			</h2>
 

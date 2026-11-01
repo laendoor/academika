@@ -22,26 +22,26 @@ export function PlanDetailModal({
 }: PlanDetailModalProps) {
 	return (
 		<Modal title={detail?.nombre ?? "Detalle del plan"} onClose={onClose}>
-			{loading && <p className="text-sm text-zinc-500">Cargando…</p>}
+			{loading && <p className="text-sm text-sage-700">Cargando…</p>}
 			{error && (
-				<p className="text-sm text-red-700" role="alert">
+				<p className="text-sm text-danger" role="alert">
 					{error}
 				</p>
 			)}
 			{detail && (
 				<>
-					<p className="text-sm text-zinc-600">
+					<p className="text-sm text-sage-700">
 						{detail.carrera_nombre} · Plan {detail.anio} ·{" "}
 						{detail.nivel ? (nivelLabels[detail.nivel] ?? detail.nivel) : "—"} ·{" "}
 						{detail.vigente ? "vigente" : "no vigente"}
 					</p>
 
-					<h3 className="mt-3 text-sm font-medium text-zinc-700">
+					<h3 className="mt-3 text-sm font-medium text-sage-800">
 						Materias ({detail.materias.length})
 					</h3>
 					{detail.materias.length > 0 ? (
 						<Table>
-							<thead className="bg-zinc-50">
+							<thead>
 								<tr>
 									<Th>Código</Th>
 									<Th>Sigla</Th>
@@ -55,21 +55,21 @@ export function PlanDetailModal({
 							<Tbody>
 								{detail.materias.map((m) => (
 									<tr key={m.id} className="bg-white">
-										<td className="px-4 py-3 text-zinc-600">{m.codigo}</td>
-										<td className="px-4 py-3 text-zinc-600">
+										<td className="px-4 py-3 text-sage-700">{m.codigo}</td>
+										<td className="px-4 py-3 text-sage-700">
 											{m.sigla ?? "—"}
 										</td>
-										<td className="px-4 py-3 text-zinc-800">{m.nombre}</td>
-										<td className="px-4 py-3 text-zinc-600">
+										<td className="px-4 py-3 text-sage-800">{m.nombre}</td>
+										<td className="px-4 py-3 text-sage-700">
 											{m.creditos?.toString() ?? "—"}
 										</td>
-										<td className="px-4 py-3 text-zinc-600">
+										<td className="px-4 py-3 text-sage-700">
 											{m.nucleo ? (nucleoLabels[m.nucleo] ?? m.nucleo) : "—"}
 										</td>
-										<td className="px-4 py-3 text-zinc-600">
+										<td className="px-4 py-3 text-sage-700">
 											{m.horas_semanales?.toString() ?? "—"}
 										</td>
-										<td className="px-4 py-3 text-zinc-600">
+										<td className="px-4 py-3 text-sage-700">
 											{m.carga_horaria_total?.toString() ?? "—"}
 										</td>
 									</tr>
@@ -77,7 +77,7 @@ export function PlanDetailModal({
 							</Tbody>
 						</Table>
 					) : (
-						<p className="mt-1 text-sm text-zinc-500">
+						<p className="mt-1 text-sm text-sage-700">
 							Este plan no tiene materias vinculadas.
 						</p>
 					)}

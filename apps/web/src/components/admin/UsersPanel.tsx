@@ -31,7 +31,7 @@ export function UsersPanel() {
 			<button
 				type="button"
 				onClick={() => setShowInvite((visible) => !visible)}
-				className="mb-4 flex items-center gap-2 rounded border border-zinc-300 px-4 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+				className="mb-4 flex items-center gap-2 rounded border border-sage-300 px-4 py-1.5 text-sm font-medium text-sage-800 hover:bg-sage-50"
 			>
 				<UserPlus className="h-4 w-4" />
 				Invitar

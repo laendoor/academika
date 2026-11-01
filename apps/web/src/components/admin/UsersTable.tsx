@@ -20,7 +20,7 @@ function RoleSelect({
 			value={role}
 			disabled={disabled}
 			onChange={(e) => onChange(e.target.value as UserRole)}
-			className="rounded border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-700 disabled:opacity-50"
+			className="rounded border border-sage-200 bg-white px-2 py-1 text-sm text-sage-800 disabled:opacity-50"
 		>
 			{roles.map((r) => (
 				<option key={r.key} value={r.key}>
@@ -47,8 +47,8 @@ function StatusToggle({
 			onClick={onToggle}
 			className={`rounded px-2 py-1 text-xs font-medium disabled:opacity-50 ${
 				isActive
-					? "bg-green-100 text-green-700 hover:bg-green-200"
-					: "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+					? "bg-success/10 text-success hover:bg-success/20"
+					: "bg-sage-100 text-sage-700 hover:bg-sage-200"
 			}`}
 		>
 			{isActive ? "Activo" : "Inactivo"}
@@ -83,7 +83,7 @@ function UserRow({
 
 	return (
 		<tr className="bg-white">
-			<td className="px-4 py-3 text-zinc-800">{user.email}</td>
+			<td className="px-4 py-3 text-sage-800">{user.email}</td>
 			<td className="px-4 py-3">
 				<RoleSelect
 					role={user.role}
@@ -105,7 +105,7 @@ function UserRow({
 					aria-label="Eliminar"
 					disabled={isUpdating || isDeleting}
 					onClick={handleDelete}
-					className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+					className="rounded p-1 text-sage-600 hover:bg-danger/10 hover:text-danger disabled:opacity-50"
 				>
 					<Trash2 className="h-4 w-4" />
 				</button>
@@ -131,7 +131,7 @@ export function UsersTable({
 }) {
 	return (
 		<Table>
-			<thead className="bg-zinc-50">
+			<thead>
 				<tr>
 					<Th>Email</Th>
 					<Th>Rol</Th>

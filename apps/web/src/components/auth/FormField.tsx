@@ -17,7 +17,7 @@ export function FormField({
 }) {
 	return (
 		<div>
-			<label htmlFor={id} className="block text-sm font-medium text-zinc-700">
+			<label htmlFor={id} className="block text-sm font-medium text-sage-800">
 				{label}
 			</label>
 			<input
@@ -27,7 +27,7 @@ export function FormField({
 				required={required}
 				autoComplete={autoComplete}
 				placeholder={placeholder}
-				className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm placeholder-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900"
+				className="mt-1 block w-full rounded-md border border-sage-300 bg-white px-3 py-2 text-sm placeholder-sage-700 focus:border-accent-700 focus:outline-none focus:ring-1 focus:ring-accent-700"
 			/>
 		</div>
 	);

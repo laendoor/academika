@@ -8,7 +8,7 @@ export function AuthCard({
 	className?: string;
 }) {
 	return (
-		<div className="flex min-h-full items-center justify-center bg-zinc-50 px-4">
+		<div className="flex min-h-full items-center justify-center px-4">
 			<div className={`w-full max-w-sm ${className}`}>{children}</div>
 		</div>
 	);

@@ -21,7 +21,7 @@ export function CorrelativasList() {
 
 	return (
 		<div className="p-8">
-			<h2 className="mb-4 text-lg font-medium text-zinc-800">Correlativas</h2>
+			<h2 className="mb-4 text-lg font-medium text-sage-800">Correlativas</h2>
 
 			<div className="mb-4 flex gap-4">
 				<select
@@ -31,7 +31,7 @@ export function CorrelativasList() {
 						setMateriaId(e.target.value);
 						setSkip(0);
 					}}
-					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
+					className="rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800"
 				>
 					<option value="">Todas las materias</option>
 					{materiasItems.map((m) => (
@@ -43,13 +43,13 @@ export function CorrelativasList() {
 			</div>
 
 			{error && (
-				<div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+				<div className="mb-4 rounded border border-danger/20 bg-danger/10 p-3 text-sm text-danger">
 					{error}
 				</div>
 			)}
 
 			<Table>
-				<thead className="bg-zinc-50">
+				<thead>
 					<tr>
 						<Th>Materia</Th>
 						<Th>Requisito</Th>
@@ -62,13 +62,13 @@ export function CorrelativasList() {
 							key={`${item.materia.id}-${item.requisito.id}`}
 							className="bg-white"
 						>
-							<td className="px-4 py-3 text-zinc-800">
+							<td className="px-4 py-3 text-sage-800">
 								{item.materia.codigo} — {item.materia.nombre}
 							</td>
-							<td className="px-4 py-3 text-zinc-600">
+							<td className="px-4 py-3 text-sage-700">
 								{item.requisito.codigo} — {item.requisito.nombre}
 							</td>
-							<td className="px-4 py-3 text-zinc-600">
+							<td className="px-4 py-3 text-sage-700">
 								{item.es_obligatoria ? "Obligatoria" : "Recomendada"}
 							</td>
 						</tr>
@@ -77,7 +77,7 @@ export function CorrelativasList() {
 			</Table>
 
 			{total === 0 && !loading && !error && (
-				<p className="mt-4 text-sm text-zinc-500">Sin correlativas.</p>
+				<p className="mt-4 text-sm text-sage-700">Sin correlativas.</p>
 			)}
 
 			<Pagination

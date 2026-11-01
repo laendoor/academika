@@ -8,17 +8,17 @@ export default function WorkspaceLayout() {
 	return (
 		<Group orientation="horizontal" className="flex-1">
 			<Panel defaultSize={30} minSize={20}>
-				<div className="h-full overflow-y-auto border-r border-zinc-200">
+				<div className="h-full overflow-y-auto border-r border-sage-200">
 					<SourcesPanel />
 				</div>
 			</Panel>
-			<Separator className="w-1 bg-transparent transition-colors hover:bg-zinc-300" />
+			<Separator className="w-1 bg-transparent transition-colors hover:bg-sage-300" />
 			<Panel defaultSize={40} minSize={25}>
 				<ChatPanel />
 			</Panel>
-			<Separator className="w-1 bg-transparent transition-colors hover:bg-zinc-300" />
+			<Separator className="w-1 bg-transparent transition-colors hover:bg-sage-300" />
 			<Panel defaultSize={30} minSize={20}>
-				<div className="h-full overflow-y-auto border-l border-zinc-200">
+				<div className="h-full overflow-y-auto border-l border-sage-200">
 					<StudioPanel />
 				</div>
 			</Panel>

@@ -70,7 +70,7 @@ export function PlanesList() {
 
 	return (
 		<div className="p-8">
-			<h2 className="mb-4 text-lg font-medium text-zinc-800">
+			<h2 className="mb-4 text-lg font-medium text-sage-800">
 				Planes de estudio
 			</h2>
 
@@ -82,7 +82,7 @@ export function PlanesList() {
 						setCarreraId(e.target.value);
 						setSkip(0);
 					}}
-					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
+					className="rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800"
 				>
 					<option value="">Todas las carreras</option>
 					{carreras.map((c) => (
@@ -94,13 +94,13 @@ export function PlanesList() {
 			</div>
 
 			{error && (
-				<div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+				<div className="mb-4 rounded border border-danger/20 bg-danger/10 p-3 text-sm text-danger">
 					{error}
 				</div>
 			)}
 
 			<Table>
-				<thead className="bg-zinc-50">
+				<thead>
 					<tr>
 						<Th>Nombre</Th>
 						<Th>Carrera</Th>
@@ -117,17 +117,17 @@ export function PlanesList() {
 									type="button"
 									aria-haspopup="dialog"
 									onClick={() => openDetail(item)}
-									className="text-zinc-800 underline decoration-zinc-300 underline-offset-2 hover:decoration-zinc-600"
+									className="text-sage-800 underline decoration-sage-300 underline-offset-2 hover:decoration-sage-600"
 								>
 									{item.nombre}
 								</button>
 							</td>
-							<td className="px-4 py-3 text-zinc-600">{item.carrera_nombre}</td>
-							<td className="px-4 py-3 text-zinc-600">{item.anio}</td>
-							<td className="px-4 py-3 text-zinc-600">
+							<td className="px-4 py-3 text-sage-700">{item.carrera_nombre}</td>
+							<td className="px-4 py-3 text-sage-700">{item.anio}</td>
+							<td className="px-4 py-3 text-sage-700">
 								{item.nivel ? (nivelLabels[item.nivel] ?? item.nivel) : "—"}
 							</td>
-							<td className="px-4 py-3 text-zinc-600">
+							<td className="px-4 py-3 text-sage-700">
 								{item.vigente ? "Sí" : "No"}
 							</td>
 						</tr>
@@ -136,7 +136,7 @@ export function PlanesList() {
 			</Table>
 
 			{total === 0 && !loading && !error && (
-				<p className="mt-4 text-sm text-zinc-500">Sin planes.</p>
+				<p className="mt-4 text-sm text-sage-700">Sin planes.</p>
 			)}
 
 			<Pagination

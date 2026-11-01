@@ -26,26 +26,26 @@ export function EstudianteDetalleModal({
 
 	return (
 		<Modal title={title} onClose={onClose}>
-			{loading && <p className="text-sm text-zinc-500">Cargando…</p>}
+			{loading && <p className="text-sm text-sage-700">Cargando…</p>}
 			{error && (
-				<p className="text-sm text-red-700" role="alert">
+				<p className="text-sm text-danger" role="alert">
 					{error}
 				</p>
 			)}
 			{detail && (
 				<>
-					<p className="text-sm text-zinc-600">
+					<p className="text-sm text-sage-700">
 						Legajo {detail.legajo ?? "—"} · DNI {detail.dni}
 					</p>
 
-					<h3 className="mt-4 mb-2 text-sm font-medium text-zinc-700">
+					<h3 className="mt-4 mb-2 text-sm font-medium text-sage-800">
 						Carreras ({detail.carreras.length})
 					</h3>
 					{detail.carreras.length > 0 ? (
-						<ul className="mb-4 space-y-1 text-sm text-zinc-600">
+						<ul className="mb-4 space-y-1 text-sm text-sage-700">
 							{detail.carreras.map((c) => (
 								<li key={c.plan_id}>
-									<span className="text-zinc-800">{c.carrera_nombre}</span> ·
+									<span className="text-sage-800">{c.carrera_nombre}</span> ·
 									Plan {c.plan_nombre} ({c.anio}) ·{" "}
 									{estadoAcademicoLabels[c.estado_academico] ??
 										c.estado_academico}
@@ -53,15 +53,15 @@ export function EstudianteDetalleModal({
 							))}
 						</ul>
 					) : (
-						<p className="mb-4 text-sm text-zinc-500">Sin carreras.</p>
+						<p className="mb-4 text-sm text-sage-700">Sin carreras.</p>
 					)}
 
-					<h3 className="mt-4 mb-2 text-sm font-medium text-zinc-700">
+					<h3 className="mt-4 mb-2 text-sm font-medium text-sage-800">
 						Historial de cursadas ({detail.cursadas.length})
 					</h3>
 					{detail.cursadas.length > 0 ? (
 						<Table>
-							<thead className="bg-zinc-50">
+							<thead>
 								<tr>
 									<Th>Materia</Th>
 									<Th>Carrera</Th>
@@ -75,30 +75,30 @@ export function EstudianteDetalleModal({
 							<Tbody>
 								{detail.cursadas.map((c) => (
 									<tr key={c.id} className="bg-white">
-										<td className="px-4 py-2 text-zinc-800">
+										<td className="px-4 py-2 text-sage-800">
 											{c.materia.codigo} — {c.materia.nombre}
 										</td>
-										<td className="px-4 py-2 text-zinc-600">
+										<td className="px-4 py-2 text-sage-700">
 											{c.carrera.codigo}
 										</td>
-										<td className="px-4 py-2 text-zinc-600">{c.anio}</td>
-										<td className="px-4 py-2 text-zinc-600">
+										<td className="px-4 py-2 text-sage-700">{c.anio}</td>
+										<td className="px-4 py-2 text-sage-700">
 											{c.cuatrimestre}
 										</td>
-										<td className="px-4 py-2 text-zinc-600">
+										<td className="px-4 py-2 text-sage-700">
 											{tipoCursadaLabels[c.tipo_cursada] ?? c.tipo_cursada}
 										</td>
-										<td className="px-4 py-2 text-zinc-600">
+										<td className="px-4 py-2 text-sage-700">
 											{estadoCursadaLabels[c.estado_cursada] ??
 												c.estado_cursada}
 										</td>
-										<td className="px-4 py-2 text-zinc-600">{c.nota ?? "—"}</td>
+										<td className="px-4 py-2 text-sage-700">{c.nota ?? "—"}</td>
 									</tr>
 								))}
 							</Tbody>
 						</Table>
 					) : (
-						<p className="text-sm text-zinc-500">Sin cursadas.</p>
+						<p className="text-sm text-sage-700">Sin cursadas.</p>
 					)}
 				</>
 			)}

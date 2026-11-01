@@ -55,18 +55,18 @@ function statusTooltip(item: SourceItem, isResubmission: boolean): string {
 function statusIcon(item: SourceItem, isResubmission: boolean) {
 	const icon =
 		item.status === "error" ? (
-			<X aria-hidden className="h-4 w-4 text-red-600" />
+			<X aria-hidden className="h-4 w-4 text-danger" />
 		) : isResubmission ? (
-			<History aria-hidden className="h-4 w-4 text-amber-600" />
+			<History aria-hidden className="h-4 w-4 text-warning" />
 		) : (
-			<Check aria-hidden className="h-4 w-4 text-green-600" />
+			<Check aria-hidden className="h-4 w-4 text-success" />
 		);
 	return (
 		<span className="group relative inline-flex">
 			{icon}
 			<span
 				role="tooltip"
-				className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden w-max max-w-64 -translate-x-1/2 rounded bg-zinc-900 px-2 py-1 text-xs font-normal whitespace-normal text-white group-hover:block group-focus-within:block"
+				className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden w-max max-w-64 -translate-x-1/2 rounded bg-ink px-2 py-1 text-xs font-normal whitespace-normal text-surface group-hover:block group-focus-within:block"
 			>
 				{statusTooltip(item, isResubmission)}
 			</span>
@@ -89,34 +89,34 @@ export function ImportLogList({ items }: { items: SourceItem[] }) {
 						type="button"
 						aria-haspopup="dialog"
 						onClick={() => setSelected(item)}
-						className="grid w-full grid-cols-[150px_20px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.5fr)_auto] items-center gap-x-2 px-2 py-1 text-left hover:bg-zinc-50"
+						className="grid w-full grid-cols-[150px_20px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.5fr)_auto] items-center gap-x-2 px-2 py-1 text-left hover:bg-sage-50"
 					>
-						<span className="font-mono text-xs text-zinc-500">
+						<span className="font-mono text-xs text-sage-700">
 							{formatIsoLocal(item.created_at)}
 						</span>
 						{statusIcon(item, resubmitted.has(item.id))}
 						<span
-							className="truncate text-sm text-zinc-800"
+							className="truncate text-sm text-sage-800"
 							title={details.files[0] ?? "—"}
 						>
 							{details.files[0] ?? "—"}
 						</span>
-						<span className="truncate text-sm text-zinc-600">
+						<span className="truncate text-sm text-sage-700">
 							{typeLabel(details.sheet_type)}
 						</span>
 						{ok ? (
-							<span className="text-sm text-zinc-600">
+							<span className="text-sm text-sage-700">
 								· {details.processed.toLocaleString("es-AR")} ok
 								{details.skipped > 0 &&
 									` · ${details.skipped.toLocaleString("es-AR")} omitidas`}
 							</span>
 						) : (
-							<span className="truncate text-sm text-red-700">
+							<span className="truncate text-sm text-danger">
 								· error: {details.error}
 							</span>
 						)}
 						<span
-							className="text-xs text-zinc-500"
+							className="text-xs text-sage-700"
 							title={details.uploader_email ?? "—"}
 						>
 							por {emailLocal(details.uploader_email)}

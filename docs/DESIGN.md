@@ -66,7 +66,7 @@ Los escalones de `sage` tienen roles fijos:
 | `sage-200` | Bordes de cards y tablas     | —         |
 | `sage-600` | Íconos y bordes de controles | 4.31:1    |
 | `sage-700` | Texto secundario             | 5.86:1    |
-| `sage-800` | Texto con peso medio         | 10.29:1    |
+| `sage-800` | Texto con peso medio         | 10.29:1   |
 
 `sage-600` no llega a AA para texto: queda para íconos y bordes. Un texto
 secundario que se lea va en `sage-700`.
@@ -100,6 +100,12 @@ utilidades de Tailwind (`text-sm`, `text-xs`, `text-2xl`), como hasta ahora.
 ## Superficies
 
 - El fondo de la app es blanco puro; el texto, `ink`.
+- La barra superior es `ink` con texto `surface`; los links, `sage-300`, que
+  sobre `ink` da 11.5:1.
+- La sidebar de admin es `accent-50`, con el link activo en `accent-100`: es el
+  único lugar de la app con superficie celeste, así que marca navegación.
+- Los encabezados de tabla son `sage-800` con texto `surface` (9.9:1): la única
+  superficie oscura del contenido, y viven en `Th`, no en cada tabla.
 - Las cards son blancas con borde `sage-200`. Sin sombras nuevas: la elevación
   que hay (modales, dropdowns) se queda como está.
 - Login y sidebar usan `brand` como acento y `ink` como texto; las tablas y

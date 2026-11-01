@@ -5,10 +5,10 @@ export function StatusBadge({
 }) {
 	const styles =
 		status === "ok"
-			? "bg-green-100 text-green-700"
+			? "bg-success/10 text-success"
 			: status === "processing"
-				? "bg-yellow-100 text-yellow-700"
-				: "bg-red-100 text-red-700";
+				? "bg-warning/5 text-warning"
+				: "bg-danger/10 text-danger";
 	const label =
 		status === "ok" ? "OK" : status === "processing" ? "Procesando" : "Error";
 	return (
