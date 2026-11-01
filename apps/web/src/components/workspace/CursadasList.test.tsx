@@ -114,7 +114,7 @@ describe("CursadasList", () => {
 	it("el tab Inscripciones presetea inscripto", () => {
 		render(<CursadasList />);
 
-		fireEvent.click(screen.getByRole("button", { name: "Inscripciones" }));
+		fireEvent.mouseDown(screen.getByRole("tab", { name: "Inscripciones" }));
 
 		expect(useCursadasMock).toHaveBeenLastCalledWith(
 			expect.objectContaining({ estado_cursada: ["inscripto"] }),
@@ -335,6 +335,6 @@ describe("CursadasList", () => {
 				"estudiante no encontrado",
 			),
 		);
-		expect(screen.getByRole("table")).toBeInTheDocument();
+		expect(screen.getByRole("table", { hidden: true })).toBeInTheDocument();
 	});
 });

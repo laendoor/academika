@@ -124,4 +124,15 @@ describe("Combobox", () => {
 
 		expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
 	});
+
+	it("la lista se renderiza en un portal, fuera del contenedor del input", () => {
+		const { input } = renderCombobox();
+
+		fireEvent.change(input, { target: { value: "lu" } });
+
+		const listbox = screen.getByRole("listbox");
+		const wrapper = input.parentElement as HTMLElement;
+		expect(wrapper.contains(listbox)).toBe(false);
+		expect(document.body.contains(listbox)).toBe(true);
+	});
 });
