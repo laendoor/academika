@@ -14,10 +14,10 @@ donde se aclare.
 | Token     | Hex       | Rol                                   | Contraste |
 | --------- | --------- | ------------------------------------- | --------- |
 | `ink`     | `#020B07` | Texto principal y tinta sobre relleno | 19.93:1   |
-| `surface` | `#F2FDFA` | Tinte de bloque; no es el fondo       | —         |
+| `surface` | `#F2FDFA` | Texto y tinta sobre fondos oscuros    | —         |
 | `brand`   | `#57BC99` | Marca, éxito, relleno de acciones     | 2.32:1    |
-| `soft`    | `#A0B8DA` | Relleno secundario, series de datos   | 2.03:1    |
-| `accent`  | `#4DADE6` | Enlaces, foco, series de datos        | 2.49:1    |
+| `soft`    | `#A0B8DA` | Azul pálido de la paleta, hoy sin uso | 2.03:1    |
+| `accent`  | `#4DADE6` | Foco y enlaces                        | 2.49:1    |
 
 Ninguno de los tres colores de marca sirve como tinta: sobre el blanco dan 2.32,
 2.03 y 2.49:1, muy por debajo de AA. Son rellenos: encima va `ink`, que da 8.60,
@@ -26,21 +26,15 @@ Ninguno de los tres colores de marca sirve como tinta: sobre el blanco dan 2.32,
 
 ### Rampas
 
-Cada familia va de 50 a 950 con el ancla en el 500. Las rampas se generaron en
-OKLCH desde el ancla, con el croma topado en el del 500 para que ningún escalón
-se salga del gamut sRGB.
+Cada familia va de 50 a 950 con el ancla en el 500. `soft` no tiene rampa: es un
+ancla sola, sin uso todavía. Las rampas se generaron en OKLCH desde el ancla, con
+el croma topado en el del 500 para que ningún escalón se salga del gamut sRGB.
 
 **brand**
 
 | 50        | 100       | 200       | 300       | 400       | 500       | 600       | 700       | 800       | 900       | 950       |
 | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
 | `#EDFFF7` | `#D6F6E8` | `#B4E7D2` | `#90D7BB` | `#73CBAA` | `#57BC99` | `#319B79` | `#007759` | `#00634A` | `#004B37` | `#002D20` |
-
-**soft**
-
-| 50        | 100       | 200       | 300       | 400       | 500       | 600       | 700       | 800       | 900       | 950       |
-| --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
-| `#F7FAFF` | `#E8F0FD` | `#D3E1F5` | `#BFD1EB` | `#AFC5E4` | `#A0B8DA` | `#8097B8` | `#637896` | `#51637D` | `#3F4D61` | `#293240` |
 
 **accent**
 
@@ -81,7 +75,8 @@ secundario que se lea va en `sage-700`.
 
 Verde es marca y también éxito: `success` es el `brand-700`, así que no hay dos
 verdes compitiendo. Un badge de estado usa el semántico como texto y el mismo
-color al 10% como fondo, no la escala de Tailwind.
+color al 10% como fondo, no la escala de Tailwind. El tinte cuesta contraste: al
+10% `warning` baja a 4.32:1, así que ese badge usa el 5% (4.61:1).
 
 ## Tipografía
 
@@ -108,8 +103,11 @@ utilidades de Tailwind (`text-sm`, `text-xs`, `text-2xl`), como hasta ahora.
   superficie oscura del contenido, y viven en `Th`, no en cada tabla.
 - Las cards son blancas con borde `sage-200`. Sin sombras nuevas: la elevación
   que hay (modales, dropdowns) se queda como está.
-- Login y sidebar usan `brand` como acento y `ink` como texto; las tablas y
+- El login usa `brand` en el botón principal, con `ink` encima: la sidebar va en
+  `accent` y ninguno de los dos comparte superficie con el otro. Las tablas y
   badges, `sage` para estructura y los semánticos para estado.
+- Los enlaces de texto llevan `accent-700` (5.78:1) y subrayado; sobre `ink`,
+  `sage-300`. No hay un token aparte: link es el rol de `accent`.
 - **Sin dark mode.** La app se ve igual con el sistema en claro o en oscuro. Un
   dark mode real es otro trabajo, con sus propios contrastes.
 
