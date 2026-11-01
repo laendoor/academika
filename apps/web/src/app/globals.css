@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
-:root {
-	--background: #ffffff;
-	--foreground: #171717;
-}
+@theme {
+	--font-sans: var(--font-libre-franklin), ui-sans-serif, system-ui, sans-serif;
+	--font-mono:
+		var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 
-:root {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
-}
+	/* Anclas: fondo, tinta y los tres colores de marca. */
+	--color-surface: #f2fdfa;
+	--color-ink: #020b07;
+	--color-brand: #57bc99;
+	--color-soft: #a0b8da;
+	--color-accent: #4dade6;
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+	/* Semánticos: los únicos colores de estado con nombre propio. */
+	--color-success: #007759;
+	--color-warning: #a16207;
+	--color-danger: #b42318;
+
+	/* brand — marca y éxito. Rampa generada desde #57bc99 en OKLCH. */
+	--color-brand-50: #edfff7;
+	--color-brand-100: #d6f6e8;
+	--color-brand-200: #b4e7d2;
+	--color-brand-300: #90d7bb;
+	--color-brand-400: #73cbaa;
+	--color-brand-500: #57bc99;
+	--color-brand-600: #319b79;
+	--color-brand-700: #007759;
+	--color-brand-800: #00634a;
+	--color-brand-900: #004b37;
+	--color-brand-950: #002d20;
+
+	/* accent — celeste, enlaces y foco. */
+	--color-accent-50: #f5fbff;
+	--color-accent-100: #dbf0ff;
+	--color-accent-200: #b0dfff;
+	--color-accent-300: #89ccf8;
+	--color-accent-400: #6bbef2;
+	--color-accent-500: #4dade6;
+	--color-accent-600: #258cc3;
+	--color-accent-700: #006c9d;
+	--color-accent-800: #00577f;
+	--color-accent-900: #004060;
+	--color-accent-950: #00263a;
+
+	/* sage — neutro derivado del hue del texto, no del brand. */
+	--color-sage-50: #edfaf5;
+	--color-sage-100: #e5f2ec;
+	--color-sage-200: #d1ded9;
+	--color-sage-300: #bbc8c2;
+	--color-sage-400: #9ca8a3;
+	--color-sage-500: #808c87;
+	--color-sage-600: #727c78;
+	--color-sage-700: #5d6763;
+	--color-sage-800: #38433e;
+	--color-sage-900: #212c27;
+	--color-sage-950: #050d0a;
 }
 
 body {
-	background: var(--background);
-	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+	background: #fff;
+	color: var(--color-ink);
 }
