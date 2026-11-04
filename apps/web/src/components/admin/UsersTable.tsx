@@ -47,8 +47,8 @@ function StatusToggle({
 			onClick={onToggle}
 			className={`rounded px-2 py-1 text-xs font-medium disabled:opacity-50 ${
 				isActive
-					? "bg-success/10 text-success hover:bg-success/20"
-					: "bg-sage-100 text-sage-700 hover:bg-sage-200"
+					? "bg-success/10 text-success hover:bg-success/15"
+					: "bg-sage-100 text-sage-800 hover:bg-sage-200"
 			}`}
 		>
 			{isActive ? "Activo" : "Inactivo"}

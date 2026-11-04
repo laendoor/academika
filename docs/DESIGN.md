@@ -55,15 +55,20 @@ semántica para el que lee el código después.
 
 Los escalones de `sage` tienen roles fijos:
 
-| Escalón    | Uso                          | Contraste |
-| ---------- | ---------------------------- | --------- |
-| `sage-200` | Bordes de cards y tablas     | —         |
-| `sage-600` | Íconos y bordes de controles | 4.31:1    |
-| `sage-700` | Texto secundario             | 5.86:1    |
-| `sage-800` | Texto con peso medio         | 10.29:1   |
+| Escalón    | Uso                      | Contraste |
+| ---------- | ------------------------ | --------- |
+| `sage-200` | Bordes de cards y tablas | —         |
+| `sage-600` | Íconos                   | 4.31:1    |
+| `sage-700` | Texto secundario         | 5.86:1    |
+| `sage-800` | Texto con peso medio     | 10.29:1   |
 
-`sage-600` no llega a AA para texto: queda para íconos y bordes. Un texto
-secundario que se lea va en `sage-700`.
+`sage-600` no llega a AA para texto: queda para íconos. Un texto secundario que se
+lea va en `sage-700`.
+
+Los bordes de los controles van en `sage-300` y, en los filtros, en `sage-200`:
+1.73:1 y 1.39:1. Ninguno llega al 3:1 que WCAG 1.4.11 pide cuando el borde es la
+única señal de que hay un campo; si en algún momento se suben, el escalón más
+suave que lo cumple es `sage-500` (3.49:1).
 
 ### Semánticos
 
@@ -107,7 +112,10 @@ utilidades de Tailwind (`text-sm`, `text-xs`, `text-2xl`), como hasta ahora.
   `accent` y ninguno de los dos comparte superficie con el otro. Las tablas y
   badges, `sage` para estructura y los semánticos para estado.
 - Los enlaces de texto llevan `accent-700` (5.78:1) y subrayado; sobre `ink`,
-  `sage-300`. No hay un token aparte: link es el rol de `accent`.
+  `sage-300`. No hay un token aparte: link es el rol de `accent`. Las acciones de
+  fila que se ven como link (abrir un plan, un alumno) van en `sage-800` con
+  subrayado `sage-300`: son botones, no navegación, y en una tabla pesa más el
+  contraste de `sage-800` (10.29:1).
 - **Sin dark mode.** La app se ve igual con el sistema en claro o en oscuro. Un
   dark mode real es otro trabajo, con sus propios contrastes.
 

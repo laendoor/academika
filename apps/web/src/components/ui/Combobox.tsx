@@ -14,7 +14,7 @@ interface ComboboxProps {
 }
 
 const INPUT_CLASS =
-	"rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800";
+	"rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800 placeholder-sage-700";
 
 /**
  * Input con lista de sugerencias: las flechas recorren, Enter elige, Escape cierra.
@@ -31,6 +31,8 @@ export function Combobox({
 	const [open, setOpen] = useState(false);
 	const [active, setActive] = useState(-1);
 	const visible = open && suggestions.length > 0;
+	// `active` puede quedar fuera de rango si la lista encoge mientras responde el fetch.
+	const current = active < suggestions.length ? active : -1;
 
 	function pick(hit: SearchHit) {
 		onChange(hit.term);
@@ -41,18 +43,19 @@ export function Combobox({
 	function onKeyDown(e: KeyboardEvent<HTMLInputElement>) {
 		if (e.key === "Escape") {
 			setOpen(false);
+			setActive(-1);
 			return;
 		}
 		if (!visible) return;
 		if (e.key === "ArrowDown") {
 			e.preventDefault();
-			setActive((i) => (i + 1) % suggestions.length);
+			setActive((current + 1) % suggestions.length);
 		} else if (e.key === "ArrowUp") {
 			e.preventDefault();
-			setActive((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
-		} else if (e.key === "Enter" && active >= 0) {
+			setActive(current <= 0 ? suggestions.length - 1 : current - 1);
+		} else if (e.key === "Enter" && current >= 0) {
 			e.preventDefault();
-			const hit = suggestions[active];
+			const hit = suggestions[current];
 			if (hit) pick(hit);
 		}
 	}
@@ -68,7 +71,7 @@ export function Combobox({
 						aria-controls={listId}
 						aria-autocomplete="list"
 						aria-activedescendant={
-							active >= 0 ? `${listId}-${active}` : undefined
+							current >= 0 ? `${listId}-${current}` : undefined
 						}
 						placeholder={placeholder}
 						value={value}
@@ -115,11 +118,11 @@ export function Combobox({
 							id={`${listId}-${i}`}
 							role="option"
 							tabIndex={-1}
-							aria-selected={i === active}
+							aria-selected={i === current}
 							onMouseDown={(e) => e.preventDefault()}
 							onClick={() => pick(hit)}
 							className={`cursor-pointer px-3 py-1.5 text-sm text-sage-800 ${
-								i === active ? "bg-sage-100" : ""
+								i === current ? "bg-sage-100" : ""
 							}`}
 						>
 							{hit.label}

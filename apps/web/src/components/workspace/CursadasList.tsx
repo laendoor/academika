@@ -22,7 +22,7 @@ import { searchAlumnos, searchMaterias } from "@/lib/api/search";
 
 const PAGE_SIZE = 20;
 const INPUT_CLASS =
-	"rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800";
+	"rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800 placeholder-sage-700";
 
 export function CursadasList() {
 	const [tab, setTab] = useState(0);
