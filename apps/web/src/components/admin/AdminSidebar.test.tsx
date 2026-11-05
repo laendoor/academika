@@ -44,9 +44,9 @@ describe("AdminSidebar", () => {
 		render(<AdminSidebar />);
 
 		const active = screen.getByRole("link", { name: "Estudiantes" });
-		expect(active.className).toContain("bg-zinc-100");
+		expect(active.className).toContain("bg-accent-100");
 		const inactive = screen.getByRole("link", { name: "Materias" });
-		expect(inactive.className).not.toContain("bg-zinc-100");
+		expect(inactive.className).not.toContain("bg-accent-100");
 	});
 
 	it("muestra la versión y el sha (dev en local)", () => {

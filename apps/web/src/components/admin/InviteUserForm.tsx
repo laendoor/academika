@@ -27,7 +27,7 @@ export function InviteUserForm({ roles }: { roles: LookupOption[] }) {
 			<div>
 				<label
 					htmlFor="invite-email"
-					className="block text-sm font-medium text-zinc-700"
+					className="block text-sm font-medium text-sage-800"
 				>
 					Email
 				</label>
@@ -40,14 +40,14 @@ export function InviteUserForm({ roles }: { roles: LookupOption[] }) {
 					onChange={(e) => setEmail(e.target.value)}
 					disabled={pending}
 					placeholder="usuario@unq.edu.ar"
-					className="mt-1 rounded border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 disabled:opacity-50"
+					className="mt-1 rounded border border-sage-300 px-3 py-1.5 text-sm text-sage-800 disabled:opacity-50"
 				/>
 			</div>
 
 			<div>
 				<label
 					htmlFor="invite-role"
-					className="block text-sm font-medium text-zinc-700"
+					className="block text-sm font-medium text-sage-800"
 				>
 					Rol
 				</label>
@@ -58,7 +58,7 @@ export function InviteUserForm({ roles }: { roles: LookupOption[] }) {
 					value={role}
 					onChange={(e) => setRole(e.target.value as UserRole)}
 					disabled={pending}
-					className="mt-1 rounded border border-zinc-300 px-3 py-1.5 text-sm text-zinc-700 disabled:opacity-50"
+					className="mt-1 rounded border border-sage-300 px-3 py-1.5 text-sm text-sage-800 disabled:opacity-50"
 				>
 					<option value="">Seleccioná un rol</option>
 					{roles.map((r) => (
@@ -72,14 +72,14 @@ export function InviteUserForm({ roles }: { roles: LookupOption[] }) {
 			<button
 				type="submit"
 				disabled={pending}
-				className="flex items-center gap-2 rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+				className="flex items-center gap-2 rounded bg-brand px-4 py-1.5 text-sm font-medium text-ink hover:bg-brand-600 disabled:opacity-50"
 			>
 				<UserPlus className="h-4 w-4" />
 				{pending ? "Invitando..." : "Enviar invitación"}
 			</button>
 
-			{error && <p className="w-full text-sm text-red-600">{error}</p>}
-			{success && <p className="w-full text-sm text-green-700">{success}</p>}
+			{error && <p className="w-full text-sm text-danger">{error}</p>}
+			{success && <p className="w-full text-sm text-success">{success}</p>}
 		</form>
 	);
 }

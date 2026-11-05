@@ -17,11 +17,11 @@ export function AdminDashboard() {
 	return (
 		<div className="p-8">
 			<div className="mb-6 flex items-center gap-2">
-				<LayoutList className="h-5 w-5 text-zinc-500" />
-				<h1 className="text-lg font-medium text-zinc-800">Datos Académicos</h1>
+				<LayoutList className="h-5 w-5 text-sage-700" />
+				<h1 className="text-lg font-medium text-sage-800">Datos Académicos</h1>
 			</div>
 			{status === "error" && (
-				<p className="mb-4 text-sm text-red-600">Error al cargar datos.</p>
+				<p className="mb-4 text-sm text-danger">Error al cargar datos.</p>
 			)}
 			<div className="grid grid-cols-2 gap-4">
 				<StatCard
@@ -67,13 +67,13 @@ function StatCard({
 	return (
 		<Link
 			href={href}
-			className="block rounded-lg border border-zinc-200 bg-white p-5 transition-colors hover:bg-zinc-50"
+			className="block rounded-lg border border-sage-200 bg-white p-5 transition-colors hover:bg-sage-50"
 		>
 			<div className="flex items-center gap-3">
-				<div className="rounded-lg bg-zinc-100 p-2 text-zinc-500">
+				<div className="rounded-lg bg-sage-100 p-2 text-sage-700">
 					<Icon className="h-5 w-5" />
 				</div>
-				<p className="text-lg text-zinc-800">
+				<p className="text-lg text-sage-800">
 					<span className="font-semibold">{value ?? "—"}</span> {label}
 				</p>
 			</div>

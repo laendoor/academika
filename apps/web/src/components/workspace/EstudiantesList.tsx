@@ -40,7 +40,7 @@ export function EstudiantesList() {
 
 	return (
 		<div className="p-8">
-			<h2 className="mb-4 text-lg font-medium text-zinc-800">Estudiantes</h2>
+			<h2 className="mb-4 text-lg font-medium text-sage-800">Estudiantes</h2>
 
 			<div className="mb-4 flex gap-4">
 				<select
@@ -49,7 +49,7 @@ export function EstudiantesList() {
 						setCarreraId(e.target.value);
 						setSkip(0);
 					}}
-					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
+					className="rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800"
 				>
 					<option value="">Todas las carreras</option>
 					{carreras.map((c) => (
@@ -65,7 +65,7 @@ export function EstudiantesList() {
 						setEstadoAcademicoId(e.target.value);
 						setSkip(0);
 					}}
-					className="rounded border border-zinc-200 px-3 py-1.5 text-sm text-zinc-700"
+					className="rounded border border-sage-200 px-3 py-1.5 text-sm text-sage-800"
 				>
 					<option value="">Todos los estados</option>
 					{estadosAcademicos.map((e) => (
@@ -77,13 +77,13 @@ export function EstudiantesList() {
 			</div>
 
 			{error && (
-				<div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+				<div className="mb-4 rounded border border-danger/20 bg-danger/10 p-3 text-sm text-danger">
 					{error}
 				</div>
 			)}
 
 			<Table>
-				<thead className="bg-zinc-50">
+				<thead>
 					<tr>
 						<Th>Legajo</Th>
 						<Th>DNI</Th>
@@ -96,14 +96,14 @@ export function EstudiantesList() {
 				<Tbody>
 					{items.map((item) => (
 						<tr key={item.id} className="bg-white">
-							<td className="px-4 py-3 text-zinc-600">{item.legajo ?? "—"}</td>
-							<td className="px-4 py-3 text-zinc-600">{item.dni}</td>
-							<td className="px-4 py-3 text-zinc-800">{item.apellido}</td>
-							<td className="px-4 py-3 text-zinc-800">{item.nombre}</td>
-							<td className="px-4 py-3 text-zinc-600">
+							<td className="px-4 py-3 text-sage-700">{item.legajo ?? "—"}</td>
+							<td className="px-4 py-3 text-sage-700">{item.dni}</td>
+							<td className="px-4 py-3 text-sage-800">{item.apellido}</td>
+							<td className="px-4 py-3 text-sage-800">{item.nombre}</td>
+							<td className="px-4 py-3 text-sage-700">
 								{item.carreras.map((c) => c.carrera_nombre).join(", ")}
 							</td>
-							<td className="px-4 py-3 text-zinc-600">
+							<td className="px-4 py-3 text-sage-700">
 								{item.carreras.map((c) => c.estado_academico).join(", ")}
 							</td>
 						</tr>
@@ -112,7 +112,7 @@ export function EstudiantesList() {
 			</Table>
 
 			{total === 0 && !loading && (
-				<p className="mt-4 text-sm text-zinc-500">Sin estudiantes.</p>
+				<p className="mt-4 text-sm text-sage-700">Sin estudiantes.</p>
 			)}
 
 			<Pagination

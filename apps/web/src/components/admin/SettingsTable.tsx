@@ -33,20 +33,20 @@ function SettingRow({
 	}
 
 	return (
-		<tr className="border-t border-zinc-200">
-			<td className="px-4 py-2 font-mono text-sm text-zinc-900">
+		<tr className="border-t border-sage-200">
+			<td className="px-4 py-2 font-mono text-sm text-sage-900">
 				{setting.key}
 			</td>
-			<td className="px-4 py-2 text-sm text-zinc-500">{setting.description}</td>
+			<td className="px-4 py-2 text-sm text-sage-700">{setting.description}</td>
 			<td className="px-4 py-2">
 				<input
 					value={text}
 					disabled={isUpdating}
 					onChange={(e) => setDraft(e.target.value)}
-					className="w-full rounded border border-zinc-200 bg-white px-2 py-1 font-mono text-sm text-zinc-700 disabled:opacity-50"
+					className="w-full rounded border border-sage-200 bg-white px-2 py-1 font-mono text-sm text-sage-800 disabled:opacity-50"
 				/>
 				{invalidJson && (
-					<p className="mt-1 text-xs text-red-600">JSON inválido</p>
+					<p className="mt-1 text-xs text-danger">JSON inválido</p>
 				)}
 			</td>
 			<td className="px-4 py-2 text-right">
@@ -54,7 +54,7 @@ function SettingRow({
 					type="button"
 					disabled={isUpdating || !dirty}
 					onClick={handleSave}
-					className="rounded px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
+					className="rounded px-2 py-1 text-xs font-medium text-sage-800 hover:bg-sage-100 disabled:opacity-50"
 				>
 					{isUpdating ? "Guardando…" : "Guardar"}
 				</button>
@@ -74,7 +74,7 @@ export function SettingsTable({
 }) {
 	return (
 		<Table>
-			<thead className="bg-zinc-50">
+			<thead>
 				<tr>
 					<Th>Clave</Th>
 					<Th>Descripción</Th>

@@ -26,18 +26,18 @@ export function Pagination({
 				type="button"
 				onClick={() => onChange(Math.max(0, skip - pageSize))}
 				disabled={!hasPrev || loading}
-				className="rounded border border-zinc-200 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+				className="rounded border border-sage-200 px-3 py-1 text-sm text-sage-800 hover:bg-sage-50 disabled:opacity-50"
 			>
 				Anterior
 			</button>
-			<span className="text-sm text-zinc-500">
+			<span className="text-sm text-sage-700">
 				{skip + 1}-{Math.min(skip + pageSize, total)} de {total}
 			</span>
 			<button
 				type="button"
 				onClick={() => onChange(skip + pageSize)}
 				disabled={!hasNext || loading}
-				className="rounded border border-zinc-200 px-3 py-1 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+				className="rounded border border-sage-200 px-3 py-1 text-sm text-sage-800 hover:bg-sage-50 disabled:opacity-50"
 			>
 				Siguiente
 			</button>

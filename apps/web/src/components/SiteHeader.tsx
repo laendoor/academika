@@ -19,8 +19,8 @@ export async function SiteHeader() {
 	}
 
 	return (
-		<header className="flex items-center justify-between border-b border-zinc-200 px-6 py-3">
-			<Link href="/workspace" className="text-sm font-semibold text-zinc-900">
+		<header className="flex items-center justify-between bg-ink px-6 py-3">
+			<Link href="/workspace" className="text-sm font-semibold text-surface">
 				Académika
 			</Link>
 
@@ -28,22 +28,22 @@ export async function SiteHeader() {
 				<nav className="flex items-center gap-6">
 					<Link
 						href="/workspace"
-						className="text-sm text-zinc-600 hover:text-zinc-900"
+						className="text-sm text-sage-300 hover:text-white"
 					>
 						Workspace
 					</Link>
 					{role === ADMIN_ROLE && (
 						<Link
 							href="/admin"
-							className="text-sm text-zinc-600 hover:text-zinc-900"
+							className="text-sm text-sage-300 hover:text-white"
 						>
 							Admin
 						</Link>
 					)}
-					<span className="text-sm text-zinc-400">{email}</span>
+					<span className="text-sm text-sage-400">{email}</span>
 					<a
 						href="/api/auth/signout"
-						className="text-sm text-zinc-500 underline hover:text-zinc-700"
+						className="text-sm text-sage-300 underline hover:text-white"
 					>
 						Salir
 					</a>

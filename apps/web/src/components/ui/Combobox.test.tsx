@@ -91,6 +91,37 @@ describe("Combobox", () => {
 		expect(onChange).toHaveBeenCalledTimes(1);
 	});
 
+	it("descarta el índice activo cuando la lista encoge", () => {
+		const onChange = vi.fn();
+		const props = {
+			label: "Filtrar por alumno",
+			placeholder: "Alumno (DNI o nombre)",
+			value: "",
+			onChange,
+		};
+		const { rerender } = render(<Combobox {...props} suggestions={HITS} />);
+		const input = screen.getByLabelText("Filtrar por alumno");
+
+		fireEvent.change(input, { target: { value: "lu" } });
+		fireEvent.keyDown(input, { key: "ArrowDown" });
+		fireEvent.keyDown(input, { key: "ArrowDown" });
+		expect(screen.getAllByRole("option")[1]).toHaveAttribute(
+			"aria-selected",
+			"true",
+		);
+
+		// El fetch responde con menos hits que el índice que quedó activo.
+		rerender(<Combobox {...props} suggestions={[HITS[0]]} />);
+
+		expect(screen.getByRole("option")).not.toHaveAttribute(
+			"aria-selected",
+			"true",
+		);
+		expect(input).not.toHaveAttribute("aria-activedescendant");
+		fireEvent.keyDown(input, { key: "Enter" });
+		expect(onChange).not.toHaveBeenCalledWith("Núñez Lucía");
+	});
+
 	it("la cruz limpia el filtro", () => {
 		const onChange = vi.fn();
 		render(
@@ -123,5 +154,16 @@ describe("Combobox", () => {
 		fireEvent.change(input, { target: { value: "zzz" } });
 
 		expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+	});
+
+	it("la lista se renderiza en un portal, fuera del contenedor del input", () => {
+		const { input } = renderCombobox();
+
+		fireEvent.change(input, { target: { value: "lu" } });
+
+		const listbox = screen.getByRole("listbox");
+		const wrapper = input.parentElement as HTMLElement;
+		expect(wrapper.contains(listbox)).toBe(false);
+		expect(document.body.contains(listbox)).toBe(true);
 	});
 });

@@ -191,7 +191,7 @@ describe("PlanesList", () => {
 		);
 	});
 
-	it("ignora respuestas viejas ante clicks rápidos", async () => {
+	it("ignora la respuesta del plan anterior si se abre otro antes", async () => {
 		mockList([makePlan("p1"), makePlan("p2")], 2);
 		const resolvers: {
 			p1?: (r: ApiResult<PlanDetail>) => void;
@@ -206,14 +206,22 @@ describe("PlanesList", () => {
 
 		render(<PlanesList />);
 		fireEvent.click(screen.getByRole("button", { name: "Plan p1" }));
+		// El modal tapa la tabla: se cierra antes de abrir el otro plan.
+		fireEvent.click(screen.getByRole("button", { name: "Cerrar detalle" }));
 		fireEvent.click(screen.getByRole("button", { name: "Plan p2" }));
 
 		await waitFor(() => expect(getPlanDetail).toHaveBeenCalledTimes(2));
 		expect(resolvers.p1).toBeDefined();
 		expect(resolvers.p2).toBeDefined();
 		resolvers.p2?.({ ok: true, data: makeDetail("p2") });
-		resolvers.p1?.({ ok: true, data: makeDetail("p1") });
 
+		await waitFor(() =>
+			expect(
+				screen.getByRole("dialog", { name: "Plan p2" }),
+			).toBeInTheDocument(),
+		);
+
+		resolvers.p1?.({ ok: true, data: makeDetail("p1") });
 		await waitFor(() =>
 			expect(
 				screen.getByRole("dialog", { name: "Plan p2" }),

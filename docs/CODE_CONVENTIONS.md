@@ -41,6 +41,9 @@ apps/web/src/components/
   ui/        ← primitivos sin dominio (PageState, ...)
 ```
 
+Colores, tipografía y reglas de contraste: [`docs/DESIGN.md`](DESIGN.md). No se usan
+clases de la paleta `zinc`: el neutro es `sage`.
+
 ### Íconos
 
 Usar `lucide-react` para todos los íconos. No SVG inline. Import tree-shakeable por ícono.
