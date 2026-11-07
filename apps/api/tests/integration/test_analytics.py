@@ -35,3 +35,17 @@ async def test_run_desconocida_404(client: AsyncClient, admin_token: str) -> Non
 async def test_docente_sin_acceso(client: AsyncClient, docente_token: str) -> None:
     assert (await client.get("/api/v1/analytics", headers=_auth(docente_token))).status_code == 403
     assert (await client.get("/api/v1/analytics/smoke", headers=_auth(docente_token))).status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_metrica_parametro_invalido_422(client: AsyncClient, admin_token: str) -> None:
+    response = await client.get("/api/v1/analytics/promedios?ingreso=abc", headers=_auth(admin_token))
+    assert response.status_code == 422
+    assert "ingreso" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_metrica_alumno_inexistente_404(client: AsyncClient, admin_token: str) -> None:
+    response = await client.get("/api/v1/analytics/historia?alu=00000000", headers=_auth(admin_token))
+    assert response.status_code == 404
+    assert "no encontrado" in response.json()["detail"]
