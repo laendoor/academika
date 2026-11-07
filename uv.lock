@@ -146,11 +146,15 @@ name = "analytika"
 version = "0.6.0"
 source = { editable = "packages/analytika" }
 dependencies = [
+    { name = "academika-db" },
     { name = "sqlalchemy", extra = ["asyncio"] },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.1.6" }]
+requires-dist = [
+    { name = "academika-db", editable = "packages/db" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.1.6" },
+]
 
 [[package]]
 name = "annotated-doc"
