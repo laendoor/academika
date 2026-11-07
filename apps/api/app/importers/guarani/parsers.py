@@ -40,12 +40,13 @@ def parse_courses(content: str) -> list[CourseRow]:
 
 def parse_study_plan_courses(content: str) -> list[StudyPlanCourseRow]:
     def _row(row: list[str]) -> StudyPlanCourseRow:
-        degree_code, plan_year_str, _cuatrimestre, nucleo_str, _area, course_code, creditos_str, _nombre = row[:8]
+        degree_code, plan_year_str, _cuatrimestre, nucleo_str, area_str, course_code, creditos_str, _nombre = row[:8]
         return StudyPlanCourseRow(
             degree_code=degree_code.strip(),
             plan_year=int(plan_year_str.strip()),
             course_code=course_code.strip(),
             nucleo=_normalize_nucleo(or_none(nucleo_str)),
+            area=or_none(area_str),
             creditos=_parse_creditos(creditos_str),
         )
 

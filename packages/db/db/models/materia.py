@@ -26,6 +26,7 @@ class Materia(AuditMixin, Base):
     sigla: Mapped[str | None] = mapped_column(String(20), nullable=True)
     creditos: Mapped[int | None] = mapped_column(Integer, nullable=True)
     nucleo: Mapped[str | None] = mapped_column(String(50), ForeignKey("lkp_nucleo_carrera.key"), nullable=True)
+    area: Mapped[str | None] = mapped_column(String(100), nullable=True)
     horas_semanales: Mapped[int | None] = mapped_column(Integer, nullable=True)
     carga_horaria_total: Mapped[int | None] = mapped_column(Integer, nullable=True)
     # Normalizado (sin tildes, minúsculas) para buscar; no sirve para mostrar.
