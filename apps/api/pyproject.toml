@@ -12,7 +12,7 @@ dependencies = [
     "pydantic-settings>=2.7",
     "pyjwt>=2.10",
     "resend>=2.0",
-    "sqlalchemy[asyncio]>=2.1.6",
+    "sqlalchemy[asyncio]>=2.1.8",
     "uuid-utils>=1.2.0",
     "uvicorn[standard]>=0.54.0",
 ]
