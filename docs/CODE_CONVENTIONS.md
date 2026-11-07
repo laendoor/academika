@@ -11,7 +11,7 @@ Para decisiones de stack y arquitectura, ver ADRs en `proyecto-finisterre/decisi
 apps/api/       ← FastAPI deployable (routers, services, config, alembic, seeds)
 apps/web/       ← Next.js deployable
 apps/cli/       ← clika (#94)
-packages/analytika/  ← motor de métricas: contratos + registry (solo sqlalchemy)
+packages/analytika/  ← motor de métricas: contratos, reglas, services de queries y métricas
 packages/db/         ← capa de datos: session factory, Base, modelos
 ```
 
@@ -24,6 +24,27 @@ Boundary dura, en este orden de dependencia (nada importa hacia arriba):
 - `apps/` no importan entre sí — lo compartido baja a `packages/`.
 - El engine de DB se crea lazy (`get_session_factory()`), nunca a import-time:
   importar un módulo no debe requerir driver ni env.
+
+---
+
+## Métricas (analytika)
+
+Una métrica es una subclase de `MetricaBase` con `key`, `name` y
+`run(session, params) -> MetricaResult` (`dict` o `list[dict]`), en `analytika/metricas/` y registrada
+por `register_metricas()` al importar `analytika`. `clika` las lista y ejecuta sin comando nuevo:
+`metrica <key> [clave=valor ...]` contra `DATABASE_URL`.
+
+- Las queries que tocan la DB viven en `analytika/services/` (una clase con la sesión en el
+  constructor, igual que los services de la API); las métricas solo orquestan.
+- Las reglas académicas viven en `analytika/reglas.py`: `clasificar_nota()` (6-10 promocionado, 4-5
+  aprobado, `A` equivalencia, `D` y 1-3 desaprobado, `PA` y sin nota pendiente) y
+  `periodo_cuatrimestral()` (S1 jun-oct; S2 nov-may etiquetado con el año de inicio: las mesas de la
+  UNQ rinden cuatrimestres anteriores, y el export no trae el tipo de mesa).
+- Los helpers de fecha y número (parseo, promedio, porcentaje) viven en `analytika/utils/`; una métrica
+  falla con `MetricaParamError` o `MetricaNotFoundError`, nunca con `ValueError`.
+- Los parámetros llegan como strings: la métrica valida los que necesita y falla con `MetricaParamError`,
+  que `clika` muestra sin tumbar el REPL.
+- Un resultado agrupado devuelve una fila por corte con su N; `None` se renderiza `-`.
 
 ---
 

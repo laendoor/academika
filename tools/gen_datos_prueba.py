@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-gen_datos_prueba.py — Generador de datos sintéticos para tests de anon_guarani.py
-Dev only — no se entrega ni se commitea.
+gen_datos_prueba.py — Generador determinista de los datos sintéticos de datos-prueba/.
+Los CSV se commitean: regenerar con este script es el camino para cambiarlos.
 
-Genera en ../../proyecto-finisterre/datos-prueba/:
+Genera en <repo>/datos-prueba/:
   - datos_personales.csv
-  - alumnos_guarani.csv   (reemplaza el fixture de nacho, que tenía DNIs vacíos)
+  - alumnos_guarani.csv
   - inscripciones.csv
 
-Los planes, requisitos, carreras y materias no se tocan — son datos estructurales.
+Los planes, requisitos, carreras y materias no se tocan — son datos estructurales,
+compartidos con apps/api/sample-data.
 
 Uso: uv run python tools/gen_datos_prueba.py
 """
