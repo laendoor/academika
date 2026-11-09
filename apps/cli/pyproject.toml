@@ -14,7 +14,7 @@ dependencies = [
 dev = [
     "psycopg2-binary>=2.9",
     "pytest>=9.2.0",
-    "pytest-asyncio>=1.4.1",
+    "pytest-asyncio>=1.4.1.post1",
     "pytest-cov>=6.0",
     "testcontainers[postgres]>=4.15.0",
 ]
