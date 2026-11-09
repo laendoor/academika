@@ -30,7 +30,10 @@ def render_result(result: Any) -> str:
     if not rows:
         return ""
     columns = _columns(rows)
-    cells = [[str(row.get(column, "")) for column in columns] for row in rows]
+    cells = [
+        ["" if column not in row else "-" if row[column] is None else str(row[column]) for column in columns]
+        for row in rows
+    ]
     widths = [max(len(column), *(len(row[i]) for row in cells)) for i, column in enumerate(columns)]
     rule = "| " + " | ".join("-" * width for width in widths) + " |"
     return "\n".join([_line(columns, widths), rule, *(_line(row, widths) for row in cells)])

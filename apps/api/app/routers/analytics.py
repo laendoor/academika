@@ -15,7 +15,7 @@ async def list_metrics() -> list[MetricaInfo]:
 
 
 @router.get("/{nombre}")
-async def run_metric(nombre: str, request: Request, session: SessionDep) -> dict:
+async def run_metric(nombre: str, request: Request, session: SessionDep) -> analytika.MetricaResult:
     metrica = analytika.find_metric(nombre)
     if metrica is None:
         raise NotFoundError("metrica", nombre)

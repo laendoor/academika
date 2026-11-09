@@ -140,6 +140,7 @@ class TestParsePlanes:
         assert row.plan_year == 2015
         assert row.course_code == "101"
         assert row.nucleo == "basico"
+        assert row.area == "Programación"
         assert row.creditos == 8
 
     def test_unknown_nucleo_and_empty_creditos_are_none(self) -> None:

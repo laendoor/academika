@@ -413,6 +413,8 @@ class GuaraniImporterService:
         fields: dict[str, object] = {}
         if row.nucleo is not None:
             fields["nucleo"] = row.nucleo
+        if row.area is not None:
+            fields["area"] = row.area
         if row.creditos is not None:
             fields["creditos"] = row.creditos
         if fields:

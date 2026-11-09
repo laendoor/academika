@@ -375,12 +375,15 @@ class TestUpsertPlanes:
         with patch.object(service, "_fetch_carreras", return_value={"TPI": carrera}):
             with patch.object(service, "_fetch_materias", return_value={"101": materia}):
                 with patch.object(service, "_fetch_planes", return_value={(carrera.id, 2015): plan}):
-                    await service._upsert_planes([make_study_plan_course_row(nucleo="basico", creditos=8)])
+                    await service._upsert_planes(
+                        [make_study_plan_course_row(nucleo="basico", area="Programación", creditos=8)]
+                    )
 
         updates = [c[0][0] for c in session.execute.call_args_list if isinstance(c[0][0], Update)]
         assert len(updates) == 1
         params = updates[0].compile().params
         assert params.get("nucleo") == "basico"
+        assert params.get("area") == "Programación"
         assert params.get("creditos") == 8
 
     async def test_skips_materia_update_when_no_data(self):

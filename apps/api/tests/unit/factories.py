@@ -26,10 +26,16 @@ def make_study_plan_course_row(
     plan_year: int = 2015,
     course_code: str = "101",
     nucleo: str | None = None,
+    area: str | None = None,
     creditos: int | None = None,
 ) -> StudyPlanCourseRow:
     return StudyPlanCourseRow(
-        degree_code=degree_code, plan_year=plan_year, course_code=course_code, nucleo=nucleo, creditos=creditos
+        degree_code=degree_code,
+        plan_year=plan_year,
+        course_code=course_code,
+        nucleo=nucleo,
+        area=area,
+        creditos=creditos,
     )
 
 

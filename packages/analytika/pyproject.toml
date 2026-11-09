@@ -3,8 +3,12 @@ name = "analytika"
 version = "0.6.0"
 requires-python = ">=3.13"
 dependencies = [
+    "academika-db",
     "sqlalchemy[asyncio]>=2.1.6",
 ]
+
+[tool.uv.sources]
+academika-db = { workspace = true }
 
 [tool.setuptools.packages.find]
 include = ["analytika*"]

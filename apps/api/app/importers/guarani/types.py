@@ -21,6 +21,7 @@ class StudyPlanCourseRow:
     plan_year: int
     course_code: str
     nucleo: str | None
+    area: str | None
     creditos: int | None
 
 

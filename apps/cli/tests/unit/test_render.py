@@ -17,6 +17,11 @@ def test_escalar_a_texto():
     assert render_result(42) == "42"
 
 
+def test_nulo_se_muestra_como_guion():
+    output = render_result([{"general": 7.24, "reciente": None}])
+    assert output.splitlines()[2] == "| 7.24    | -        |"
+
+
 def test_lista_de_escalares_a_tabla_de_una_columna():
     output = render_result([1, "dos"])
     assert output.splitlines()[0] == "| valor |"

@@ -102,10 +102,12 @@ async def test_importar_planes_actualiza_materia(db_session: AsyncSession) -> No
     assert upserted == 2
     materia = (await db_session.execute(select(Materia).where(Materia.codigo == "80005"))).scalars().one()
     assert materia.nucleo == "basico"
+    assert materia.area == "Programación"
     assert materia.creditos == 8
-    # código de núcleo desconocido ("A" en exports reales) → warn + null, pero los créditos se guardan
+    # código de núcleo desconocido ("A" en exports reales) → warn + null, pero área y créditos se guardan
     materia_a = (await db_session.execute(select(Materia).where(Materia.codigo == "80010"))).scalars().one()
     assert materia_a.nucleo is None
+    assert materia_a.area == "Matemática"
     assert materia_a.creditos == 6
 
 

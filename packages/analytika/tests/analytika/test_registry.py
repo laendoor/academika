@@ -18,6 +18,10 @@ def test_smoke_registrada_al_importar():
     assert "smoke" in [m.key for m in list_metrics()]
 
 
+def test_metricas_base_registradas():
+    assert {"historia", "promedios", "avance"} <= {m.key for m in list_metrics()}
+
+
 def test_register_duplicada_falla(registry_snapshot):
     with pytest.raises(ValueError, match="smoke"):
         register(SmokeMetrica())
