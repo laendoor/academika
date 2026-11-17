@@ -25,7 +25,7 @@ export const PUT = route.apiHandler(async (req: NextRequest, ctx) => {
 		const json = await res.json().catch(() => ({}));
 		const message =
 			(json as { detail?: string }).detail ?? route.UNEXPECTED_ERROR;
-		throw new route.RouteError(message, res.status >= 500 ? 500 : res.status);
+		throw new route.RouteError(message, Math.min(res.status, 500));
 	}
 
 	return NextResponse.json(await res.json());
@@ -45,7 +45,7 @@ export const DELETE = route.apiHandler(async (req: NextRequest, ctx) => {
 		const json = (await res.json().catch(() => ({}))) as { detail?: string };
 		const message =
 			typeof json.detail === "string" ? json.detail : route.UNEXPECTED_ERROR;
-		throw new route.RouteError(message, res.status >= 500 ? 500 : res.status);
+		throw new route.RouteError(message, Math.min(res.status, 500));
 	}
 
 	return route.ok();

@@ -23,7 +23,7 @@ export const POST = apiHandler(async (req: NextRequest) => {
 	if (!res.ok) {
 		const json = await res.json().catch(() => ({}));
 		const message = (json as { detail?: string }).detail ?? UNEXPECTED_ERROR;
-		throw new RouteError(message, res.status >= 500 ? 500 : res.status);
+		throw new RouteError(message, Math.min(res.status, 500));
 	}
 
 	return NextResponse.json(await res.json());
